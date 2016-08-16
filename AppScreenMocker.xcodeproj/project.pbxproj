@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		18576F811D619DF900837ED2 /* UIUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18576F801D619DF900837ED2 /* UIUtils.swift */; };
 		187E30C81D61A71300F27B9D /* SignalStrengthIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 187E30C71D61A71300F27B9D /* SignalStrengthIndicator.swift */; };
+		187E30CA1D61C05000F27B9D /* TopLayoutGuide.swift in Sources */ = {isa = PBXBuildFile; fileRef = 187E30C91D61C05000F27B9D /* TopLayoutGuide.swift */; };
 		18AE3CD91D5DB4D300E651C6 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18AE3CD81D5DB4D300E651C6 /* AppDelegate.swift */; };
 		18AE3CE31D5DB4D300E651C6 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 18AE3CE11D5DB4D300E651C6 /* LaunchScreen.storyboard */; };
 		18AE3CEB1D5DBA8700E651C6 /* AppNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18AE3CEA1D5DBA8700E651C6 /* AppNavigationController.swift */; };
@@ -35,6 +36,7 @@
 /* Begin PBXFileReference section */
 		18576F801D619DF900837ED2 /* UIUtils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIUtils.swift; sourceTree = "<group>"; };
 		187E30C71D61A71300F27B9D /* SignalStrengthIndicator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SignalStrengthIndicator.swift; sourceTree = "<group>"; };
+		187E30C91D61C05000F27B9D /* TopLayoutGuide.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TopLayoutGuide.swift; sourceTree = "<group>"; };
 		18AE3CD51D5DB4D300E651C6 /* AppScreenMocker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AppScreenMocker.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		18AE3CD81D5DB4D300E651C6 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		18AE3CDF1D5DB4D300E651C6 /* AppAssets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = AppAssets.xcassets; sourceTree = "<group>"; };
@@ -73,6 +75,7 @@
 			isa = PBXGroup;
 			children = (
 				187E30C71D61A71300F27B9D /* SignalStrengthIndicator.swift */,
+				187E30C91D61C05000F27B9D /* TopLayoutGuide.swift */,
 			);
 			name = Views;
 			sourceTree = "<group>";
@@ -266,6 +269,7 @@
 				18B532431D6167D80004BFE1 /* WechatMomentsController.swift in Sources */,
 				18576F811D619DF900837ED2 /* UIUtils.swift in Sources */,
 				18AE3CEB1D5DBA8700E651C6 /* AppNavigationController.swift in Sources */,
+				187E30CA1D61C05000F27B9D /* TopLayoutGuide.swift in Sources */,
 				18AE3CD91D5DB4D300E651C6 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
