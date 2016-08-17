@@ -41,15 +41,15 @@ class WechatMomentsController: UIViewController {
         mockRootView.addSubview(coverImage)
         coverImage.addSingleTapGesture(self, action: #selector(WechatMomentsController.requestImagePicker(_:)))
         
-        mockRootView.addSubview(navigationBarView2)
         mockRootView.addSubview(avatarImageBg)
         avatarImageBg.addSubview(avatarImage)
-        
-        avatarImage.userInteractionEnabled = true
         avatarImage.addSingleTapGesture(self, action: #selector(WechatMomentsController.requestImagePicker(_:)))
 
         mockRootView.addSubview(usernameLabel)
 
+        mockRootView.addSubview(momentView)
+        mockRootView.addSubview(momentView2)
+        mockRootView.addSubview(momentView3)
         view.setNeedsUpdateConstraints()
     }
     
@@ -60,6 +60,7 @@ class WechatMomentsController: UIViewController {
 
     let mockRootView: UIView = {
         let view = UIView()
+        view.clipsToBounds = true
         return view;
     }()
     
@@ -77,7 +78,7 @@ class WechatMomentsController: UIViewController {
     
     let coverImage: UIImageView = {
         let imageView = UIImageView()
-        imageView.backgroundColor = MaterialColor.brown.lighten2
+        imageView.backgroundColor = MaterialColor.black
         imageView.contentMode = .ScaleAspectFill
         return imageView
     }()
@@ -117,12 +118,21 @@ class WechatMomentsController: UIViewController {
         return label
     }()
     
-    let navigationBarView2: UIView = {
-        let view = WechatNavigationBarView()
-        view.backgroundColor = UIUtils.UIColorFromARGB(0xf0222222)
+    let momentView: MomentView = {
+        let view = MomentView()
         return view
     }()
     
+    let momentView2: MomentView = {
+        let view = MomentView()
+        return view
+    }()
+ 
+    let momentView3: MomentView = {
+        let view = MomentView()
+        return view
+    }()
+
     override func updateViewConstraints() {
         
         if (!didSetupConstraints) {
@@ -133,7 +143,7 @@ class WechatMomentsController: UIViewController {
             
             mockRootView.snp_makeConstraints { make in
                 make.edges.equalTo(scrollView).inset(UIEdgeInsetsZero)
-                make.width.equalTo(scrollView)
+                make.width.equalTo(375)
                 make.height.equalTo(667)
             }
             
@@ -176,11 +186,22 @@ class WechatMomentsController: UIViewController {
                 make.right.equalTo(avatarImageBg.snp_left).inset(-22)
             }
             
-            navigationBarView2.snp_makeConstraints { make in
-                make.top.equalTo(coverImage.snp_bottom)
+            momentView.snp_makeConstraints { make in
+                make.top.equalTo(avatarImageBg.snp_bottom).offset(32)
                 make.leading.equalTo(mockRootView)
                 make.trailing.equalTo(mockRootView)
-                make.bottom.equalTo(mockRootView)
+            }
+            
+            momentView2.snp_makeConstraints { make in
+                make.top.equalTo(momentView.snp_bottom)
+                make.leading.equalTo(mockRootView)
+                make.trailing.equalTo(mockRootView)
+            }
+            
+            momentView3.snp_makeConstraints { make in
+                make.top.equalTo(momentView2.snp_bottom)
+                make.leading.equalTo(mockRootView)
+                make.trailing.equalTo(mockRootView)
             }
             
             didSetupConstraints = true

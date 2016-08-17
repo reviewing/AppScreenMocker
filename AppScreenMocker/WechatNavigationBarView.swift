@@ -57,8 +57,6 @@ class WechatNavigationBarView: UIView {
     }
     
     override func updateConstraints() {
-        super.updateConstraints()
-        
         navigationBackIcon.snp_makeConstraints { make in
             make.centerY.equalTo(self)
             make.left.equalTo(self).offset(10)
@@ -77,5 +75,7 @@ class WechatNavigationBarView: UIView {
             make.centerY.equalTo(self)
             make.right.equalTo(self).inset(10)
         }
+        
+        super.updateConstraints()
     }
 }

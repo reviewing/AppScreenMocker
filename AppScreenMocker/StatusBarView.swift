@@ -102,8 +102,6 @@ class StatusBarView: UIView {
     }
     
     override func updateConstraints() {
-        super.updateConstraints()
-        
         timeLabelInStatusBar.snp_makeConstraints { make in
             make.center.equalTo(self)
         }
@@ -157,5 +155,7 @@ class StatusBarView: UIView {
             make.centerY.equalTo(self)
             make.right.equalTo(alarmImage.snp_left).offset(-6)
         }
+        
+        super.updateConstraints()
     }
 }
