@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import QuartzCore
 
 class UIUtils {
     static func UIColorFromARGB(argbValue: UInt) -> UIColor {
@@ -16,5 +17,13 @@ class UIUtils {
             blue: CGFloat(argbValue & 0x0000FF) / 255.0,
             alpha: CGFloat((argbValue & 0xFF000000) >> 24) / 255.0
         )
+    }
+    
+    static func imageWithView(view: UIView) -> UIImage {
+        UIGraphicsBeginImageContextWithOptions(view.bounds.size, view.opaque, 0.0);
+        view.layer.renderInContext(UIGraphicsGetCurrentContext()!)
+        let image: UIImage = UIGraphicsGetImageFromCurrentImageContext();
+        UIGraphicsEndImageContext();
+        return image;
     }
 }

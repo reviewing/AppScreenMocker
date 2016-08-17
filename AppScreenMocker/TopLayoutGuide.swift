@@ -84,7 +84,40 @@ class TopLayoutGuide: UIView {
         return view
     }()
     
-    override init (frame: CGRect) {
+    let navigationBarView: UIView = {
+        let view = UIView()
+        return view
+    }()
+    
+    let navigationBackIcon: UIImageView = {
+        let view = UIImageView()
+        view.image = UIImage(named: "NavigationBack")
+        return view
+    }()
+    
+    let navigationBackItem: UILabel = {
+        let label = UILabel()
+        label.textColor = .whiteColor()
+        label.font = UIFont.systemFontOfSize(16)
+        label.text = NSLocalizedString("发现", comment: "")
+        return label
+    }()
+    
+    let navigationTitleLabel: UILabel = {
+        let label = UILabel()
+        label.textColor = .whiteColor()
+        label.font = UIFont.boldSystemFontOfSize(18.5)
+        label.text = NSLocalizedString("朋友圈", comment: "")
+        return label
+    }()
+    
+    let navigationRightItem: UIImageView = {
+        let imageView = UIImageView()
+        imageView.image = UIImage(named: "NavigationCamera")
+        return imageView
+    }()
+    
+    override init(frame: CGRect) {
         super.init(frame: frame)
         self.addSubview(statusBarView)
         statusBarView.addSubview(timeLabelInStatusBar)
@@ -97,9 +130,15 @@ class TopLayoutGuide: UIView {
         statusBarView.addSubview(bluetoothImage)
         statusBarView.addSubview(batteryLabel)
         statusBarView.addSubview(batteryImage)
+        
+        self.addSubview(navigationBarView)
+        navigationBarView.addSubview(navigationBackIcon)
+        navigationBarView.addSubview(navigationBackItem)
+        navigationBarView.addSubview(navigationTitleLabel)
+        navigationBarView.addSubview(navigationRightItem)
     }
     
-    convenience init () {
+    convenience init() {
         self.init(frame:CGRect.zero)
     }
     
@@ -169,6 +208,32 @@ class TopLayoutGuide: UIView {
         portraitImage.snp_makeConstraints { make in
             make.centerY.equalTo(statusBarView)
             make.right.equalTo(alarmImage.snp_left).offset(-6)
+        }
+        
+        navigationBarView.snp_makeConstraints { make in
+            make.top.equalTo(statusBarView.snp_bottom)
+            make.left.equalTo(self)
+            make.right.equalTo(self)
+            make.height.equalTo(44)
+        }
+        
+        navigationBackIcon.snp_makeConstraints { make in
+            make.centerY.equalTo(navigationBarView)
+            make.left.equalTo(navigationBarView).offset(10)
+        }
+        
+        navigationBackItem.snp_makeConstraints { make in
+            make.centerY.equalTo(navigationBarView)
+            make.left.equalTo(navigationBackIcon.snp_right)
+        }
+        
+        navigationTitleLabel.snp_makeConstraints { make in
+            make.center.equalTo(navigationBarView)
+        }
+        
+        navigationRightItem.snp_makeConstraints { make in
+            make.centerY.equalTo(navigationBarView)
+            make.right.equalTo(navigationBarView).inset(10)
         }
     }
 }

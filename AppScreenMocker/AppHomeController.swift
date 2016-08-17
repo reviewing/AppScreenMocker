@@ -65,7 +65,7 @@ class AppHomeController: UIViewController {
     
     /// Prepares the navigationItem.
     private func prepareNavigationItem() {
-        navigationItem.title = "截图构造"
+        navigationItem.title = "截屏构造"
         navigationItem.titleLabel.textAlignment = .Left
         navigationItem.titleLabel.textColor = MaterialColor.white
         navigationItem.titleLabel.font = RobotoFont.mediumWithSize(20)
