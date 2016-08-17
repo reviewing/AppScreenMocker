@@ -36,11 +36,12 @@ class WechatMomentsController: UIViewController {
         view.backgroundColor = MaterialColor.white
         view.addSubview(scrollView)
         scrollView.addSubview(mockRootView)
-        mockRootView.addSubview(topLayoutGuideView)
+        mockRootView.addSubview(statusBarView)
+        mockRootView.addSubview(navigationBarView)
         mockRootView.addSubview(coverImage)
         coverImage.addSingleTapGesture(self, action: #selector(WechatMomentsController.requestImagePicker(_:)))
         
-        mockRootView.addSubview(topLayoutGuideView2)
+        mockRootView.addSubview(navigationBarView2)
         mockRootView.addSubview(avatarImageBg)
         avatarImageBg.addSubview(avatarImage)
         
@@ -62,8 +63,14 @@ class WechatMomentsController: UIViewController {
         return view;
     }()
     
-    let topLayoutGuideView: UIView = {
-        let view = TopLayoutGuide()
+    let statusBarView: StatusBarView = {
+        let view = StatusBarView()
+        view.backgroundColor = UIUtils.UIColorFromARGB(0xf0222222)
+        return view
+    }()
+    
+    let navigationBarView: UIView = {
+        let view = WechatNavigationBarView()
         view.backgroundColor = UIUtils.UIColorFromARGB(0xf0222222)
         return view
     }()
@@ -110,8 +117,8 @@ class WechatMomentsController: UIViewController {
         return label
     }()
     
-    let topLayoutGuideView2: UIView = {
-        let view = TopLayoutGuide()
+    let navigationBarView2: UIView = {
+        let view = WechatNavigationBarView()
         view.backgroundColor = UIUtils.UIColorFromARGB(0xf0222222)
         return view
     }()
@@ -130,15 +137,22 @@ class WechatMomentsController: UIViewController {
                 make.height.equalTo(667)
             }
             
-            topLayoutGuideView.snp_makeConstraints { make in
+            statusBarView.snp_makeConstraints { make in
                 make.top.equalTo(mockRootView)
                 make.leading.equalTo(mockRootView)
                 make.trailing.equalTo(mockRootView)
-                make.height.equalTo(64)
+                make.height.equalTo(20)
+            }
+            
+            navigationBarView.snp_makeConstraints { make in
+                make.top.equalTo(statusBarView.snp_bottom)
+                make.leading.equalTo(mockRootView)
+                make.trailing.equalTo(mockRootView)
+                make.height.equalTo(44)
             }
             
             coverImage.snp_makeConstraints { make in
-                make.top.equalTo(topLayoutGuideView.snp_bottom)
+                make.top.equalTo(navigationBarView.snp_bottom)
                 make.leading.equalTo(mockRootView)
                 make.trailing.equalTo(mockRootView)
                 make.height.equalTo(255)
@@ -162,7 +176,7 @@ class WechatMomentsController: UIViewController {
                 make.right.equalTo(avatarImageBg.snp_left).inset(-22)
             }
             
-            topLayoutGuideView2.snp_makeConstraints { make in
+            navigationBarView2.snp_makeConstraints { make in
                 make.top.equalTo(coverImage.snp_bottom)
                 make.leading.equalTo(mockRootView)
                 make.trailing.equalTo(mockRootView)
