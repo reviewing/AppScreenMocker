@@ -11,9 +11,10 @@ import Material
 import SnapKit
 
 class MomentView: UIView {
-    
+        
     let hostAvatar: UIImageView = {
         let imageView = UIImageView()
+        imageView.tag = ViewID.HostAvatar.rawValue
         imageView.backgroundColor = MaterialColor.black
         imageView.contentMode = .ScaleAspectFill
         return imageView
@@ -21,17 +22,19 @@ class MomentView: UIView {
     
     let hostName: UILabel = {
         let label = UILabel()
+        label.tag = ViewID.HostName.rawValue
         label.textColor = UIUtils.UIColorFromARGB(0xff465783)
         label.font = UIFont.boldSystemFontOfSize(15.5)
-        label.text = NSLocalizedString("段弘", comment: "")
+        label.text = NSLocalizedString("用户名", comment: "")
         return label
     }()
     
     let textLabel: UILabel = {
         let label = UILabel()
+        label.tag = ViewID.TextLabel.rawValue
         label.textColor = UIUtils.UIColorFromARGB(0xff222222)
         label.font = UIFont.systemFontOfSize(15.5)
-        label.text = NSLocalizedString("你好呀世界，今天我要回家了，希望一路顺利吧！祝大家健康幸福。", comment: "")
+        label.text = NSLocalizedString("朋友圈消息文本内容", comment: "")
         label.lineBreakMode = .ByWordWrapping
         label.numberOfLines = 0
         return label
@@ -39,9 +42,10 @@ class MomentView: UIView {
     
     let locationLabel: UILabel = {
         let label = UILabel()
+        label.tag = ViewID.LocationLabel.rawValue
         label.textColor = UIUtils.UIColorFromARGB(0xff5b6a92)
         label.font = UIFont.systemFontOfSize(12)
-        label.text = NSLocalizedString("广安・武胜县国税局", comment: "")
+        label.text = NSLocalizedString("成都・地点名称", comment: "")
         label.lineBreakMode = .ByWordWrapping
         label.numberOfLines = 0
         return label
@@ -49,6 +53,7 @@ class MomentView: UIView {
     
     let timeLabel: UILabel = {
         let label = UILabel()
+        label.tag = ViewID.TimeLabel.rawValue
         label.textColor = .grayColor()
         label.font = UIFont.systemFontOfSize(12)
         label.text = NSLocalizedString("1分钟前", comment: "")
@@ -57,14 +62,16 @@ class MomentView: UIView {
     
     let sourceLabel: UILabel = {
         let label = UILabel()
+        label.tag = ViewID.SourceLabel.rawValue
         label.textColor = .grayColor()
         label.font = UIFont.systemFontOfSize(12)
-        label.text = NSLocalizedString("弘哥保护你", comment: "")
+        label.text = NSLocalizedString("发布来源", comment: "")
         return label
     }()
     
     let actionButton: UIImageView = {
         let imageView = UIImageView()
+        imageView.tag = ViewID.MomentAction.rawValue
         imageView.image = UIImage.init(named: "WechatMomentsAction")
         return imageView
     }()
@@ -87,7 +94,7 @@ class MomentView: UIView {
     required init(coder aDecoder: NSCoder) {
         fatalError("This class does not support NSCoding")
     }
-    
+        
     override func updateConstraints() {
         hostAvatar.snp_makeConstraints { make in
             make.left.equalTo(self).offset(10)

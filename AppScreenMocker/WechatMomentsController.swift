@@ -39,17 +39,17 @@ class WechatMomentsController: UIViewController {
         mockRootView.addSubview(statusBarView)
         mockRootView.addSubview(navigationBarView)
         mockRootView.addSubview(coverImage)
-        coverImage.addSingleTapGesture(self, action: #selector(WechatMomentsController.requestImagePicker(_:)))
         
         mockRootView.addSubview(avatarImageBg)
         avatarImageBg.addSubview(avatarImage)
-        avatarImage.addSingleTapGesture(self, action: #selector(WechatMomentsController.requestImagePicker(_:)))
 
         mockRootView.addSubview(usernameLabel)
 
         mockRootView.addSubview(momentView)
         mockRootView.addSubview(momentView2)
         mockRootView.addSubview(momentView3)
+
+        view.addSingleTapGesture(self, action: #selector(WechatMomentsController.requestEdit(_:)), recursively: true)
         view.setNeedsUpdateConstraints()
     }
     
@@ -78,20 +78,41 @@ class WechatMomentsController: UIViewController {
     
     let coverImage: UIImageView = {
         let imageView = UIImageView()
+        imageView.tag = ViewID.CoverImage.rawValue
         imageView.backgroundColor = MaterialColor.black
         imageView.contentMode = .ScaleAspectFill
         return imageView
     }()
     
-    func requestImagePicker(recognizer: UITapGestureRecognizer) {
-        currentImageView = recognizer.view as? UIImageView
-        
-        let imagePicker = UIImagePickerController()
-        imagePicker.delegate = self
-        imagePicker.sourceType = UIImagePickerControllerSourceType.SavedPhotosAlbum;
-        imagePicker.allowsEditing = false
-        
-        self.presentViewController(imagePicker, animated: true, completion: nil)
+    func requestEdit(recognizer: UITapGestureRecognizer) {
+        switch recognizer.view {
+        case let view where view is UIImageView && ViewID(rawValue: view!.tag)?.actionHint == 1:
+            currentImageView = recognizer.view as? UIImageView
+            
+            let imagePicker = UIImagePickerController()
+            imagePicker.delegate = self
+            imagePicker.sourceType = UIImagePickerControllerSourceType.SavedPhotosAlbum;
+            imagePicker.allowsEditing = false
+            
+            self.presentViewController(imagePicker, animated: true, completion: nil)
+        case let view where view is UILabel && view!.tag != 0:
+            let alert = UIAlertController(title: "编辑文字", message: ViewID(rawValue: view!.tag)?.description, preferredStyle: .Alert)
+            
+            alert.addTextFieldWithConfigurationHandler({ (textField) -> Void in
+                textField.placeholder = "请输入文字"
+            })
+            
+            alert.addAction(UIAlertAction(title: "确认", style: .Default, handler: { (action) -> Void in
+                let textField = alert.textFields![0] as UITextField
+                if !(textField.text?.isEmpty ?? true) {
+                    (view as! UILabel).text = textField.text
+                }
+            }))
+            
+            self.presentViewController(alert, animated: true, completion: nil)
+        default:
+            break
+        }
     }
     
     let avatarImageBg: UIView = {
@@ -104,15 +125,17 @@ class WechatMomentsController: UIViewController {
     
     let avatarImage: UIImageView = {
         let imageView = UIImageView()
+        imageView.tag = ViewID.AvatarImage.rawValue
         imageView.backgroundColor = MaterialColor.black
         return imageView
     }()
     
     let usernameLabel: UILabel = {
         let label = UILabel()
+        label.tag = ViewID.SelfNameLabel.rawValue
         label.textColor = UIUtils.UIColorFromARGB(0xfffffdf1)
         label.font = UIFont.boldSystemFontOfSize(18)
-        label.text = NSLocalizedString("段弘", comment: "")
+        label.text = NSLocalizedString("用户名", comment: "")
         label.shadowColor = MaterialColor.black;
         label.shadowOffset = CGSizeMake(0, 1);
         return label
