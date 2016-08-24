@@ -16,11 +16,21 @@ class WechatMomentsController: UIViewController {
     var didSetupConstraints = false
     
     var currentImageView: UIImageView?
-    
+    private var switchControl: MaterialSwitch!
+
     override func viewDidLoad() {
         super.viewDidLoad()
+        prepareSwitchControl()
         prepareNavigationItem()
         prepareView()
+    }
+    
+    private func prepareSwitchControl() {
+        switchControl = MaterialSwitch(state: .Off, style: .LightContent, size: .Small)
+        switchControl.buttonOnColor = MaterialColor.green.darken2
+        switchControl.trackOnColor = MaterialColor.green.lighten3
+        switchControl.buttonOffColor = MaterialColor.green.lighten4
+        switchControl.trackOffColor = MaterialColor.green.lighten3
     }
     
     private func prepareNavigationItem() {
@@ -30,6 +40,7 @@ class WechatMomentsController: UIViewController {
         navigationItem.titleLabel.font = RobotoFont.mediumWithSize(20)
         
         self.navigationItem.backBarButtonItem = nil
+        navigationItem.rightControls = [switchControl]
     }
     
     private func prepareView() {
@@ -240,5 +251,6 @@ extension WechatMomentsController: UIImagePickerControllerDelegate, UINavigation
             
         })
         currentImageView?.image = info[UIImagePickerControllerOriginalImage] as? UIImage
+        momentView.updateConstraints()
     }
 }

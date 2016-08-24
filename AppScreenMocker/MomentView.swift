@@ -40,6 +40,15 @@ class MomentView: UIView {
         return label
     }()
     
+    let singlePhoto: UIImageView = {
+        let imageView = UIImageView()
+        imageView.tag = ViewID.MomentPhoto.rawValue
+        imageView.contentMode = .ScaleAspectFit
+        imageView.clipsToBounds = true
+        imageView.backgroundColor = MaterialColor.black
+        return imageView
+    }()
+    
     let locationLabel: UILabel = {
         let label = UILabel()
         label.tag = ViewID.LocationLabel.rawValue
@@ -76,15 +85,23 @@ class MomentView: UIView {
         return imageView
     }()
     
+    let separator: UIView = {
+        let view = UIView()
+        view.backgroundColor = UIUtils.UIColorFromARGB(0xffe7e7e6)
+        return view
+    }()
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         self.addSubview(hostAvatar)
         self.addSubview(hostName)
         self.addSubview(textLabel)
+        self.addSubview(singlePhoto)
         self.addSubview(locationLabel)
         self.addSubview(timeLabel)
         self.addSubview(sourceLabel)
         self.addSubview(actionButton)
+        self.addSubview(separator)
     }
     
     convenience init() {
@@ -97,7 +114,7 @@ class MomentView: UIView {
         
     override func updateConstraints() {
         hostAvatar.snp_makeConstraints { make in
-            make.left.equalTo(self).offset(10)
+            make.leading.equalTo(self).offset(10)
             make.top.equalTo(self).offset(14)
             make.width.height.equalTo(40)
         }
@@ -114,9 +131,22 @@ class MomentView: UIView {
             make.trailing.equalTo(self.snp_trailing).inset(10).priorityHigh()
         }
         
-        locationLabel.snp_makeConstraints { make in
+        singlePhoto.snp_makeConstraints { make in
             make.leading.equalTo(hostName)
             make.top.equalTo(textLabel.snp_bottom).offset(6)
+            make.width.greaterThanOrEqualTo(120).priorityHigh()
+            make.width.lessThanOrEqualTo(self.superview!).multipliedBy(0.48).priorityHigh()
+            make.height.greaterThanOrEqualTo(80).priorityHigh()
+            make.height.lessThanOrEqualTo(self.superview!).multipliedBy(0.27).priorityHigh()
+            let instinctSize = singlePhoto.intrinsicContentSize();
+            if instinctSize.height > 0 && instinctSize.width > 0 {
+                make.width.equalTo(singlePhoto.snp_height).multipliedBy(CGFloat(instinctSize.width) / instinctSize.height)
+            }
+        }
+        
+        locationLabel.snp_makeConstraints { make in
+            make.leading.equalTo(hostName)
+            make.top.equalTo(singlePhoto.snp_bottom).offset(6)
             make.trailing.equalTo(self.snp_trailing).inset(10).priorityHigh()
         }
         
@@ -134,6 +164,12 @@ class MomentView: UIView {
         actionButton.snp_makeConstraints { make in
             make.centerY.equalTo(timeLabel)
             make.trailing.equalTo(self.snp_trailing).inset(10).priorityHigh()
+        }
+        
+        separator.snp_makeConstraints { make in
+            make.width.equalTo(self)
+            make.height.equalTo(1)
+            make.bottom.equalTo(self)
         }
         
         super.updateConstraints()
