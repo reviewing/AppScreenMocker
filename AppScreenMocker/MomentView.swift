@@ -17,6 +17,7 @@ class MomentView: UIView {
         imageView.tag = ViewID.HostAvatar.rawValue
         imageView.backgroundColor = MaterialColor.black
         imageView.contentMode = .ScaleAspectFill
+        imageView.clipsToBounds = true
         return imageView
     }()
     
@@ -47,6 +48,11 @@ class MomentView: UIView {
         imageView.clipsToBounds = true
         imageView.backgroundColor = MaterialColor.black
         return imageView
+    }()
+    
+    let multiplePhotos: UIView = {
+        let photoGridView = UIView()
+        return photoGridView
     }()
     
     let locationLabel: UILabel = {
@@ -131,23 +137,39 @@ class MomentView: UIView {
             make.trailing.equalTo(self.snp_trailing).inset(10).priorityHigh()
         }
         
-        singlePhoto.snp_makeConstraints { make in
-            make.leading.equalTo(hostName)
-            make.top.equalTo(textLabel.snp_bottom).offset(6)
-            make.width.greaterThanOrEqualTo(120).priorityHigh()
-            make.width.lessThanOrEqualTo(self.superview!).multipliedBy(0.48).priorityHigh()
-            make.height.greaterThanOrEqualTo(80).priorityHigh()
-            make.height.lessThanOrEqualTo(self.superview!).multipliedBy(0.27).priorityHigh()
-            let instinctSize = singlePhoto.intrinsicContentSize();
-            if instinctSize.height > 0 && instinctSize.width > 0 {
-                make.width.equalTo(singlePhoto.snp_height).multipliedBy(CGFloat(instinctSize.width) / instinctSize.height)
+        if !singlePhoto.hidden {
+            singlePhoto.snp_removeConstraints()
+            singlePhoto.snp_makeConstraints { make in
+                make.leading.equalTo(hostName)
+                make.top.equalTo(textLabel.snp_bottom).offset(6)
+                make.width.greaterThanOrEqualTo(120).priorityHigh()
+                make.width.lessThanOrEqualTo(self.superview!).multipliedBy(0.48)
+                make.height.greaterThanOrEqualTo(80).priorityHigh()
+                make.height.lessThanOrEqualTo(self.superview!).multipliedBy(0.27)
+                let instinctSize = singlePhoto.intrinsicContentSize();
+                if instinctSize.height > 0 && instinctSize.width > 0 {
+                    if instinctSize.height > instinctSize.width {
+                        make.width.equalTo(singlePhoto.snp_height).multipliedBy(CGFloat(instinctSize.width) / instinctSize.height)
+                    } else {
+                        make.height.equalTo(singlePhoto.snp_width).multipliedBy(CGFloat(instinctSize.height) / instinctSize.width)
+                    }
+                }
             }
-        }
-        
-        locationLabel.snp_makeConstraints { make in
-            make.leading.equalTo(hostName)
-            make.top.equalTo(singlePhoto.snp_bottom).offset(6)
-            make.trailing.equalTo(self.snp_trailing).inset(10).priorityHigh()
+            
+            locationLabel.snp_removeConstraints()
+            locationLabel.snp_makeConstraints { make in
+                make.leading.equalTo(hostName)
+                make.top.equalTo(singlePhoto.snp_bottom).offset(6)
+                make.trailing.equalTo(self.snp_trailing).inset(10).priorityHigh()
+            }
+        } else {
+            singlePhoto.snp_removeConstraints()
+            locationLabel.snp_removeConstraints()
+            locationLabel.snp_makeConstraints { make in
+                make.leading.equalTo(hostName)
+                make.top.equalTo(textLabel.snp_bottom).offset(6)
+                make.trailing.equalTo(self.snp_trailing).inset(10).priorityHigh()
+            }
         }
         
         timeLabel.snp_makeConstraints { make in

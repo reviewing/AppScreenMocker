@@ -1,15 +1,18 @@
 PODS:
   - Material (1.42.9)
   - SnapKit (0.15.0)
+  - Toast-Swift (1.3.0)
 
 DEPENDENCIES:
   - Material (~> 1.0)
   - SnapKit (~> 0.15.0)
+  - Toast-Swift (~> 1.3.0)
 
 SPEC CHECKSUMS:
   Material: a84ed893b7785f0d3c8d568e88c055f82b436473
   SnapKit: 4962eed2ee18e48cbd2b2292fffc57efe7235f87
+  Toast-Swift: 25c3d98db42dc70d9a77b5006ee000e0becb458e
 
-PODFILE CHECKSUM: bfb1f8302cc17aa8cecd5a3fee02e4b3e2d112bb
+PODFILE CHECKSUM: 9ececc397dde83d8a0e4a26b59b30e24e957a4df
 
 COCOAPODS: 1.0.1

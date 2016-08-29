@@ -10,8 +10,9 @@ import UIKit
 import Material
 import SnapKit
 import QuartzCore
+import Toast_Swift
 
-class WechatMomentsController: UIViewController {
+class WechatMomentsController: UIViewController, MaterialSwitchDelegate {
     
     var didSetupConstraints = false
     
@@ -31,6 +32,11 @@ class WechatMomentsController: UIViewController {
         switchControl.trackOnColor = MaterialColor.green.lighten3
         switchControl.buttonOffColor = MaterialColor.green.lighten4
         switchControl.trackOffColor = MaterialColor.green.lighten3
+        switchControl.delegate = self
+    }
+    
+    func materialSwitchStateChanged(control: MaterialSwitch) {
+        self.view.makeToast(control.on ? "编辑模式" : "正常模式", duration: 1.0, position: .Bottom)
     }
     
     private func prepareNavigationItem() {
@@ -54,7 +60,7 @@ class WechatMomentsController: UIViewController {
         mockRootView.addSubview(avatarImageBg)
         avatarImageBg.addSubview(avatarImage)
 
-        mockRootView.addSubview(usernameLabel)
+        mockRootView.addSubview(selfNameLabel)
 
         mockRootView.addSubview(momentView)
         mockRootView.addSubview(momentView2)
@@ -92,10 +98,33 @@ class WechatMomentsController: UIViewController {
         imageView.tag = ViewID.CoverImage.rawValue
         imageView.backgroundColor = MaterialColor.black
         imageView.contentMode = .ScaleAspectFill
+        imageView.clipsToBounds = true
         return imageView
     }()
     
     func requestEdit(recognizer: UITapGestureRecognizer) {
+        if switchControl.on {
+            let id = ViewID(rawValue: recognizer.view!.tag);
+            
+            if id == nil {
+                return
+            }
+            
+            switch id! {
+            case .LocationLabel, .SourceLabel, .MomentPhoto:
+                recognizer.view!.hidden = true
+            case .SelfNameLabel, .CoverImage, .AvatarImage:
+                selfNameLabel.hidden = true
+                coverImage.hidden = true
+                avatarImage.hidden = true
+                avatarImageBg.hidden = true
+                break
+            default:
+                break
+            }
+            return
+        }
+        
         switch recognizer.view {
         case let view where view is UIImageView && ViewID(rawValue: view!.tag)?.actionHint == 1:
             currentImageView = recognizer.view as? UIImageView
@@ -141,7 +170,7 @@ class WechatMomentsController: UIViewController {
         return imageView
     }()
     
-    let usernameLabel: UILabel = {
+    let selfNameLabel: UILabel = {
         let label = UILabel()
         label.tag = ViewID.SelfNameLabel.rawValue
         label.textColor = UIUtils.UIColorFromARGB(0xfffffdf1)
@@ -215,7 +244,7 @@ class WechatMomentsController: UIViewController {
                 make.height.equalTo(70)
             }
             
-            usernameLabel.snp_makeConstraints { make in
+            selfNameLabel.snp_makeConstraints { make in
                 make.bottom.equalTo(coverImage.snp_bottom).inset(11)
                 make.right.equalTo(avatarImageBg.snp_left).inset(-22)
             }
