@@ -79,7 +79,7 @@ class AppHomeController: UIViewController {
             MaterialDataSourceItem(
                 data: [
                     "title": "微信",
-                    "detail": "支持1种界面",
+                    "detail": "支持朋友圈",
                     "icon": "Wechat",
                     "goto": "WechatScreenList"
                 ]

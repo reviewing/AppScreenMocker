@@ -9,10 +9,12 @@
 import Foundation
 
 enum ViewID: Int {
-    case HostAvatar = 1, HostName, TextLabel, LocationLabel, TimeLabel, SourceLabel, SelfNameLabel, CoverImage, AvatarImage, MomentAction, MomentPhoto
+    case RootView = 1, HostAvatar, HostName, TextLabel, LocationLabel, TimeLabel, SourceLabel, SelfNameLabel, CoverImage, AvatarImage, MomentAction, MomentPhoto
     
     var description: String {
         switch self {
+        case .RootView:
+            return "根视图"
         case .HostAvatar:
             return "发布者头像"
         case .HostName:

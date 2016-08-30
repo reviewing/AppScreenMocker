@@ -157,25 +157,47 @@ class MomentView: UIView {
             }
             
             locationLabel.snp_removeConstraints()
-            locationLabel.snp_makeConstraints { make in
-                make.leading.equalTo(hostName)
-                make.top.equalTo(singlePhoto.snp_bottom).offset(6)
-                make.trailing.equalTo(self.snp_trailing).inset(10).priorityHigh()
+            timeLabel.snp_removeConstraints()
+            if !locationLabel.hidden {
+                locationLabel.snp_makeConstraints { make in
+                    make.leading.equalTo(hostName)
+                    make.top.equalTo(singlePhoto.snp_bottom).offset(6)
+                    make.trailing.equalTo(self.snp_trailing).inset(10).priorityHigh()
+                }
+                timeLabel.snp_makeConstraints { make in
+                    make.leading.equalTo(hostName)
+                    make.top.equalTo(locationLabel.snp_bottom).offset(6)
+                    make.bottom.equalTo(self).inset(10)
+                }
+            } else {
+                timeLabel.snp_makeConstraints { make in
+                    make.leading.equalTo(hostName)
+                    make.top.equalTo(singlePhoto.snp_bottom).offset(6)
+                    make.bottom.equalTo(self).inset(10)
+                }
             }
         } else {
             singlePhoto.snp_removeConstraints()
             locationLabel.snp_removeConstraints()
-            locationLabel.snp_makeConstraints { make in
-                make.leading.equalTo(hostName)
-                make.top.equalTo(textLabel.snp_bottom).offset(6)
-                make.trailing.equalTo(self.snp_trailing).inset(10).priorityHigh()
+            timeLabel.snp_removeConstraints()
+            if !locationLabel.hidden {
+                locationLabel.snp_makeConstraints { make in
+                    make.leading.equalTo(hostName)
+                    make.top.equalTo(textLabel.snp_bottom).offset(6)
+                    make.trailing.equalTo(self.snp_trailing).inset(10).priorityHigh()
+                }
+                timeLabel.snp_makeConstraints { make in
+                    make.leading.equalTo(hostName)
+                    make.top.equalTo(locationLabel.snp_bottom).offset(6)
+                    make.bottom.equalTo(self).inset(10)
+                }
+            } else {
+                timeLabel.snp_makeConstraints { make in
+                    make.leading.equalTo(hostName)
+                    make.top.equalTo(textLabel.snp_bottom).offset(6)
+                    make.bottom.equalTo(self).inset(10)
+                }
             }
-        }
-        
-        timeLabel.snp_makeConstraints { make in
-            make.leading.equalTo(hostName)
-            make.top.equalTo(locationLabel.snp_bottom).offset(6)
-            make.bottom.equalTo(self).inset(10)
         }
         
         sourceLabel.snp_makeConstraints { make in

@@ -18,12 +18,16 @@ class WechatMomentsController: UIViewController, MaterialSwitchDelegate {
     
     var currentImageView: UIImageView?
     private var switchControl: MaterialSwitch!
+    private var editToggleButton: FlatButton!
+    private var flatMenu: Menu!
 
     override func viewDidLoad() {
         super.viewDidLoad()
         prepareSwitchControl()
+        prepareEditToggleButton()
         prepareNavigationItem()
         prepareView()
+        prepareFlatMenu()
     }
     
     private func prepareSwitchControl() {
@@ -37,6 +41,29 @@ class WechatMomentsController: UIViewController, MaterialSwitchDelegate {
     
     func materialSwitchStateChanged(control: MaterialSwitch) {
         self.view.makeToast(control.on ? "编辑模式" : "正常模式", duration: 1.0, position: .Bottom)
+        editToggleButton.setTitle(control.on ? "编辑模式" : "正常模式", forState: .Normal)
+        if control.on {
+            self.flatMenu.views![0].hidden = false;
+        } else {
+            if self.flatMenu.opened {
+                self.flatMenu.close() { [unowned self] (view: UIView) in
+                    self.flatMenu.views![0].hidden = true;
+                }
+            } else {
+                self.flatMenu.views![0].hidden = true;
+            }
+        }
+    }
+    
+    private func prepareEditToggleButton() {
+        let w: CGFloat = 200
+        editToggleButton = FlatButton(frame: CGRectMake((view.bounds.width - w) / 2, 100, w, 48))
+        editToggleButton.setTitle("正常模式", forState: .Normal)
+        editToggleButton.setTitleColor(MaterialColor.white, forState: .Normal)
+        editToggleButton.pulseColor = MaterialColor.white
+        editToggleButton.addTarget(.TouchUpInside) { [unowned self] in
+            self.switchControl.toggle()
+        }
     }
     
     private func prepareNavigationItem() {
@@ -46,7 +73,53 @@ class WechatMomentsController: UIViewController, MaterialSwitchDelegate {
         navigationItem.titleLabel.font = RobotoFont.mediumWithSize(20)
         
         self.navigationItem.backBarButtonItem = nil
-        navigationItem.rightControls = [switchControl]
+        navigationItem.rightControls = [switchControl, editToggleButton]
+    }
+    
+    private func prepareFlatMenu() {
+        let btn1: FlatButton = FlatButton()
+        btn1.addTarget(.TouchUpInside) { [unowned self] in
+            if self.flatMenu.enabled {
+                if self.flatMenu.opened {
+                    self.flatMenu.close()
+                } else {
+                    self.flatMenu.open()
+                }
+            }
+        }
+        btn1.setTitleColor(MaterialColor.white, forState: .Normal)
+        btn1.backgroundColor = MaterialColor.green.darken1
+        btn1.pulseColor = MaterialColor.white
+        btn1.setTitle("选项", forState: .Normal)
+        btn1.hidden = true
+        view.addSubview(btn1)
+        
+        let btn2: FlatButton = FlatButton()
+        btn2.addTarget(.TouchUpInside) { [unowned self] in
+            self.toggleCoverVisiblity()
+            btn2.setTitle(self.coverImage.hidden ? "显示封面栏" :"隐藏封面栏", forState: .Normal)
+        }
+        btn2.setTitleColor(MaterialColor.white, forState: .Normal)
+        btn2.backgroundColor = MaterialColor.green.darken1
+        btn2.pulseColor = MaterialColor.white
+        btn2.setTitle("隐藏封面栏", forState: .Normal)
+        view.addSubview(btn2)
+        
+        let btn3: FlatButton = FlatButton()
+        btn3.setTitleColor(MaterialColor.white, forState: .Normal)
+        btn3.backgroundColor = MaterialColor.green.darken1
+        btn3.pulseColor = MaterialColor.white
+        btn3.setTitle("添加消息", forState: .Normal)
+        view.addSubview(btn3)
+        
+        let spacing: CGFloat = 24
+        let width: CGFloat = 128
+        let height: CGFloat = 36
+        flatMenu = Menu(origin: CGPointMake((view.bounds.width - width) / 2, spacing))
+        flatMenu.direction = .Down
+        flatMenu.spacing = 8
+        flatMenu.itemSize = CGSizeMake(width, height)
+        flatMenu.views = [btn1, btn2, btn3]
     }
     
     private func prepareView() {
@@ -65,8 +138,10 @@ class WechatMomentsController: UIViewController, MaterialSwitchDelegate {
         mockRootView.addSubview(momentView)
         mockRootView.addSubview(momentView2)
         mockRootView.addSubview(momentView3)
-
-        view.addSingleTapGesture(self, action: #selector(WechatMomentsController.requestEdit(_:)), recursively: true)
+        
+        view.addSingleTapGesture(true) {[unowned self] (recognizer: UIGestureRecognizer) in
+            self.requestEdit(recognizer)
+        }
         view.setNeedsUpdateConstraints()
     }
     
@@ -101,59 +176,6 @@ class WechatMomentsController: UIViewController, MaterialSwitchDelegate {
         imageView.clipsToBounds = true
         return imageView
     }()
-    
-    func requestEdit(recognizer: UITapGestureRecognizer) {
-        if switchControl.on {
-            let id = ViewID(rawValue: recognizer.view!.tag);
-            
-            if id == nil {
-                return
-            }
-            
-            switch id! {
-            case .LocationLabel, .SourceLabel, .MomentPhoto:
-                recognizer.view!.hidden = true
-            case .SelfNameLabel, .CoverImage, .AvatarImage:
-                selfNameLabel.hidden = true
-                coverImage.hidden = true
-                avatarImage.hidden = true
-                avatarImageBg.hidden = true
-                break
-            default:
-                break
-            }
-            return
-        }
-        
-        switch recognizer.view {
-        case let view where view is UIImageView && ViewID(rawValue: view!.tag)?.actionHint == 1:
-            currentImageView = recognizer.view as? UIImageView
-            
-            let imagePicker = UIImagePickerController()
-            imagePicker.delegate = self
-            imagePicker.sourceType = UIImagePickerControllerSourceType.SavedPhotosAlbum;
-            imagePicker.allowsEditing = false
-            
-            self.presentViewController(imagePicker, animated: true, completion: nil)
-        case let view where view is UILabel && view!.tag != 0:
-            let alert = UIAlertController(title: "编辑文字", message: ViewID(rawValue: view!.tag)?.description, preferredStyle: .Alert)
-            
-            alert.addTextFieldWithConfigurationHandler({ (textField) -> Void in
-                textField.placeholder = "请输入文字"
-            })
-            
-            alert.addAction(UIAlertAction(title: "确认", style: .Default, handler: { (action) -> Void in
-                let textField = alert.textFields![0] as UITextField
-                if !(textField.text?.isEmpty ?? true) {
-                    (view as! UILabel).text = textField.text
-                }
-            }))
-            
-            self.presentViewController(alert, animated: true, completion: nil)
-        default:
-            break
-        }
-    }
     
     let avatarImageBg: UIView = {
         let view = UIView()
@@ -196,6 +218,68 @@ class WechatMomentsController: UIViewController, MaterialSwitchDelegate {
         return view
     }()
 
+    func requestEdit(recognizer: UIGestureRecognizer) {
+        if switchControl.on {
+            let id = ViewID(rawValue: recognizer.view!.tag);
+            
+            if id == nil {
+                return
+            }
+            
+            switch id! {
+            case .LocationLabel, .SourceLabel, .MomentPhoto:
+                recognizer.view!.hidden = true
+                recognizer.view!.superview?.updateConstraints()
+            case .SelfNameLabel, .CoverImage, .AvatarImage:
+                toggleCoverVisiblity()
+                break
+            default:
+                break
+            }
+            return
+        }
+        
+        switch recognizer.view {
+        case let view where view is UIImageView && ViewID(rawValue: view!.tag)?.actionHint == 1:
+            currentImageView = recognizer.view as? UIImageView
+            
+            let imagePicker = UIImagePickerController()
+            imagePicker.delegate = self
+            imagePicker.sourceType = UIImagePickerControllerSourceType.SavedPhotosAlbum;
+            imagePicker.allowsEditing = false
+            
+            self.presentViewController(imagePicker, animated: true, completion: nil)
+        case let view where view is UILabel && view!.tag != 0:
+            let alert = UIAlertController(title: "编辑文字", message: ViewID(rawValue: view!.tag)?.description, preferredStyle: .Alert)
+            
+            alert.addTextFieldWithConfigurationHandler({ (textField) -> Void in
+                textField.placeholder = "请输入文字"
+            })
+            
+            alert.addAction(UIAlertAction(title: "确认", style: .Default, handler: { (action) -> Void in
+                let textField = alert.textFields![0] as UITextField
+                if !(textField.text?.isEmpty ?? true) {
+                    (view as! UILabel).text = textField.text
+                }
+            }))
+            
+            self.presentViewController(alert, animated: true, completion: nil)
+        default:
+            break
+        }
+    }
+
+    func toggleCoverVisiblity() {
+        let hidden = coverImage.hidden
+        selfNameLabel.hidden = !hidden
+        coverImage.hidden = !hidden
+        avatarImage.hidden = !hidden
+        avatarImageBg.hidden = !hidden
+        
+        didSetupConstraints = false
+        updateViewConstraints()
+    }
+    
     override func updateViewConstraints() {
         
         if (!didSetupConstraints) {
@@ -224,35 +308,55 @@ class WechatMomentsController: UIViewController, MaterialSwitchDelegate {
                 make.height.equalTo(44)
             }
             
-            coverImage.snp_makeConstraints { make in
-                make.top.equalTo(navigationBarView.snp_bottom)
-                make.leading.equalTo(mockRootView)
-                make.trailing.equalTo(mockRootView)
-                make.height.equalTo(255)
-            }
-            
-            avatarImageBg.snp_makeConstraints { make in
-                make.bottom.equalTo(coverImage.snp_bottom).inset(-24)
-                make.trailing.equalTo(mockRootView).inset(12)
-                make.width.equalTo(74)
-                make.height.equalTo(74)
-            }
-            
-            avatarImage.snp_makeConstraints { make in
-                make.center.equalTo(avatarImageBg)
-                make.width.equalTo(70)
-                make.height.equalTo(70)
-            }
-            
-            selfNameLabel.snp_makeConstraints { make in
-                make.bottom.equalTo(coverImage.snp_bottom).inset(11)
-                make.right.equalTo(avatarImageBg.snp_left).inset(-22)
-            }
-            
-            momentView.snp_makeConstraints { make in
-                make.top.equalTo(avatarImageBg.snp_bottom).offset(32)
-                make.leading.equalTo(mockRootView)
-                make.trailing.equalTo(mockRootView)
+            if !coverImage.hidden {
+                coverImage.snp_removeConstraints()
+                avatarImageBg.snp_removeConstraints()
+                avatarImage.snp_removeConstraints()
+                selfNameLabel.snp_removeConstraints()
+                momentView.snp_removeConstraints()
+
+                coverImage.snp_makeConstraints { make in
+                    make.top.equalTo(navigationBarView.snp_bottom)
+                    make.leading.equalTo(mockRootView)
+                    make.trailing.equalTo(mockRootView)
+                    make.height.equalTo(255)
+                }
+                
+                avatarImageBg.snp_makeConstraints { make in
+                    make.bottom.equalTo(coverImage.snp_bottom).inset(-24)
+                    make.trailing.equalTo(mockRootView).inset(12)
+                    make.width.equalTo(74)
+                    make.height.equalTo(74)
+                }
+                
+                avatarImage.snp_makeConstraints { make in
+                    make.center.equalTo(avatarImageBg)
+                    make.width.equalTo(70)
+                    make.height.equalTo(70)
+                }
+                
+                selfNameLabel.snp_makeConstraints { make in
+                    make.bottom.equalTo(coverImage.snp_bottom).inset(11)
+                    make.right.equalTo(avatarImageBg.snp_left).inset(-22)
+                }
+                
+                momentView.snp_makeConstraints { make in
+                    make.top.equalTo(avatarImageBg.snp_bottom).offset(32)
+                    make.leading.equalTo(mockRootView)
+                    make.trailing.equalTo(mockRootView)
+                }
+            } else {
+                coverImage.snp_removeConstraints()
+                avatarImageBg.snp_removeConstraints()
+                avatarImage.snp_removeConstraints()
+                selfNameLabel.snp_removeConstraints()
+                momentView.snp_removeConstraints()
+                
+                momentView.snp_makeConstraints { make in
+                    make.top.equalTo(navigationBarView.snp_bottom)
+                    make.leading.equalTo(mockRootView)
+                    make.trailing.equalTo(mockRootView)
+                }
             }
             
             momentView2.snp_makeConstraints { make in
