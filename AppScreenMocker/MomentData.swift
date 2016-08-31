@@ -10,12 +10,12 @@ import UIKit
 
 class MomentData {
     internal var hostAvatarUrl: String?
-    internal var hostName: String? = "用户名"
-    internal var bodyText: String? = "朋友圈消息文本内容"
+    internal var hostName: String? = "科比"
+    internal var bodyText: String? = "科比称与詹姆斯私交甚好"
     internal var singlePhotoUrl: String?
     internal var singlePhotoSize: CGSize? = CGSizeMake(120, 120)
     internal var multiplePhotoUrls: [String]?
-    internal var locationText: String? = "成都・地点名称"
+    internal var locationText: String? = "成都・成都体育中心"
     internal var timeText: String? = "1分钟前"
-    internal var sourceText: String? = "发布来源"
+    internal var sourceText: String? = "新浪体育"
 }

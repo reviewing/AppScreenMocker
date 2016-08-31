@@ -26,7 +26,6 @@ class MomentView: UITableViewCell {
         label.tag = ViewID.HostName.rawValue
         label.textColor = UIUtils.UIColorFromARGB(0xff465783)
         label.font = UIFont.boldSystemFontOfSize(15.5)
-        label.text = NSLocalizedString("用户名", comment: "")
         return label
     }()
     
@@ -35,7 +34,6 @@ class MomentView: UITableViewCell {
         label.tag = ViewID.BodyLabel.rawValue
         label.textColor = UIUtils.UIColorFromARGB(0xff222222)
         label.font = UIFont.systemFontOfSize(15.5)
-        label.text = NSLocalizedString("朋友圈消息文本内容", comment: "")
         label.lineBreakMode = .ByWordWrapping
         label.numberOfLines = 0
         return label
@@ -60,7 +58,6 @@ class MomentView: UITableViewCell {
         label.tag = ViewID.LocationLabel.rawValue
         label.textColor = UIUtils.UIColorFromARGB(0xff5b6a92)
         label.font = UIFont.systemFontOfSize(12)
-        label.text = NSLocalizedString("成都・地点名称", comment: "")
         label.lineBreakMode = .ByWordWrapping
         label.numberOfLines = 0
         return label
@@ -71,7 +68,6 @@ class MomentView: UITableViewCell {
         label.tag = ViewID.TimeLabel.rawValue
         label.textColor = .grayColor()
         label.font = UIFont.systemFontOfSize(12)
-        label.text = NSLocalizedString("1分钟前", comment: "")
         return label
     }()
     
@@ -80,7 +76,6 @@ class MomentView: UITableViewCell {
         label.tag = ViewID.SourceLabel.rawValue
         label.textColor = .grayColor()
         label.font = UIFont.systemFontOfSize(12)
-        label.text = NSLocalizedString("发布来源", comment: "")
         return label
     }()
     
