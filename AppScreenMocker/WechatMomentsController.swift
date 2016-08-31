@@ -229,10 +229,36 @@ class WechatMomentsController: UIViewController, MaterialSwitchDelegate {
             
             switch id! {
             case .LocationLabel, .SourceLabel, .SinglePhoto:
-                recognizer.view!.hidden = true
-                recognizer.view!.superview?.updateConstraints()
+                let alert = UIAlertController(title: id!.description, message: ViewID(rawValue: view!.tag)?.description, preferredStyle: .ActionSheet)
+                alert.addAction(UIAlertAction(title: "隐藏" + id!.description, style: .Default) { (action) -> Void in
+                    let indexPath = self.findIndexPathOfView(recognizer.view)
+                    
+                    if indexPath == nil {
+                        return
+                    }
+                    
+                    switch id! {
+                    case .LocationLabel:
+                        self.momentDataSource[indexPath!.row].locationText = nil
+                    case .SourceLabel:
+                        self.momentDataSource[indexPath!.row].sourceText = nil
+                    case .SinglePhoto:
+                        self.momentDataSource[indexPath!.row].singlePhotoSize = nil
+                    default:
+                        break
+                    }
+                    
+                    self.momentTableView.reloadRowsAtIndexPaths([indexPath!], withRowAnimation: .Fade)
+                })
+                alert.addAction(UIAlertAction(title: "取消", style: .Cancel, handler: nil))
+                self.presentViewController(alert, animated: true, completion: nil)
             case .SelfNameLabel, .CoverImage, .AvatarImage:
-                toggleCoverVisiblity()
+                let alert = UIAlertController(title: "封面", message: ViewID(rawValue: view!.tag)?.description, preferredStyle: .ActionSheet)
+                alert.addAction(UIAlertAction(title: "隐藏封面", style: .Default) { (action) -> Void in
+                    self.toggleCoverVisiblity()
+                })
+                alert.addAction(UIAlertAction(title: "取消", style: .Cancel, handler: nil))
+                self.presentViewController(alert, animated: true, completion: nil)
                 break
             default:
                 break
@@ -257,13 +283,12 @@ class WechatMomentsController: UIViewController, MaterialSwitchDelegate {
                 textField.placeholder = "请输入文字"
             })
             
-            alert.addAction(UIAlertAction(title: "确认", style: .Default, handler: { (action) -> Void in
+            alert.addAction(UIAlertAction(title: "确认", style: .Default) { (action) -> Void in
                 let textField = alert.textFields![0] as UITextField
                 if !(textField.text?.isEmpty ?? true) {
                     (view as! UILabel).text = textField.text
                     
-                    let momentView = view?.superview as! MomentView
-                    let indexPath = self.momentTableView.indexPathForCell(momentView)
+                    let indexPath = self.findIndexPathOfView(view!.superview)
                     
                     let id = ViewID(rawValue: recognizer.view!.tag);
                     
@@ -284,8 +309,9 @@ class WechatMomentsController: UIViewController, MaterialSwitchDelegate {
                         self.momentDataSource[indexPath!.row].sourceText = textField.text
                     default:
                         break
+                    }
                 }
-            }}))
+            })
             
             alert.addAction(UIAlertAction(title: "取消", style: .Cancel, handler: nil))
             
@@ -392,6 +418,24 @@ class WechatMomentsController: UIViewController, MaterialSwitchDelegate {
         
         super.updateViewConstraints()
     }
+    
+    func findIndexPathOfView(view: UIView?) -> NSIndexPath? {
+        var v: UIView? = view
+        while v != nil {
+            if v is MomentView {
+                break
+            }
+            v = v!.superview
+        }
+        
+        if v == nil {
+            return nil
+        }
+        
+        let momentView = v as! MomentView
+        let indexPath = self.momentTableView.indexPathForCell(momentView)
+        return indexPath
+    }
 }
 
 extension WechatMomentsController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
@@ -426,7 +470,7 @@ extension WechatMomentsController: UIImagePickerControllerDelegate, UINavigation
         default:
             break
         }
-        momentTableView.reloadData()
+        momentTableView.reloadRowsAtIndexPaths([indexPath!], withRowAnimation: .Automatic)
     }
 }
 

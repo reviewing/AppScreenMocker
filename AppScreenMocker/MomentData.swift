@@ -13,7 +13,7 @@ class MomentData {
     internal var hostName: String? = "用户名"
     internal var bodyText: String? = "朋友圈消息文本内容"
     internal var singlePhotoUrl: String?
-    internal var singlePhotoSize: CGSize = CGSizeMake(120, 120)
+    internal var singlePhotoSize: CGSize? = CGSizeMake(120, 120)
     internal var multiplePhotoUrls: [String]?
     internal var locationText: String? = "成都・地点名称"
     internal var timeText: String? = "1分钟前"

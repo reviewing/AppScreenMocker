@@ -140,9 +140,12 @@ class MomentView: UITableViewCell {
             } else {
                 singlePhoto.image = nil
             }
+            singlePhoto.hidden = data.singlePhotoSize == nil
             locationLabel.text = data.locationText
+            locationLabel.hidden = data.locationText == nil
             timeLabel.text = data.timeText
             sourceLabel.text = data.sourceText
+            sourceLabel.hidden = data.sourceText == nil
         }
     }
     
@@ -170,7 +173,9 @@ class MomentView: UITableViewCell {
             singlePhoto.snp_makeConstraints { make in
                 make.leading.equalTo(hostName)
                 make.top.equalTo(bodyLabel.snp_bottom).offset(6)
-                make.size.equalTo(data.singlePhotoSize)
+                if data.singlePhotoSize != nil {
+                    make.size.equalTo(data.singlePhotoSize!)
+                }
             }
             
             locationLabel.snp_removeConstraints()
