@@ -8,6 +8,7 @@
 
 import UIKit
 import QuartzCore
+import AssetsLibrary
 
 class UIUtils {
     static func UIColorFromARGB(argbValue: UInt) -> UIColor {
@@ -25,5 +26,15 @@ class UIUtils {
         let image: UIImage = UIGraphicsGetImageFromCurrentImageContext();
         UIGraphicsEndImageContext();
         return image;
+    }
+    
+    static func getImageFromPath(path: String, onComplete:((image: UIImage?) -> Void)) {
+        let assetsLibrary = ALAssetsLibrary()
+        let url = NSURL(string: path)!
+        assetsLibrary.assetForURL(url, resultBlock: { (asset) -> Void in
+            onComplete(image: UIImage(CGImage: asset.defaultRepresentation().fullScreenImage().takeUnretainedValue()))
+            }, failureBlock: { (error) -> Void in
+                onComplete(image: nil)
+        })
     }
 }

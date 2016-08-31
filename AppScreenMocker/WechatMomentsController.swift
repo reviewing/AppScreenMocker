@@ -21,11 +21,15 @@ class WechatMomentsController: UIViewController, MaterialSwitchDelegate {
     private var editToggleButton: FlatButton!
     private var flatMenu: Menu!
 
+    private var momentDataSource: Array<MomentData>!
+    private var momentTableView: UITableView!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         prepareSwitchControl()
         prepareEditToggleButton()
         prepareNavigationItem()
+        prepareTableView()
         prepareView()
         prepareFlatMenu()
     }
@@ -122,22 +126,34 @@ class WechatMomentsController: UIViewController, MaterialSwitchDelegate {
         flatMenu.views = [btn1, btn2, btn3]
     }
     
+    private func prepareTableView() {
+        momentDataSource = [MomentData]()
+        for _ in 0..<10 {
+            momentDataSource.append(MomentData())
+        }
+        
+        momentTableView = UITableView()
+        momentTableView.registerClass(MomentView.self, forCellReuseIdentifier: "MomentViewCell")
+        momentTableView.dataSource = self
+        momentTableView.delegate = self
+        momentTableView.scrollEnabled = false
+        momentTableView.tableFooterView = UIView()
+        momentTableView.separatorStyle = .None
+    }
+    
     private func prepareView() {
         view.backgroundColor = MaterialColor.white
         view.addSubview(scrollView)
         scrollView.addSubview(mockRootView)
         mockRootView.addSubview(statusBarView)
         mockRootView.addSubview(navigationBarView)
-        mockRootView.addSubview(coverImage)
         
+        mockRootView.addSubview(coverImage)
         mockRootView.addSubview(avatarImageBg)
         avatarImageBg.addSubview(avatarImage)
-
         mockRootView.addSubview(selfNameLabel)
 
-        mockRootView.addSubview(momentView)
-        mockRootView.addSubview(momentView2)
-        mockRootView.addSubview(momentView3)
+        mockRootView.addSubview(momentTableView)
         
         view.addSingleTapGesture(true) {[unowned self] (recognizer: UIGestureRecognizer) in
             self.requestEdit(recognizer)
@@ -202,21 +218,6 @@ class WechatMomentsController: UIViewController, MaterialSwitchDelegate {
         label.shadowOffset = CGSizeMake(0, 1);
         return label
     }()
-    
-    let momentView: MomentView = {
-        let view = MomentView()
-        return view
-    }()
-    
-    let momentView2: MomentView = {
-        let view = MomentView()
-        return view
-    }()
- 
-    let momentView3: MomentView = {
-        let view = MomentView()
-        return view
-    }()
 
     func requestEdit(recognizer: UIGestureRecognizer) {
         if switchControl.on {
@@ -227,7 +228,7 @@ class WechatMomentsController: UIViewController, MaterialSwitchDelegate {
             }
             
             switch id! {
-            case .LocationLabel, .SourceLabel, .MomentPhoto:
+            case .LocationLabel, .SourceLabel, .SinglePhoto:
                 recognizer.view!.hidden = true
                 recognizer.view!.superview?.updateConstraints()
             case .SelfNameLabel, .CoverImage, .AvatarImage:
@@ -260,8 +261,33 @@ class WechatMomentsController: UIViewController, MaterialSwitchDelegate {
                 let textField = alert.textFields![0] as UITextField
                 if !(textField.text?.isEmpty ?? true) {
                     (view as! UILabel).text = textField.text
+                    
+                    let momentView = view?.superview as! MomentView
+                    let indexPath = self.momentTableView.indexPathForCell(momentView)
+                    
+                    let id = ViewID(rawValue: recognizer.view!.tag);
+                    
+                    if id == nil || indexPath == nil {
+                        return
+                    }
+                    
+                    switch id! {
+                    case .HostName:
+                        self.momentDataSource[indexPath!.row].hostName = textField.text
+                    case .BodyLabel:
+                        self.momentDataSource[indexPath!.row].bodyText = textField.text
+                    case .LocationLabel:
+                        self.momentDataSource[indexPath!.row].locationText = textField.text
+                    case .TimeLabel:
+                        self.momentDataSource[indexPath!.row].timeText = textField.text
+                    case .SourceLabel:
+                        self.momentDataSource[indexPath!.row].sourceText = textField.text
+                    default:
+                        break
                 }
-            }))
+            }}))
+            
+            alert.addAction(UIAlertAction(title: "取消", style: .Cancel, handler: nil))
             
             self.presentViewController(alert, animated: true, completion: nil)
         default:
@@ -313,7 +339,7 @@ class WechatMomentsController: UIViewController, MaterialSwitchDelegate {
                 avatarImageBg.snp_removeConstraints()
                 avatarImage.snp_removeConstraints()
                 selfNameLabel.snp_removeConstraints()
-                momentView.snp_removeConstraints()
+                momentTableView.snp_removeConstraints()
 
                 coverImage.snp_makeConstraints { make in
                     make.top.equalTo(navigationBarView.snp_bottom)
@@ -340,35 +366,25 @@ class WechatMomentsController: UIViewController, MaterialSwitchDelegate {
                     make.right.equalTo(avatarImageBg.snp_left).inset(-22)
                 }
                 
-                momentView.snp_makeConstraints { make in
+                momentTableView.snp_makeConstraints { make in
                     make.top.equalTo(avatarImageBg.snp_bottom).offset(32)
                     make.leading.equalTo(mockRootView)
                     make.trailing.equalTo(mockRootView)
+                    make.bottom.equalTo(mockRootView)
                 }
             } else {
                 coverImage.snp_removeConstraints()
                 avatarImageBg.snp_removeConstraints()
                 avatarImage.snp_removeConstraints()
                 selfNameLabel.snp_removeConstraints()
-                momentView.snp_removeConstraints()
+                momentTableView.snp_removeConstraints()
                 
-                momentView.snp_makeConstraints { make in
+                momentTableView.snp_makeConstraints { make in
                     make.top.equalTo(navigationBarView.snp_bottom)
                     make.leading.equalTo(mockRootView)
                     make.trailing.equalTo(mockRootView)
+                    make.bottom.equalTo(mockRootView)
                 }
-            }
-            
-            momentView2.snp_makeConstraints { make in
-                make.top.equalTo(momentView.snp_bottom)
-                make.leading.equalTo(mockRootView)
-                make.trailing.equalTo(mockRootView)
-            }
-            
-            momentView3.snp_makeConstraints { make in
-                make.top.equalTo(momentView2.snp_bottom)
-                make.leading.equalTo(mockRootView)
-                make.trailing.equalTo(mockRootView)
             }
             
             didSetupConstraints = true
@@ -380,10 +396,65 @@ class WechatMomentsController: UIViewController, MaterialSwitchDelegate {
 
 extension WechatMomentsController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     func imagePickerController(picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : AnyObject]){
-        self.dismissViewControllerAnimated(true, completion: { () -> Void in
-            
-        })
-        currentImageView?.image = info[UIImagePickerControllerOriginalImage] as? UIImage
-        momentView.updateConstraints()
+        self.dismissViewControllerAnimated(true, completion: nil)
+        if currentImageView == nil {
+            return
+        }
+        
+        let momentView = currentImageView?.superview as? MomentView
+        let image = info[UIImagePickerControllerOriginalImage] as? UIImage
+        
+        if momentView == nil {
+            currentImageView!.image = image
+            return
+        }
+        
+        let indexPath = self.momentTableView.indexPathForCell(momentView!)
+        
+        let id = ViewID(rawValue: currentImageView!.tag);
+        
+        if id == nil || indexPath == nil {
+            return
+        }
+        
+        switch id! {
+        case .HostAvatar:
+            self.momentDataSource[indexPath!.row].hostAvatarUrl = (info[UIImagePickerControllerReferenceURL] as? NSURL)?.absoluteString
+        case .SinglePhoto:
+            self.momentDataSource[indexPath!.row].singlePhotoUrl = (info[UIImagePickerControllerReferenceURL] as? NSURL)?.absoluteString
+            self.momentDataSource[indexPath!.row].singlePhotoSize = MomentView.computeImageSize(image?.size)
+        default:
+            break
+        }
+        momentTableView.reloadData()
+    }
+}
+
+extension WechatMomentsController: UITableViewDataSource {
+    func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return momentDataSource.count;
+    }
+    
+    func numberOfSectionsInTableView(tableView: UITableView) -> Int {
+        return 1
+    }
+    
+    func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
+        let cell: MomentView = MomentView(style: .Default, reuseIdentifier: "MomentViewCell")
+        cell.addSingleTapGesture(true) {[unowned self] (recognizer: UIGestureRecognizer) in
+            self.requestEdit(recognizer)
+        }
+        cell.data = momentDataSource[indexPath.row]
+        return cell
+    }
+}
+
+extension WechatMomentsController: UITableViewDelegate {
+    func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
+        return UITableViewAutomaticDimension
+    }
+    
+    func tableView(tableView: UITableView, estimatedHeightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
+        return UITableViewAutomaticDimension
     }
 }

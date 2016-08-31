@@ -9,7 +9,7 @@
 import Foundation
 
 enum ViewID: Int {
-    case RootView = 1, HostAvatar, HostName, TextLabel, LocationLabel, TimeLabel, SourceLabel, SelfNameLabel, CoverImage, AvatarImage, MomentAction, MomentPhoto
+    case RootView = 1, HostAvatar, HostName, BodyLabel, LocationLabel, TimeLabel, SourceLabel, SelfNameLabel, CoverImage, AvatarImage, MomentAction, SinglePhoto
     
     var description: String {
         switch self {
@@ -19,7 +19,7 @@ enum ViewID: Int {
             return "发布者头像"
         case .HostName:
             return "发布者用户名"
-        case .TextLabel:
+        case .BodyLabel:
             return "文字内容"
         case .LocationLabel:
             return "地点"
@@ -35,14 +35,14 @@ enum ViewID: Int {
             return "用户头像"
         case .MomentAction:
             return "赞和评论"
-        case .MomentPhoto:
+        case .SinglePhoto:
             return "图片内容"
         }
     }
     
     var actionHint: Int {
         switch self {
-        case .HostAvatar, .CoverImage, .AvatarImage, .MomentPhoto:
+        case .HostAvatar, .CoverImage, .AvatarImage, .SinglePhoto:
             return 1
         default:
             return 0

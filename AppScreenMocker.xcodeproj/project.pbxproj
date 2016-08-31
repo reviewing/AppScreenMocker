@@ -12,6 +12,7 @@
 		182439781D63FE12002A5C99 /* MomentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 182439771D63FE12002A5C99 /* MomentView.swift */; };
 		1824397A1D6BFC15002A5C99 /* ViewID.swift in Sources */ = {isa = PBXBuildFile; fileRef = 182439791D6BFC15002A5C99 /* ViewID.swift */; };
 		182AB0A71D75594D001EA9A1 /* UIControl+Target.swift in Sources */ = {isa = PBXBuildFile; fileRef = 182AB0A61D75594D001EA9A1 /* UIControl+Target.swift */; };
+		182AB0AD1D757CC0001EA9A1 /* MomentData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 182AB0AC1D757CC0001EA9A1 /* MomentData.swift */; };
 		18576F811D619DF900837ED2 /* UIUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18576F801D619DF900837ED2 /* UIUtils.swift */; };
 		187E30C81D61A71300F27B9D /* SignalStrengthIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 187E30C71D61A71300F27B9D /* SignalStrengthIndicator.swift */; };
 		187E30CA1D61C05000F27B9D /* WechatNavigationBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 187E30C91D61C05000F27B9D /* WechatNavigationBarView.swift */; };
@@ -44,6 +45,7 @@
 		182439771D63FE12002A5C99 /* MomentView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MomentView.swift; sourceTree = "<group>"; };
 		182439791D6BFC15002A5C99 /* ViewID.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewID.swift; sourceTree = "<group>"; };
 		182AB0A61D75594D001EA9A1 /* UIControl+Target.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIControl+Target.swift"; sourceTree = "<group>"; };
+		182AB0AC1D757CC0001EA9A1 /* MomentData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MomentData.swift; sourceTree = "<group>"; };
 		18576F801D619DF900837ED2 /* UIUtils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIUtils.swift; sourceTree = "<group>"; };
 		187E30C71D61A71300F27B9D /* SignalStrengthIndicator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SignalStrengthIndicator.swift; sourceTree = "<group>"; };
 		187E30C91D61C05000F27B9D /* WechatNavigationBarView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WechatNavigationBarView.swift; sourceTree = "<group>"; };
@@ -88,6 +90,7 @@
 				18B532421D6167D80004BFE1 /* WechatMomentsController.swift */,
 				182439771D63FE12002A5C99 /* MomentView.swift */,
 				182439791D6BFC15002A5C99 /* ViewID.swift */,
+				182AB0AC1D757CC0001EA9A1 /* MomentData.swift */,
 			);
 			name = Moments;
 			sourceTree = "<group>";
@@ -297,6 +300,7 @@
 				18AE3CED1D5DBD5300E651C6 /* AppHomeController.swift in Sources */,
 				187E30C81D61A71300F27B9D /* SignalStrengthIndicator.swift in Sources */,
 				182439731D62FA06002A5C99 /* UIView+Gestures.swift in Sources */,
+				182AB0AD1D757CC0001EA9A1 /* MomentData.swift in Sources */,
 				182439781D63FE12002A5C99 /* MomentView.swift in Sources */,
 				18B532411D615EB70004BFE1 /* WechatScreenListController.swift in Sources */,
 				18B532431D6167D80004BFE1 /* WechatMomentsController.swift in Sources */,
