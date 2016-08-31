@@ -463,9 +463,9 @@ extension WechatMomentsController: UIImagePickerControllerDelegate, UINavigation
         
         switch id! {
         case .HostAvatar:
-            self.momentDataSource[indexPath!.row].hostAvatarUrl = (info[UIImagePickerControllerReferenceURL] as? NSURL)?.absoluteString
+            self.momentDataSource[indexPath!.row].hostAvatarUrl = info[UIImagePickerControllerReferenceURL] as? NSURL
         case .SinglePhoto:
-            self.momentDataSource[indexPath!.row].singlePhotoUrl = (info[UIImagePickerControllerReferenceURL] as? NSURL)?.absoluteString
+            self.momentDataSource[indexPath!.row].singlePhotoUrl = info[UIImagePickerControllerReferenceURL] as? NSURL
             self.momentDataSource[indexPath!.row].singlePhotoSize = MomentView.computeImageSize(image?.size)
         default:
             break

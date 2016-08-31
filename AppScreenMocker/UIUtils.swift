@@ -8,7 +8,7 @@
 
 import UIKit
 import QuartzCore
-import AssetsLibrary
+import Photos
 
 class UIUtils {
     static func UIColorFromARGB(argbValue: UInt) -> UIColor {
@@ -28,13 +28,15 @@ class UIUtils {
         return image;
     }
     
-    static func getImageFromPath(path: String, onComplete:((image: UIImage?) -> Void)) {
-        let assetsLibrary = ALAssetsLibrary()
-        let url = NSURL(string: path)!
-        assetsLibrary.assetForURL(url, resultBlock: { (asset) -> Void in
-            onComplete(image: UIImage(CGImage: asset.defaultRepresentation().fullScreenImage().takeUnretainedValue()))
-            }, failureBlock: { (error) -> Void in
-                onComplete(image: nil)
-        })
+    static func imageFromAssetURL(assetURL: NSURL, targetSize: CGSize, onComplete:((image: UIImage?) -> Void)) {
+        let asset = PHAsset.fetchAssetsWithALAssetURLs([assetURL], options: nil)
+        guard let result = asset.firstObject where result is PHAsset else {
+            return
+        }
+        
+        let imageManager = PHImageManager.defaultManager()
+        imageManager.requestImageForAsset(result as! PHAsset, targetSize: targetSize, contentMode: PHImageContentMode.AspectFill, options: nil) { (image, dict) -> Void in
+            onComplete(image: image)
+        }
     }
 }

@@ -114,7 +114,7 @@ class MomentView: UITableViewCell {
         didSet {
             if data.hostAvatarUrl != nil {
                 let originalUrl = data.hostAvatarUrl
-                UIUtils.getImageFromPath(data.hostAvatarUrl!, onComplete: { (image) in
+                UIUtils.imageFromAssetURL(data.hostAvatarUrl!, targetSize: CGSizeMake(40, 40), onComplete: { (image) in
                     if self.data.hostAvatarUrl == originalUrl {
                         self.hostAvatar.image = image
                     }
@@ -124,9 +124,9 @@ class MomentView: UITableViewCell {
             }
             hostName.text = data.hostName
             bodyLabel.text = data.bodyText
-            if data.singlePhotoUrl != nil {
+            if data.singlePhotoUrl != nil && data.singlePhotoSize != nil {
                 let originalUrl = data.singlePhotoUrl
-                UIUtils.getImageFromPath(data.singlePhotoUrl!, onComplete: { (image) in
+                UIUtils.imageFromAssetURL(data.singlePhotoUrl!, targetSize: data.singlePhotoSize!, onComplete: { (image) in
                     if self.data.singlePhotoUrl == originalUrl {
                         self.singlePhoto.image = image
                         self.updateConstraints()
