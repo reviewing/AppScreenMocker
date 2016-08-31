@@ -11,7 +11,6 @@ import Material
 import SnapKit
 
 class MomentView: UITableViewCell {
-        
     let hostAvatar: UIImageView = {
         let imageView = UIImageView()
         imageView.tag = ViewID.HostAvatar.rawValue

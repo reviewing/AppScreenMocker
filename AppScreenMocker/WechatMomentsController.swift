@@ -220,19 +220,17 @@ class WechatMomentsController: UIViewController, MaterialSwitchDelegate {
     }()
 
     func requestEdit(recognizer: UIGestureRecognizer) {
+        let id = ViewID(rawValue: recognizer.view!.tag);
+        if id == nil {
+            return
+        }
+        
         if switchControl.on {
-            let id = ViewID(rawValue: recognizer.view!.tag);
-            
-            if id == nil {
-                return
-            }
-            
             switch id! {
             case .LocationLabel, .SourceLabel, .SinglePhoto:
                 let alert = UIAlertController(title: id!.description, message: ViewID(rawValue: view!.tag)?.description, preferredStyle: .ActionSheet)
                 alert.addAction(UIAlertAction(title: "隐藏" + id!.description, style: .Default) { (action) -> Void in
                     let indexPath = self.findIndexPathOfView(recognizer.view)
-                    
                     if indexPath == nil {
                         return
                     }
@@ -252,6 +250,7 @@ class WechatMomentsController: UIViewController, MaterialSwitchDelegate {
                 })
                 alert.addAction(UIAlertAction(title: "取消", style: .Cancel, handler: nil))
                 self.presentViewController(alert, animated: true, completion: nil)
+                return
             case .SelfNameLabel, .CoverImage, .AvatarImage:
                 let alert = UIAlertController(title: "封面", message: ViewID(rawValue: view!.tag)?.description, preferredStyle: .ActionSheet)
                 alert.addAction(UIAlertAction(title: "隐藏封面", style: .Default) { (action) -> Void in
@@ -259,11 +258,10 @@ class WechatMomentsController: UIViewController, MaterialSwitchDelegate {
                 })
                 alert.addAction(UIAlertAction(title: "取消", style: .Cancel, handler: nil))
                 self.presentViewController(alert, animated: true, completion: nil)
-                break
+                return
             default:
                 break
             }
-            return
         }
         
         switch recognizer.view {
@@ -289,10 +287,7 @@ class WechatMomentsController: UIViewController, MaterialSwitchDelegate {
                     (view as! UILabel).text = textField.text
                     
                     let indexPath = self.findIndexPathOfView(view!.superview)
-                    
-                    let id = ViewID(rawValue: recognizer.view!.tag);
-                    
-                    if id == nil || indexPath == nil {
+                    if indexPath == nil {
                         return
                     }
                     
@@ -314,7 +309,30 @@ class WechatMomentsController: UIViewController, MaterialSwitchDelegate {
             })
             
             alert.addAction(UIAlertAction(title: "取消", style: .Cancel, handler: nil))
-            
+            self.presentViewController(alert, animated: true, completion: nil)
+        case let view where id! == .MomentAction:
+            let indexPath = self.findIndexPathOfView(view!.superview)
+            if indexPath == nil {
+                return
+            }
+            let alert = UIAlertController(title: "编辑消息", message: nil, preferredStyle: .ActionSheet)
+            alert.addAction(UIAlertAction(title: "添加图片", style: .Default) { (action) -> Void in
+                self.momentDataSource[indexPath!.row].singlePhotoSize = MomentData.defaultSinglePhotoSize
+                self.momentTableView.reloadRowsAtIndexPaths([indexPath!], withRowAnimation: .Fade)
+                })
+            alert.addAction(UIAlertAction(title: "显示地点", style: .Default) { (action) -> Void in
+                self.momentDataSource[indexPath!.row].locationText = MomentData.defaultLocationText
+                self.momentTableView.reloadRowsAtIndexPaths([indexPath!], withRowAnimation: .Fade)
+                })
+            alert.addAction(UIAlertAction(title: "显示来源", style: .Default) { (action) -> Void in
+                self.momentDataSource[indexPath!.row].sourceText = MomentData.defaultSourceText
+                self.momentTableView.reloadRowsAtIndexPaths([indexPath!], withRowAnimation: .Fade)
+                })
+            alert.addAction(UIAlertAction(title: "显示赞", style: .Default) { (action) -> Void in
+            })
+            alert.addAction(UIAlertAction(title: "显示评论", style: .Default) { (action) -> Void in
+            })
+            alert.addAction(UIAlertAction(title: "取消", style: .Cancel, handler: nil))
             self.presentViewController(alert, animated: true, completion: nil)
         default:
             break
