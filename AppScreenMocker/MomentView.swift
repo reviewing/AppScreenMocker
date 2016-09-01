@@ -40,16 +40,16 @@ class MomentView: UITableViewCell {
     
     let singlePhoto: UIImageView = {
         let imageView = UIImageView()
-        imageView.tag = ViewID.SinglePhoto.rawValue
+        imageView.tag = ViewID.BodyPhoto.rawValue
         imageView.contentMode = .ScaleAspectFit
         imageView.clipsToBounds = true
         imageView.backgroundColor = MaterialColor.black
         return imageView
     }()
     
-    let multiplePhotos: UIView = {
-        let photoGridView = UIView()
-        return photoGridView
+    let multiplePhotos: SudokuView = {
+        let sudokuView = SudokuView()
+        return sudokuView
     }()
     
     let locationLabel: UILabel = {
@@ -97,6 +97,7 @@ class MomentView: UITableViewCell {
         self.addSubview(hostName)
         self.addSubview(bodyLabel)
         self.addSubview(singlePhoto)
+        self.addSubview(multiplePhotos)
         self.addSubview(locationLabel)
         self.addSubview(timeLabel)
         self.addSubview(sourceLabel)
@@ -109,7 +110,7 @@ class MomentView: UITableViewCell {
         fatalError("This class does not support NSCoding")
     }
     
-    internal var data: MomentData = MomentData() {
+    internal var data = MomentData() {
         didSet {
             if data.hostAvatarUrl != nil {
                 let originalUrl = data.hostAvatarUrl
@@ -123,10 +124,10 @@ class MomentView: UITableViewCell {
             }
             hostName.text = data.hostName
             bodyLabel.text = data.bodyText
-            if data.singlePhotoUrl != nil && data.singlePhotoSize != nil {
-                let originalUrl = data.singlePhotoUrl
-                UIUtils.imageFromAssetURL(data.singlePhotoUrl!, targetSize: data.singlePhotoSize!, onComplete: { (image) in
-                    if self.data.singlePhotoUrl == originalUrl {
+            if data.photoUrls.count == 1 && data.singlePhotoSize != nil {
+                let originalUrl = data.photoUrls[0]
+                UIUtils.imageFromAssetURL(originalUrl, targetSize: data.singlePhotoSize!, onComplete: { (image) in
+                    if self.data.photoUrls.count == 1 && self.data.photoUrls[0] == originalUrl {
                         self.singlePhoto.image = image
                         self.updateConstraints()
                     }
@@ -134,7 +135,11 @@ class MomentView: UITableViewCell {
             } else {
                 singlePhoto.image = nil
             }
-            singlePhoto.hidden = data.singlePhotoSize == nil
+            singlePhoto.hidden = data.photoUrls.count != 1 || data.singlePhotoSize == nil
+            multiplePhotos.hidden = data.photoUrls.count <= 1
+            if !multiplePhotos.hidden {
+                multiplePhotos.imageUrls = data.photoUrls
+            }
             locationLabel.text = data.locationText
             locationLabel.hidden = data.locationText == nil
             timeLabel.text = data.timeText
@@ -164,20 +169,22 @@ class MomentView: UITableViewCell {
         
         if !singlePhoto.hidden {
             singlePhoto.snp_removeConstraints()
+            multiplePhotos.snp_removeConstraints()
+            locationLabel.snp_removeConstraints()
+            timeLabel.snp_removeConstraints()
+
             singlePhoto.snp_makeConstraints { make in
                 make.leading.equalTo(hostName)
-                make.top.equalTo(bodyLabel.snp_bottom).offset(6)
+                make.top.equalTo(bodyLabel.snp_bottom).offset(10)
                 if data.singlePhotoSize != nil {
                     make.size.equalTo(data.singlePhotoSize!)
                 }
             }
             
-            locationLabel.snp_removeConstraints()
-            timeLabel.snp_removeConstraints()
             if !locationLabel.hidden {
                 locationLabel.snp_makeConstraints { make in
                     make.leading.equalTo(hostName)
-                    make.top.equalTo(singlePhoto.snp_bottom).offset(6)
+                    make.top.equalTo(singlePhoto.snp_bottom).offset(8)
                     make.trailing.equalTo(self.snp_trailing).inset(10).priorityHigh()
                 }
                 timeLabel.snp_makeConstraints { make in
@@ -188,18 +195,49 @@ class MomentView: UITableViewCell {
             } else {
                 timeLabel.snp_makeConstraints { make in
                     make.leading.equalTo(hostName)
-                    make.top.equalTo(singlePhoto.snp_bottom).offset(6)
+                    make.top.equalTo(singlePhoto.snp_bottom).offset(8)
+                    make.bottom.equalTo(self).inset(10)
+                }
+            }
+        } else if !multiplePhotos.hidden {
+            singlePhoto.snp_removeConstraints()
+            multiplePhotos.snp_removeConstraints()
+            locationLabel.snp_removeConstraints()
+            timeLabel.snp_removeConstraints()
+            
+            multiplePhotos.updateConstraints()
+            multiplePhotos.snp_makeConstraints { make in
+                make.leading.equalTo(hostName)
+                make.top.equalTo(bodyLabel.snp_bottom).offset(10)
+            }
+            
+            if !locationLabel.hidden {
+                locationLabel.snp_makeConstraints { make in
+                    make.leading.equalTo(hostName)
+                    make.top.equalTo(multiplePhotos.snp_bottom).offset(8)
+                    make.trailing.equalTo(self.snp_trailing).inset(10).priorityHigh()
+                }
+                timeLabel.snp_makeConstraints { make in
+                    make.leading.equalTo(hostName)
+                    make.top.equalTo(locationLabel.snp_bottom).offset(6)
+                    make.bottom.equalTo(self).inset(10)
+                }
+            } else {
+                timeLabel.snp_makeConstraints { make in
+                    make.leading.equalTo(hostName)
+                    make.top.equalTo(multiplePhotos.snp_bottom).offset(8)
                     make.bottom.equalTo(self).inset(10)
                 }
             }
         } else {
             singlePhoto.snp_removeConstraints()
+            multiplePhotos.snp_removeConstraints()
             locationLabel.snp_removeConstraints()
             timeLabel.snp_removeConstraints()
             if !locationLabel.hidden {
                 locationLabel.snp_makeConstraints { make in
                     make.leading.equalTo(hostName)
-                    make.top.equalTo(bodyLabel.snp_bottom).offset(6)
+                    make.top.equalTo(bodyLabel.snp_bottom).offset(8)
                     make.trailing.equalTo(self.snp_trailing).inset(10).priorityHigh()
                 }
                 timeLabel.snp_makeConstraints { make in
@@ -210,7 +248,7 @@ class MomentView: UITableViewCell {
             } else {
                 timeLabel.snp_makeConstraints { make in
                     make.leading.equalTo(hostName)
-                    make.top.equalTo(bodyLabel.snp_bottom).offset(6)
+                    make.top.equalTo(bodyLabel.snp_bottom).offset(8)
                     make.bottom.equalTo(self).inset(10)
                 }
             }

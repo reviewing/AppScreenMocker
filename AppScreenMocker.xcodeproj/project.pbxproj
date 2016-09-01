@@ -21,6 +21,7 @@
 		18AE3CEB1D5DBA8700E651C6 /* AppNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18AE3CEA1D5DBA8700E651C6 /* AppNavigationController.swift */; };
 		18AE3CED1D5DBD5300E651C6 /* AppHomeController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18AE3CEC1D5DBD5300E651C6 /* AppHomeController.swift */; };
 		18AE3CFA1D5DCC0C00E651C6 /* AppAssets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 18AE3CDF1D5DB4D300E651C6 /* AppAssets.xcassets */; };
+		18AE42711D77BCFF0071C9C2 /* SudokuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18AE42701D77BCFF0071C9C2 /* SudokuView.swift */; };
 		18B532411D615EB70004BFE1 /* WechatScreenListController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18B532401D615EB70004BFE1 /* WechatScreenListController.swift */; };
 		18B532431D6167D80004BFE1 /* WechatMomentsController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18B532421D6167D80004BFE1 /* WechatMomentsController.swift */; };
 		EC20D67A2C682F257C92D26E /* Pods_AppScreenMocker.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C9BFB3F7FE03F99592201D4A /* Pods_AppScreenMocker.framework */; };
@@ -56,6 +57,7 @@
 		18AE3CE41D5DB4D300E651C6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		18AE3CEA1D5DBA8700E651C6 /* AppNavigationController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppNavigationController.swift; sourceTree = "<group>"; };
 		18AE3CEC1D5DBD5300E651C6 /* AppHomeController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppHomeController.swift; sourceTree = "<group>"; };
+		18AE42701D77BCFF0071C9C2 /* SudokuView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SudokuView.swift; sourceTree = "<group>"; };
 		18B532401D615EB70004BFE1 /* WechatScreenListController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WechatScreenListController.swift; sourceTree = "<group>"; };
 		18B532421D6167D80004BFE1 /* WechatMomentsController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WechatMomentsController.swift; sourceTree = "<group>"; };
 		68A0C31FB7A9931C06C549D0 /* Pods-AppScreenMocker.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AppScreenMocker.debug.xcconfig"; path = "Pods/Target Support Files/Pods-AppScreenMocker/Pods-AppScreenMocker.debug.xcconfig"; sourceTree = "<group>"; };
@@ -91,6 +93,7 @@
 				182439771D63FE12002A5C99 /* MomentView.swift */,
 				182439791D6BFC15002A5C99 /* ViewID.swift */,
 				182AB0AC1D757CC0001EA9A1 /* MomentData.swift */,
+				18AE42701D77BCFF0071C9C2 /* SudokuView.swift */,
 			);
 			name = Moments;
 			sourceTree = "<group>";
@@ -303,6 +306,7 @@
 				182AB0AD1D757CC0001EA9A1 /* MomentData.swift in Sources */,
 				182439781D63FE12002A5C99 /* MomentView.swift in Sources */,
 				18B532411D615EB70004BFE1 /* WechatScreenListController.swift in Sources */,
+				18AE42711D77BCFF0071C9C2 /* SudokuView.swift in Sources */,
 				18B532431D6167D80004BFE1 /* WechatMomentsController.swift in Sources */,
 				182439751D63F72F002A5C99 /* StatusBarView.swift in Sources */,
 				182AB0A71D75594D001EA9A1 /* UIControl+Target.swift in Sources */,

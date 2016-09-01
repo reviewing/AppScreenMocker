@@ -227,7 +227,7 @@ class WechatMomentsController: UIViewController, MaterialSwitchDelegate {
         
         if switchControl.on {
             switch id! {
-            case .LocationLabel, .SourceLabel, .SinglePhoto:
+            case .LocationLabel, .SourceLabel, .BodyPhoto:
                 let alert = UIAlertController(title: id!.description, message: ViewID(rawValue: view!.tag)?.description, preferredStyle: .ActionSheet)
                 alert.addAction(UIAlertAction(title: "隐藏" + id!.description, style: .Default) { (action) -> Void in
                     let indexPath = self.findIndexPathOfView(recognizer.view)
@@ -240,7 +240,7 @@ class WechatMomentsController: UIViewController, MaterialSwitchDelegate {
                         self.momentDataSource[indexPath!.row].locationText = nil
                     case .SourceLabel:
                         self.momentDataSource[indexPath!.row].sourceText = nil
-                    case .SinglePhoto:
+                    case .BodyPhoto:
                         self.momentDataSource[indexPath!.row].singlePhotoSize = nil
                     default:
                         break
@@ -318,7 +318,12 @@ class WechatMomentsController: UIViewController, MaterialSwitchDelegate {
             let alert = UIAlertController(title: "编辑消息", message: nil, preferredStyle: .ActionSheet)
             alert.addAction(UIAlertAction(title: "添加图片", style: .Default) { (action) -> Void in
                 self.momentDataSource[indexPath!.row].singlePhotoSize = MomentData.defaultSinglePhotoSize
-                self.momentTableView.reloadRowsAtIndexPaths([indexPath!], withRowAnimation: .Fade)
+                if self.momentDataSource[indexPath!.row].photoUrls.count < 9 {
+                    self.momentDataSource[indexPath!.row].photoUrls.append(NSURL())
+                    self.momentTableView.reloadRowsAtIndexPaths([indexPath!], withRowAnimation: .Fade)
+                } else {
+                    self.view.makeToast("最多只能添加9张图片", duration: 1.0, position: .Bottom)
+                }
                 })
             alert.addAction(UIAlertAction(title: "显示地点", style: .Default) { (action) -> Void in
                 self.momentDataSource[indexPath!.row].locationText = MomentData.defaultLocationText
@@ -454,6 +459,14 @@ class WechatMomentsController: UIViewController, MaterialSwitchDelegate {
         let indexPath = self.momentTableView.indexPathForCell(momentView)
         return indexPath
     }
+    
+    func findIndexOfImageView(imageView: UIImageView?, indexPath: NSIndexPath?) -> Int {
+        if imageView == nil || indexPath == nil {
+            return -1;
+        }
+        let momentView = self.momentTableView.cellForRowAtIndexPath(indexPath!) as! MomentView
+        return momentView.multiplePhotos.imageViews.indexOf(imageView!) ?? -1
+    }
 }
 
 extension WechatMomentsController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
@@ -479,12 +492,18 @@ extension WechatMomentsController: UIImagePickerControllerDelegate, UINavigation
             return
         }
         
+        guard let imageUrl = info[UIImagePickerControllerReferenceURL] as? NSURL else {
+            return
+        }
+        
         switch id! {
         case .HostAvatar:
-            self.momentDataSource[indexPath!.row].hostAvatarUrl = info[UIImagePickerControllerReferenceURL] as? NSURL
-        case .SinglePhoto:
-            self.momentDataSource[indexPath!.row].singlePhotoUrl = info[UIImagePickerControllerReferenceURL] as? NSURL
-            self.momentDataSource[indexPath!.row].singlePhotoSize = MomentView.computeImageSize(image?.size)
+            self.momentDataSource[indexPath!.row].hostAvatarUrl = imageUrl
+        case .BodyPhoto:
+            self.momentDataSource[indexPath!.row].photoUrls.append(imageUrl)
+            if self.momentDataSource[indexPath!.row].photoUrls.count == 1 {
+                self.momentDataSource[indexPath!.row].singlePhotoSize = MomentView.computeImageSize(image?.size)
+            }
         default:
             break
         }

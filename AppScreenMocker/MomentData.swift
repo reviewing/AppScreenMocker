@@ -19,9 +19,8 @@ class MomentData {
     internal var hostAvatarUrl: NSURL?
     internal var hostName: String? = defaultHostName
     internal var bodyText: String? = defaultBodyText
-    internal var singlePhotoUrl: NSURL?
     internal var singlePhotoSize: CGSize? = defaultSinglePhotoSize
-    internal var multiplePhotoUrls: [NSURL]?
+    internal var photoUrls: [NSURL] = []
     internal var locationText: String? = defaultLocationText
     internal var timeText: String? = defaultTimeText
     internal var sourceText: String? = defaultSourceText
