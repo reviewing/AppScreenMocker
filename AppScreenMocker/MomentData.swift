@@ -10,7 +10,7 @@ import UIKit
 
 class MomentData {
     static let defaultHostName = "科比"
-    static let defaultBodyText = "科比称与詹姆斯私交甚好"
+    static let defaultBodyText = "我与詹姆斯私交甚好"
     static let defaultSinglePhotoSize = CGSizeMake(120, 120)
     static let defaultLocationText = "成都・成都体育中心"
     static let defaultTimeText = "1分钟前"

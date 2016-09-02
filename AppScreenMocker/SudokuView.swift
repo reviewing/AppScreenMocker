@@ -22,6 +22,7 @@ class SudokuView: UIView {
                     for _ in 0..<imageUrls.count - oldImageViewCount {
                         let imageView = UIImageView()
                         imageView.backgroundColor = MaterialColor.black
+                        imageView.tag = ViewID.BodyPhoto.rawValue
                         imageViews.append(imageView)
                         self.addSubview(imageView)
                     }
@@ -65,6 +66,12 @@ class SudokuView: UIView {
     
     override func updateConstraints() {
         for i in 0..<imageViews.count {
+            self.snp_makeConstraints { make in
+                make.top.equalTo(imageViews[0])
+                make.left.equalTo(imageViews[0])
+                make.width.equalTo(3 * imageWidth + 2 * imageMargin)
+            }
+            
             imageViews[i].snp_makeConstraints { make in
                 make.width.height.equalTo(imageWidth)
             }
@@ -104,7 +111,7 @@ class SudokuView: UIView {
                 break
             }
         }
-                
+
         super.updateConstraints()
     }
 }

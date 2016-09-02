@@ -49,6 +49,7 @@ class MomentView: UITableViewCell {
     
     let multiplePhotos: SudokuView = {
         let sudokuView = SudokuView()
+        sudokuView.tag = ViewID.BodyPhoto.rawValue
         return sudokuView
     }()
     
