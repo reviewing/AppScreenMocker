@@ -45,7 +45,7 @@ class WechatMomentsController: UIViewController, MaterialSwitchDelegate {
     
     func materialSwitchStateChanged(control: MaterialSwitch) {
         self.view.makeToast(control.on ? "编辑模式" : "正常模式", duration: 1.0, position: .Bottom)
-        editToggleButton.setTitle(control.on ? "编辑模式" : "正常模式", forState: .Normal)
+        editToggleButton.setTitle(control.on ? "完成" : "编辑", forState: .Normal)
         if control.on {
             self.flatMenu.views![0].hidden = false;
         } else {
@@ -60,9 +60,9 @@ class WechatMomentsController: UIViewController, MaterialSwitchDelegate {
     }
     
     private func prepareEditToggleButton() {
-        let w: CGFloat = 200
-        editToggleButton = FlatButton(frame: CGRectMake((view.bounds.width - w) / 2, 100, w, 48))
-        editToggleButton.setTitle("正常模式", forState: .Normal)
+        let w: CGFloat = 100
+        editToggleButton = FlatButton(frame: CGRectMake((view.bounds.width - w) / 2, 0, w, 48))
+        editToggleButton.setTitle("编辑", forState: .Normal)
         editToggleButton.setTitleColor(MaterialColor.white, forState: .Normal)
         editToggleButton.pulseColor = MaterialColor.white
         editToggleButton.addTarget(.TouchUpInside) { [unowned self] in
