@@ -80,7 +80,47 @@ class WechatMomentsController: UIViewController, MaterialSwitchDelegate {
         navigationItem.rightControls = [switchControl, editToggleButton]
     }
     
+    let action1: FlatButton = {
+        let button = FlatButton()
+        button.setTitleColor(MaterialColor.white, forState: .Normal)
+        button.backgroundColor = MaterialColor.green.darken1
+        button.pulseColor = MaterialColor.white
+        button.setTitle("隐藏封面", forState: .Normal)
+        return button
+    }()
+    
+    let action2: FlatButton = {
+        let button = FlatButton()
+        button.setTitleColor(MaterialColor.white, forState: .Normal)
+        button.backgroundColor = MaterialColor.green.darken1
+        button.pulseColor = MaterialColor.white
+        button.setTitle("添加消息", forState: .Normal)
+        return button
+    }()
+    
+    let spacing: CGFloat = 8
+    let menuItemWidth: CGFloat = (UIScreen.mainScreen().bounds.width - 4 * 8) / 3
+    let menuItemHeight: CGFloat = 36
+    
     private func prepareFlatMenu() {
+        action1.addTarget(.TouchUpInside) { [unowned self] in
+            self.toggleCoverVisiblity()
+            self.action1.setTitle(self.coverImage.hidden ? "显示封面" :"隐藏封面", forState: .Normal)
+        }
+        view.addSubview(action1)
+        action2.addTarget(.TouchUpInside) { [unowned self] in
+            var lastVisibleRow = self.momentTableView.indexPathsForVisibleRows?.last?.row ?? -1
+            self.momentDataSource.append(MomentData())
+            self.momentTableView.insertRowsAtIndexPaths([NSIndexPath(forRow: lastVisibleRow + 1, inSection: 0)], withRowAnimation: .Fade)
+            lastVisibleRow = self.momentTableView.indexPathsForVisibleRows?.last?.row ?? -1
+            if self.momentDataSource.count > lastVisibleRow + 1 {
+                self.momentDataSource.removeLast()
+                self.momentTableView.deleteRowsAtIndexPaths([NSIndexPath(forRow: lastVisibleRow + 1, inSection: 0)], withRowAnimation: .None)
+                self.view.makeToast("一屏已经显示不下啦！", duration: 1.0, position: .Bottom)
+            }
+        }
+        view.addSubview(action2)
+        
         let btn1: FlatButton = FlatButton()
         btn1.addTarget(.TouchUpInside) { [unowned self] in
             if self.flatMenu.enabled {
@@ -94,19 +134,18 @@ class WechatMomentsController: UIViewController, MaterialSwitchDelegate {
         btn1.setTitleColor(MaterialColor.white, forState: .Normal)
         btn1.backgroundColor = MaterialColor.green.darken1
         btn1.pulseColor = MaterialColor.white
-        btn1.setTitle("选项", forState: .Normal)
-        btn1.hidden = true
+        btn1.setTitle("更多", forState: .Normal)
         view.addSubview(btn1)
         
         let btn2: FlatButton = FlatButton()
         btn2.addTarget(.TouchUpInside) { [unowned self] in
             self.toggleCoverVisiblity()
-            btn2.setTitle(self.coverImage.hidden ? "显示封面栏" :"隐藏封面栏", forState: .Normal)
+            btn2.setTitle(self.coverImage.hidden ? "显示封面" :"隐藏封面", forState: .Normal)
         }
         btn2.setTitleColor(MaterialColor.white, forState: .Normal)
         btn2.backgroundColor = MaterialColor.green.darken1
         btn2.pulseColor = MaterialColor.white
-        btn2.setTitle("隐藏封面栏", forState: .Normal)
+        btn2.setTitle("隐藏封面", forState: .Normal)
         view.addSubview(btn2)
         
         let btn3: FlatButton = FlatButton()
@@ -127,13 +166,10 @@ class WechatMomentsController: UIViewController, MaterialSwitchDelegate {
         btn3.setTitle("添加消息", forState: .Normal)
         view.addSubview(btn3)
         
-        let spacing: CGFloat = 24
-        let width: CGFloat = 128
-        let height: CGFloat = 36
-        flatMenu = Menu(origin: CGPointMake((view.bounds.width - width) / 2, spacing))
+        flatMenu = Menu(origin: CGPointMake(view.bounds.width - menuItemWidth - spacing, spacing))
         flatMenu.direction = .Down
-        flatMenu.spacing = 8
-        flatMenu.itemSize = CGSizeMake(width, height)
+        flatMenu.spacing = spacing
+        flatMenu.itemSize = CGSizeMake(menuItemWidth, menuItemHeight)
         flatMenu.views = [btn1, btn2, btn3]
     }
     
@@ -153,6 +189,8 @@ class WechatMomentsController: UIViewController, MaterialSwitchDelegate {
         momentTableView.allowsSelection = false
     }
     
+    var gestureClosure: (UIGestureRecognizer) -> () = {_ in }
+
     private func prepareView() {
         view.backgroundColor = MaterialColor.white
         view.addSubview(scrollView)
@@ -177,8 +215,6 @@ class WechatMomentsController: UIViewController, MaterialSwitchDelegate {
 
         view.setNeedsUpdateConstraints()
     }
-    
-    var gestureClosure: (UIGestureRecognizer) -> () = {_ in }
     
     let scrollView: UIScrollView = {
         let view = UIScrollView()
@@ -384,12 +420,28 @@ class WechatMomentsController: UIViewController, MaterialSwitchDelegate {
         
         if (!didSetupConstraints) {
             
+            action1.snp_makeConstraints { make in
+                make.left.equalTo(view).offset(8)
+                make.top.equalTo(view).offset(8)
+                make.width.equalTo(menuItemWidth)
+                make.height.equalTo(menuItemHeight)
+            }
+            
+            action2.snp_makeConstraints { make in
+                make.left.equalTo(action1.snp_right).offset(8)
+                make.top.equalTo(view).offset(8)
+                make.width.equalTo(menuItemWidth)
+                make.height.equalTo(menuItemHeight)
+            }
+            
             scrollView.snp_makeConstraints { make in
-                make.edges.equalTo(view).inset(UIEdgeInsetsZero)
+                make.edges.equalTo(view).inset(UIEdgeInsetsMake(52, 0, 0, 0))
             }
             
             mockRootView.snp_makeConstraints { make in
-                make.edges.equalTo(scrollView).inset(UIEdgeInsetsZero)
+                make.top.equalTo(scrollView)
+                make.centerX.equalTo(scrollView)
+                make.bottom.equalTo(scrollView)
                 make.width.equalTo(375)
                 make.height.equalTo(667)
             }
