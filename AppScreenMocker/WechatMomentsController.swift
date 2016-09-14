@@ -139,38 +139,31 @@ class WechatMomentsController: UIViewController, MaterialSwitchDelegate {
         
         let btn2: FlatButton = FlatButton()
         btn2.addTarget(.TouchUpInside) { [unowned self] in
-            self.toggleCoverVisiblity()
-            btn2.setTitle(self.coverImage.hidden ? "显示封面" :"隐藏封面", forState: .Normal)
+            UIImageWriteToSavedPhotosAlbum(UIUtils.imageWithView(self.mockRootView), self, #selector(WechatMomentsController.image(_:didFinishSavingWithError:contextInfo:)), nil)
         }
         btn2.setTitleColor(MaterialColor.white, forState: .Normal)
         btn2.backgroundColor = MaterialColor.green.darken1
         btn2.pulseColor = MaterialColor.white
-        btn2.setTitle("隐藏封面", forState: .Normal)
+        btn2.setTitle("保存截图", forState: .Normal)
         view.addSubview(btn2)
-        
-        let btn3: FlatButton = FlatButton()
-        btn3.addTarget(.TouchUpInside) { [unowned self] in
-            var lastVisibleRow = self.momentTableView.indexPathsForVisibleRows?.last?.row ?? -1
-            self.momentDataSource.append(MomentData())
-            self.momentTableView.insertRowsAtIndexPaths([NSIndexPath(forRow: lastVisibleRow + 1, inSection: 0)], withRowAnimation: .Fade)
-            lastVisibleRow = self.momentTableView.indexPathsForVisibleRows?.last?.row ?? -1
-            if self.momentDataSource.count > lastVisibleRow + 1 {
-                self.momentDataSource.removeLast()
-                self.momentTableView.deleteRowsAtIndexPaths([NSIndexPath(forRow: lastVisibleRow + 1, inSection: 0)], withRowAnimation: .None)
-                self.view.makeToast("一屏已经显示不下啦！", duration: 1.0, position: .Bottom)
-            }
-        }
-        btn3.setTitleColor(MaterialColor.white, forState: .Normal)
-        btn3.backgroundColor = MaterialColor.green.darken1
-        btn3.pulseColor = MaterialColor.white
-        btn3.setTitle("添加消息", forState: .Normal)
-        view.addSubview(btn3)
         
         flatMenu = Menu(origin: CGPointMake(view.bounds.width - menuItemWidth - spacing, spacing))
         flatMenu.direction = .Down
         flatMenu.spacing = spacing
         flatMenu.itemSize = CGSizeMake(menuItemWidth, menuItemHeight)
-        flatMenu.views = [btn1, btn2, btn3]
+        flatMenu.views = [btn1, btn2]
+    }
+    
+    func image(image: UIImage, didFinishSavingWithError error: NSError?, contextInfo:UnsafePointer<Void>) {
+        if error == nil {
+            let ac = UIAlertController(title: "Saved!", message: "Your altered image has been saved to your photos.", preferredStyle: .Alert)
+            ac.addAction(UIAlertAction(title: "OK", style: .Default, handler: nil))
+            presentViewController(ac, animated: true, completion: nil)
+        } else {
+            let ac = UIAlertController(title: "Save error", message: error?.localizedDescription, preferredStyle: .Alert)
+            ac.addAction(UIAlertAction(title: "OK", style: .Default, handler: nil))
+            presentViewController(ac, animated: true, completion: nil)
+        }
     }
     
     private func prepareTableView() {
@@ -224,6 +217,7 @@ class WechatMomentsController: UIViewController, MaterialSwitchDelegate {
     let mockRootView: UIView = {
         let view = UIView()
         view.clipsToBounds = true
+        view.backgroundColor = MaterialColor.white
         return view;
     }()
     
@@ -268,7 +262,7 @@ class WechatMomentsController: UIViewController, MaterialSwitchDelegate {
         label.tag = ViewID.SelfNameLabel.rawValue
         label.textColor = UIUtils.UIColorFromARGB(0xfffffdf1)
         label.font = UIFont.boldSystemFontOfSize(18)
-        label.text = NSLocalizedString("用户名", comment: "")
+        label.text = NSLocalizedString("詹姆斯", comment: "")
         label.shadowColor = MaterialColor.black;
         label.shadowOffset = CGSizeMake(0, 1);
         return label
@@ -457,7 +451,7 @@ class WechatMomentsController: UIViewController, MaterialSwitchDelegate {
                 make.top.equalTo(statusBarView.snp_bottom)
                 make.leading.equalTo(mockRootView)
                 make.trailing.equalTo(mockRootView)
-                make.height.equalTo(44)
+                make.height.equalTo(43)
             }
             
             if !coverImage.hidden {
@@ -471,7 +465,7 @@ class WechatMomentsController: UIViewController, MaterialSwitchDelegate {
                     make.top.equalTo(navigationBarView.snp_bottom)
                     make.leading.equalTo(mockRootView)
                     make.trailing.equalTo(mockRootView)
-                    make.height.equalTo(255)
+                    make.height.equalTo(256)
                 }
                 
                 avatarImageBg.snp_makeConstraints { make in
@@ -493,7 +487,7 @@ class WechatMomentsController: UIViewController, MaterialSwitchDelegate {
                 }
                 
                 momentTableView.snp_makeConstraints { make in
-                    make.top.equalTo(avatarImageBg.snp_bottom).offset(32)
+                    make.top.equalTo(coverImage.snp_bottom).offset(52)
                     make.leading.equalTo(mockRootView)
                     make.trailing.equalTo(mockRootView)
                     make.bottom.equalTo(mockRootView)

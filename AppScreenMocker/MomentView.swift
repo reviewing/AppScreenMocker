@@ -24,7 +24,7 @@ class MomentView: UITableViewCell {
         let label = UILabel()
         label.tag = ViewID.HostName.rawValue
         label.textColor = UIUtils.UIColorFromARGB(0xff465783)
-        label.font = UIFont.boldSystemFontOfSize(15.5)
+        label.font = UIFont.boldSystemFontOfSize(15)
         return label
     }()
     
@@ -32,7 +32,7 @@ class MomentView: UITableViewCell {
         let label = UILabel()
         label.tag = ViewID.BodyLabel.rawValue
         label.textColor = UIUtils.UIColorFromARGB(0xff222222)
-        label.font = UIFont.systemFontOfSize(15.5)
+        label.font = UIFont.systemFontOfSize(15)
         label.lineBreakMode = .ByWordWrapping
         label.numberOfLines = 0
         return label
@@ -153,7 +153,7 @@ class MomentView: UITableViewCell {
         hostAvatar.snp_makeConstraints { make in
             make.leading.equalTo(self).offset(10)
             make.top.equalTo(self).offset(14)
-            make.width.height.equalTo(40)
+            make.width.height.equalTo(42)
         }
         
         hostName.snp_makeConstraints { make in
