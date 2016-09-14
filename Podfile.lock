@@ -1,21 +1,21 @@
 PODS:
-  - Kingfisher (3.0.1)
+  - Kingfisher (2.6.0)
   - Material (1.42.9)
   - SnapKit (0.15.0)
   - Toast-Swift (1.3.0)
 
 DEPENDENCIES:
-  - Kingfisher (~> 3.0)
+  - Kingfisher (~> 2.4)
   - Material (~> 1.0)
   - SnapKit (~> 0.15.0)
   - Toast-Swift (~> 1.3.0)
 
 SPEC CHECKSUMS:
-  Kingfisher: d5a491b45ea453d90a31bd2c0831d5243e73a73f
+  Kingfisher: d84c5fd176ea86cc7b8aac65fd55feda6f70f130
   Material: a84ed893b7785f0d3c8d568e88c055f82b436473
   SnapKit: 4962eed2ee18e48cbd2b2292fffc57efe7235f87
   Toast-Swift: 25c3d98db42dc70d9a77b5006ee000e0becb458e
 
-PODFILE CHECKSUM: 1a2c28e9844b1ec9432fbf1e8d83d4e5a4e65c1c
+PODFILE CHECKSUM: a9528e02f3c5a29bafeac635f1cbc536df4c2611
 
 COCOAPODS: 1.0.1

@@ -192,6 +192,7 @@ class WechatMomentsController: UIViewController, MaterialSwitchDelegate {
         mockRootView.addSubview(navigationBarView)
         
         mockRootView.addSubview(coverImage)
+        
         mockRootView.addSubview(avatarImageBg)
         avatarImageBg.addSubview(avatarImage)
         mockRootView.addSubview(selfNameLabel)

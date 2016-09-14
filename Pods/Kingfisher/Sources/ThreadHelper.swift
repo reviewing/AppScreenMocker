@@ -26,15 +26,19 @@
 
 import Foundation
 
-extension DispatchQueue {
-    // This method will dispatch the `block` to self.
-    // If `self` is the main queue, and current thread is main thread, the block
-    // will be invoked immediately instead of being dispatched.
-    func safeAsync(_ block: @escaping ()->()) {
-        if self === DispatchQueue.main && Thread.isMainThread {
+func dispatch_async_safely_to_main_queue(block: ()->()) {
+    dispatch_async_safely_to_queue(dispatch_get_main_queue(), block)
+}
+
+// This method will dispatch the `block` to a specified `queue`.
+// If the `queue` is the main queue, and current thread is main thread, the block 
+// will be invoked immediately instead of being dispatched.
+func dispatch_async_safely_to_queue(queue: dispatch_queue_t, _ block: ()->()) {
+    if queue === dispatch_get_main_queue() && NSThread.isMainThread() {
+        block()
+    } else {
+        dispatch_async(queue) {
             block()
-        } else {
-            async { block() }
         }
     }
 }

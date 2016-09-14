@@ -24,32 +24,38 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 //  THE SOFTWARE.
 
-#if os(macOS)
+#if os(OSX)
 import AppKit
 #else
 import UIKit
 #endif
 
-public extension Notification.Name {
-    /**
-     This notification will be sent when the disk cache got cleaned either there are cached files expired or the total size exceeding the max allowed size. The manually invoking of `clearDiskCache` method will not trigger this notification.
-     
-     The `object` of this notification is the `ImageCache` object which sends the notification.
-     
-     A list of removed hashes (files) could be retrieved by accessing the array under `KingfisherDiskCacheCleanedHashKey` key in `userInfo` of the notification object you received. By checking the array, you could know the hash codes of files are removed.
-     
-     The main purpose of this notification is supplying a chance to maintain some necessary information on the cached files. See [this wiki](https://github.com/onevcat/Kingfisher/wiki/How-to-implement-ETag-based-304-(Not-Modified)-handling-in-Kingfisher) for a use case on it.
-     */
-    public static var KingfisherDidCleanDiskCache = Notification.Name.init("com.onevcat.Kingfisher.KingfisherDidCleanDiskCache")
-}
+/**
+This notification will be sent when the disk cache got cleaned either there are cached files expired or the total size exceeding the max allowed size. The manually invoking of `clearDiskCache` method will not trigger this notification.
+
+The `object` of this notification is the `ImageCache` object which sends the notification.
+
+A list of removed hashes (files) could be retrieved by accessing the array under `KingfisherDiskCacheCleanedHashKey` key in `userInfo` of the notification object you received. By checking the array, you could know the hash codes of files are removed.
+
+The main purpose of this notification is supplying a chance to maintain some necessary information on the cached files. See [this wiki](https://github.com/onevcat/Kingfisher/wiki/How-to-implement-ETag-based-304-(Not-Modified)-handling-in-Kingfisher) for a use case on it.
+*/
+public let KingfisherDidCleanDiskCacheNotification = "com.onevcat.Kingfisher.KingfisherDidCleanDiskCacheNotification"
 
 /**
 Key for array of cleaned hashes in `userInfo` of `KingfisherDidCleanDiskCacheNotification`.
 */
 public let KingfisherDiskCacheCleanedHashKey = "com.onevcat.Kingfisher.cleanedHash"
 
+private let defaultCacheName = "default"
+private let cacheReverseDNS = "com.onevcat.Kingfisher.ImageCache."
+private let ioQueueName = "com.onevcat.Kingfisher.ImageCache.ioQueue."
+private let processQueueName = "com.onevcat.Kingfisher.ImageCache.processQueue."
+
+private let defaultCacheInstance = ImageCache(name: defaultCacheName)
+private let defaultMaxCachePeriodInSecond: NSTimeInterval = 60 * 60 * 24 * 7 //Cache exists for 1 week
+
 /// It represents a task of retrieving image. You can call `cancel` on it to stop the process.
-public typealias RetrieveImageDiskTask = DispatchWorkItem
+public typealias RetrieveImageDiskTask = dispatch_block_t
 
 /**
 Cache type of a cached image.
@@ -59,56 +65,48 @@ Cache type of a cached image.
 - Disk:   The image is cached in disk.
 */
 public enum CacheType {
-    case none, memory, disk
+    case None, Memory, Disk
 }
 
-/// `ImageCache` represents both the memory and disk cache system of Kingfisher. 
-/// While a default image cache object will be used if you prefer the extension methods of Kingfisher, 
-/// you can create your own cache object and configure it as your need. You could use an `ImageCache`
-/// object to manipulate memory and disk cache for Kingfisher.
-open class ImageCache {
+/// `ImageCache` represents both the memory and disk cache system of Kingfisher. While a default image cache object will be used if you prefer the extension methods of Kingfisher, you can create your own cache object and configure it as your need. You should use an `ImageCache` object to manipulate memory and disk cache for Kingfisher.
+public class ImageCache {
 
     //Memory
-    fileprivate let memoryCache = NSCache<NSString, AnyObject>()
+    private let memoryCache = NSCache()
     
-    /// The largest cache cost of memory cache. The total cost is pixel count of 
-    /// all cached images in memory.
-    /// Default is unlimited. Memory cache will be purged automatically when a 
-    /// memory warning notification is received.
-    open var maxMemoryCost: UInt = 0 {
+    /// The largest cache cost of memory cache. The total cost is pixel count of all cached images in memory.
+    public var maxMemoryCost: UInt = 0 {
         didSet {
             self.memoryCache.totalCostLimit = Int(maxMemoryCost)
         }
     }
     
     //Disk
-    fileprivate let ioQueue: DispatchQueue
-    fileprivate var fileManager: FileManager!
+    private let ioQueue: dispatch_queue_t
+    private var fileManager: NSFileManager!
     
     ///The disk cache location.
-    open let diskCachePath: String
+    public let diskCachePath: String
     
-    /// The longest time duration in second of the cache being stored in disk. 
-    /// Default is 1 week (60 * 60 * 24 * 7 seconds).
-    open var maxCachePeriodInSecond: TimeInterval = 60 * 60 * 24 * 7 //Cache exists for 1 week
+    /// The longest time duration of the cache being stored in disk. Default is 1 week.
+    public var maxCachePeriodInSecond = defaultMaxCachePeriodInSecond
     
-    /// The largest disk size can be taken for the cache. It is the total 
-    /// allocated size of cached files in bytes.
-    /// Default is no limit.
-    open var maxDiskCacheSize: UInt = 0
+    /// The largest disk size can be taken for the cache. It is the total allocated size of cached files in bytes. Default is 0, which means no limit.
+    public var maxDiskCacheSize: UInt = 0
     
-    fileprivate let processQueue: DispatchQueue
+    private let processQueue: dispatch_queue_t
     
     /// The default cache.
-    public static let `default` = ImageCache(name: "default")
+    public class var defaultCache: ImageCache {
+        return defaultCacheInstance
+    }
     
     /**
     Init method. Passing a name for the cache. It represents a cache folder in the memory and disk.
     
-    - parameter name: Name of the cache. It will be used as the memory cache name and the disk cache folder name 
-                      appending to the cache path. This value should not be an empty string.
-    - parameter path: Optional - Location of cache path on disk. If `nil` is passed in (the default value),
-                      the `.cachesDirectory` in of your app will be used.
+    - parameter name: Name of the cache. It will be used as the memory cache name and the disk cache folder name appending to the cache path. This value should not be an empty string.
+    - parameter path: Optional - Location of cache path on disk. If `nil` is passed (the default value), 
+                      the cache folder in of your app will be used. If you want to cache some user generating images, you could pass the Documentation path here.
     
     - returns: The cache object.
     */
@@ -118,32 +116,28 @@ open class ImageCache {
             fatalError("[Kingfisher] You should specify a name for the cache. A cache with empty name is not permitted.")
         }
         
-        let cacheName = "com.onevcat.Kingfisher.ImageCache.\(name)"
+        let cacheName = cacheReverseDNS + name
         memoryCache.name = cacheName
         
-        let dstPath = path ?? NSSearchPathForDirectoriesInDomains(.cachesDirectory, .userDomainMask, true).first!
-        diskCachePath = (dstPath as NSString).appendingPathComponent(cacheName)
+        let dstPath = path ?? NSSearchPathForDirectoriesInDomains(.CachesDirectory, NSSearchPathDomainMask.UserDomainMask, true).first!
+        diskCachePath = (dstPath as NSString).stringByAppendingPathComponent(cacheName)
         
-        let ioQueueName = "com.onevcat.Kingfisher.ImageCache.ioQueue.\(name)"
-        ioQueue = DispatchQueue(label: ioQueueName)
+        ioQueue = dispatch_queue_create(ioQueueName + name, DISPATCH_QUEUE_SERIAL)
+        processQueue = dispatch_queue_create(processQueueName + name, DISPATCH_QUEUE_CONCURRENT)
         
-        let processQueueName = "com.onevcat.Kingfisher.ImageCache.processQueue.\(name)"
-        processQueue = DispatchQueue(label: processQueueName, attributes: .concurrent)
+        dispatch_sync(ioQueue, { () -> Void in
+            self.fileManager = NSFileManager()
+        })
         
-        ioQueue.sync { fileManager = FileManager() }
-        
-#if !os(macOS) && !os(watchOS)
-        NotificationCenter.default.addObserver(
-            self, selector: #selector(clearMemoryCache), name: .UIApplicationDidReceiveMemoryWarning, object: nil)
-        NotificationCenter.default.addObserver(
-            self, selector: #selector(cleanExpiredDiskCache), name: .UIApplicationWillTerminate, object: nil)
-        NotificationCenter.default.addObserver(
-            self, selector: #selector(backgroundCleanExpiredDiskCache), name: .UIApplicationDidEnterBackground, object: nil)
+#if !os(OSX) && !os(watchOS)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(ImageCache.clearMemoryCache), name: UIApplicationDidReceiveMemoryWarningNotification, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(ImageCache.cleanExpiredDiskCache), name: UIApplicationWillTerminateNotification, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(ImageCache.backgroundCleanExpiredDiskCache), name: UIApplicationDidEnterBackgroundNotification, object: nil)
 #endif
     }
     
     deinit {
-        NotificationCenter.default.removeObserver(self)
+        NSNotificationCenter.defaultCenter().removeObserver(self)
     }
 }
 
@@ -153,51 +147,53 @@ extension ImageCache {
     Store an image to cache. It will be saved to both memory and disk. It is an async operation.
     
     - parameter image:             The image to be stored.
-    - parameter original:          The original data of the image.
+    - parameter originalData:      The original data of the image.
                                    Kingfisher will use it to check the format of the image and optimize cache size on disk.
-                                   If `nil` is supplied, the image data will be saved as a normalized PNG file.
+                                   If `nil` is supplied, the image data will be saved as a normalized PNG file. 
                                    It is strongly suggested to supply it whenever possible, to get a better performance and disk usage.
     - parameter key:               Key for the image.
-    - parameter identifier:        The identifier of processor used. If you are using a processor for the image, pass the identifier of
-                                   processor to it.
-                                   This identifier will be used to generate a corresponding key for the combination of `key` and processor.
     - parameter toDisk:            Whether this image should be cached to disk or not. If false, the image will be only cached in memory.
     - parameter completionHandler: Called when store operation completes.
     */
-    open func store(_ image: Image,
-                      original: Data? = nil,
-                      forKey key: String,
-                      processorIdentifier identifier: String = "",
-                      cacheSerializer serializer: CacheSerializer = DefaultCacheSerializer.default,
-                      toDisk: Bool = true,
-                      completionHandler: (() -> Void)? = nil)
-    {
+    public func storeImage(image: Image, originalData: NSData? = nil, forKey key: String, toDisk: Bool = true, completionHandler: (() -> Void)? = nil) {
+        memoryCache.setObject(image, forKey: key, cost: image.kf_imageCost)
         
-        let computedKey = key.computedKey(with: identifier)
-        memoryCache.setObject(image, forKey: computedKey as NSString, cost: image.kf_imageCost)
-
         func callHandlerInMainQueue() {
             if let handler = completionHandler {
-                DispatchQueue.main.async {
+                dispatch_async(dispatch_get_main_queue()) {
                     handler()
                 }
             }
         }
         
         if toDisk {
-            ioQueue.async {
+            dispatch_async(ioQueue, {
+                let imageFormat: ImageFormat
+                if let originalData = originalData {
+                    imageFormat = originalData.kf_imageFormat
+                } else {
+                    imageFormat = .Unknown
+                }
                 
-                if let data = serializer.data(with: image, original: original) {
-                    if !self.fileManager.fileExists(atPath: self.diskCachePath) {
+                let data: NSData?
+                switch imageFormat {
+                case .PNG: data = originalData ?? ImagePNGRepresentation(image)
+                case .JPEG: data = originalData ?? ImageJPEGRepresentation(image, 1.0)
+                case .GIF: data = originalData ?? ImageGIFRepresentation(image)
+                case .Unknown: data = originalData ?? ImagePNGRepresentation(image.kf_normalizedImage())
+                }
+                
+                if let data = data {
+                    if !self.fileManager.fileExistsAtPath(self.diskCachePath) {
                         do {
-                            try self.fileManager.createDirectory(atPath: self.diskCachePath, withIntermediateDirectories: true, attributes: nil)
+                            try self.fileManager.createDirectoryAtPath(self.diskCachePath, withIntermediateDirectories: true, attributes: nil)
                         } catch _ {}
                     }
                     
-                    self.fileManager.createFile(atPath: self.cachePath(forComputedKey: computedKey), contents: data, attributes: nil)
+                    self.fileManager.createFileAtPath(self.cachePathForKey(key), contents: data, attributes: nil)
                 }
                 callHandlerInMainQueue()
-            }
+            })
         } else {
             callHandlerInMainQueue()
         }
@@ -208,34 +204,27 @@ extension ImageCache {
     It is an async operation.
     
     - parameter key:               Key for the image.
-    - parameter identifier:        The identifier of processor used. If you are using a processor for the image, pass the identifier of processor to it.
-                                   This identifier will be used to generate a corresponding key for the combination of `key` and processor.
     - parameter fromDisk:          Whether this image should be removed from disk or not. If false, the image will be only removed from memory.
     - parameter completionHandler: Called when removal operation completes.
     */
-    open func removeImage(forKey key: String,
-                          processorIdentifier identifier: String = "",
-                          fromDisk: Bool = true,
-                          completionHandler: (() -> Void)? = nil)
-    {
-        let computedKey = key.computedKey(with: identifier)
-        memoryCache.removeObject(forKey: computedKey as NSString)
+    public func removeImageForKey(key: String, fromDisk: Bool = true, completionHandler: (() -> Void)? = nil) {
+        memoryCache.removeObjectForKey(key)
         
         func callHandlerInMainQueue() {
             if let handler = completionHandler {
-                DispatchQueue.main.async {
+                dispatch_async(dispatch_get_main_queue()) {
                     handler()
                 }
             }
         }
         
         if fromDisk {
-            ioQueue.async{
+            dispatch_async(ioQueue, { () -> Void in
                 do {
-                    try self.fileManager.removeItem(atPath: self.cachePath(forComputedKey: computedKey))
+                    try self.fileManager.removeItemAtPath(self.cachePathForKey(key))
                 } catch _ {}
                 callHandlerInMainQueue()
-            }
+            })
         } else {
             callHandlerInMainQueue()
         }
@@ -249,18 +238,12 @@ extension ImageCache {
     Get an image for a key from memory or disk.
     
     - parameter key:               Key for the image.
-    - parameter options:           Options of retrieving image. If you need to retrieve an image which was 
-                                   stored with a specified `ImageProcessor`, pass the processor in the option too.
-    - parameter completionHandler: Called when getting operation completes with image result and cached type of 
-                                   this image. If there is no such key cached, the image will be `nil`.
+    - parameter options:           Options of retrieving image.
+    - parameter completionHandler: Called when getting operation completes with image result and cached type of this image. If there is no such key cached, the image will be `nil`.
     
     - returns: The retrieving task.
     */
-    @discardableResult
-    open func retrieveImage(forKey key: String,
-                               options: KingfisherOptionsInfo?,
-                     completionHandler: ((Image?, CacheType) -> ())?) -> RetrieveImageDiskTask?
-    {
+    public func retrieveImageForKey(key: String, options: KingfisherOptionsInfo?, completionHandler: ((Image?, CacheType) -> ())?) -> RetrieveImageDiskTask? {
         // No completion handler. Not start working and early return.
         guard let completionHandler = completionHandler else {
             return nil
@@ -269,54 +252,42 @@ extension ImageCache {
         var block: RetrieveImageDiskTask?
         let options = options ?? KingfisherEmptyOptionsInfo
         
-        if let image = self.retrieveImageInMemoryCache(forKey: key, options: options) {
-            options.callbackDispatchQueue.safeAsync {
-                completionHandler(image, .memory)
+        if let image = self.retrieveImageInMemoryCacheForKey(key) {
+            dispatch_async_safely_to_queue(options.callbackDispatchQueue) { () -> Void in
+                completionHandler(image, .Memory)
             }
         } else {
             var sSelf: ImageCache! = self
-            block = DispatchWorkItem(block: {
+            block = dispatch_block_create(DISPATCH_BLOCK_INHERIT_QOS_CLASS) {
                 // Begin to load image from disk
-                if let image = sSelf.retrieveImageInDiskCache(forKey: key, options: options) {
+                if let image = sSelf.retrieveImageInDiskCacheForKey(key, scale: options.scaleFactor, preloadAllGIFData: options.preloadAllGIFData) {
                     if options.backgroundDecode {
-                        sSelf.processQueue.async {
-                            let result = image.kf_decoded(scale: options.scaleFactor)
-                            
-                            sSelf.store(result,
-                                        forKey: key,
-                                        processorIdentifier: options.processor.identifier,
-                                        cacheSerializer: options.cacheSerializer,
-                                        toDisk: false,
-                                        completionHandler: nil)
-                            
-                            options.callbackDispatchQueue.safeAsync {
-                                completionHandler(result, .memory)
+                        dispatch_async(sSelf.processQueue, { () -> Void in
+                            let result = image.kf_decodedImage(scale: options.scaleFactor)
+                            sSelf.storeImage(result!, forKey: key, toDisk: false, completionHandler: nil)
+
+                            dispatch_async_safely_to_queue(options.callbackDispatchQueue, { () -> Void in
+                                completionHandler(result, .Memory)
                                 sSelf = nil
-                            }
-                        }
+                            })
+                        })
                     } else {
-                        sSelf.store(image,
-                                    forKey: key,
-                                    processorIdentifier: options.processor.identifier,
-                                    cacheSerializer: options.cacheSerializer,
-                                    toDisk: false,
-                                    completionHandler: nil
-                        )
-                        options.callbackDispatchQueue.safeAsync {
-                            completionHandler(image, .disk)
+                        sSelf.storeImage(image, forKey: key, toDisk: false, completionHandler: nil)
+                        dispatch_async_safely_to_queue(options.callbackDispatchQueue, { () -> Void in
+                            completionHandler(image, .Disk)
                             sSelf = nil
-                        }
+                        })
                     }
                 } else {
                     // No image found from either memory or disk
-                    options.callbackDispatchQueue.safeAsync {
-                        completionHandler(nil, .none)
+                    dispatch_async_safely_to_queue(options.callbackDispatchQueue, { () -> Void in
+                        completionHandler(nil, .None)
                         sSelf = nil
-                    }
+                    })
                 }
-            })
+            }
             
-            sSelf.ioQueue.async(execute: block!)
+            dispatch_async(sSelf.ioQueue, block!)
         }
     
         return block
@@ -325,34 +296,26 @@ extension ImageCache {
     /**
     Get an image for a key from memory.
     
-    - parameter key:     Key for the image.
-    - parameter options: Options of retrieving image. If you need to retrieve an image which was 
-                         stored with a specified `ImageProcessor`, pass the processor in the option too.
+    - parameter key: Key for the image.
+    
     - returns: The image object if it is cached, or `nil` if there is no such key in the cache.
     */
-    open func retrieveImageInMemoryCache(forKey key: String, options: KingfisherOptionsInfo? = nil) -> Image? {
-        
-        let options = options ?? KingfisherEmptyOptionsInfo
-        let computedKey = key.computedKey(with: options.processor.identifier)
-        
-        return memoryCache.object(forKey: computedKey as NSString) as? Image
+    public func retrieveImageInMemoryCacheForKey(key: String) -> Image? {
+        return memoryCache.objectForKey(key) as? Image
     }
     
     /**
     Get an image for a key from disk.
     
-    - parameter key:     Key for the image.
-    - parameter options: Options of retrieving image. If you need to retrieve an image which was
-                         stored with a specified `ImageProcessor`, pass the processor in the option too.
+    - parameter key: Key for the image.
+    - parameter scale: The scale factor to assume when interpreting the image data.
+    - parameter preloadAllGIFData: Whether all GIF data should be loaded. If true, you can set the loaded image to a regular UIImageView to play 
+      the GIF animation. Otherwise, you should use `AnimatedImageView` to play it. Default is `false`
 
     - returns: The image object if it is cached, or `nil` if there is no such key in the cache.
     */
-    open func retrieveImageInDiskCache(forKey key: String, options: KingfisherOptionsInfo? = nil) -> Image? {
-        
-        let options = options ?? KingfisherEmptyOptionsInfo
-        let computedKey = key.computedKey(with: options.processor.identifier)
-        
-        return diskImage(forComputedKey: computedKey, serializer: options.cacheSerializer, options: options)
+    public func retrieveImageInDiskCacheForKey(key: String, scale: CGFloat = 1.0, preloadAllGIFData: Bool = false) -> Image? {
+        return diskImageForKey(key, scale: scale, preloadAllGIFData: preloadAllGIFData)
     }
 }
 
@@ -364,32 +327,40 @@ extension ImageCache {
     @objc public func clearMemoryCache() {
         memoryCache.removeAllObjects()
     }
+
+    /**
+    Clear disk cache.
+    */
+    public func clearDiskCache() {
+        clearDiskCacheWithCompletionHandler(nil)
+    }
     
     /**
     Clear disk cache. This is an async operation.
     
     - parameter completionHander: Called after the operation completes.
     */
-    open func clearDiskCache(completion handler: (()->())? = nil) {
-        ioQueue.async {
+    public func clearDiskCacheWithCompletionHandler(completionHander: (()->())?) {
+        dispatch_async(ioQueue, { () -> Void in
             do {
-                try self.fileManager.removeItem(atPath: self.diskCachePath)
-                try self.fileManager.createDirectory(atPath: self.diskCachePath, withIntermediateDirectories: true, attributes: nil)
-            } catch _ { }
-            
-            if let handler = handler {
-                DispatchQueue.main.async {
-                    handler()
-                }
+                try self.fileManager.removeItemAtPath(self.diskCachePath)
+                try self.fileManager.createDirectoryAtPath(self.diskCachePath, withIntermediateDirectories: true, attributes: nil)
+            } catch _ {
             }
-        }
+            
+            if let completionHander = completionHander {
+                dispatch_async(dispatch_get_main_queue(), { () -> Void in
+                    completionHander()
+                })
+            }
+        })
     }
     
     /**
     Clean expired disk cache. This is an async operation.
     */
-    @objc fileprivate func cleanExpiredDiskCache() {
-        cleanExpiredDiskCache(completion: nil)
+    @objc public func cleanExpiredDiskCache() {
+        cleanExpiredDiskCacheWithCompletionHander(nil)
     }
     
     /**
@@ -397,17 +368,18 @@ extension ImageCache {
     
     - parameter completionHandler: Called after the operation completes.
     */
-    open func cleanExpiredDiskCache(completion handler: (()->())? = nil) {
+    public func cleanExpiredDiskCacheWithCompletionHander(completionHandler: (()->())?) {
         
         // Do things in cocurrent io queue
-        ioQueue.async {
+        dispatch_async(ioQueue, { () -> Void in
             
             var (URLsToDelete, diskCacheSize, cachedFiles) = self.travelCachedFiles(onlyForCacheSize: false)
             
             for fileURL in URLsToDelete {
                 do {
-                    try self.fileManager.removeItem(at: fileURL)
-                } catch _ { }
+                    try self.fileManager.removeItemAtURL(fileURL)
+                } catch _ {
+                }
             }
                 
             if self.maxDiskCacheSize > 0 && diskCacheSize > self.maxDiskCacheSize {
@@ -417,12 +389,10 @@ extension ImageCache {
                 let sortedFiles = cachedFiles.keysSortedByValue {
                     resourceValue1, resourceValue2 -> Bool in
                     
-                    if let date1 = resourceValue1.contentAccessDate,
-                       let date2 = resourceValue2.contentAccessDate
-                    {
-                        return date1.compare(date2) == .orderedAscending
+                    if let date1 = resourceValue1[NSURLContentAccessDateKey] as? NSDate,
+                           date2 = resourceValue2[NSURLContentAccessDateKey] as? NSDate {
+                        return date1.compare(date2) == .OrderedAscending
                     }
-                    
                     // Not valid date information. This should not happen. Just in case.
                     return true
                 }
@@ -430,13 +400,15 @@ extension ImageCache {
                 for fileURL in sortedFiles {
                     
                     do {
-                        try self.fileManager.removeItem(at: fileURL)
-                    } catch { }
+                        try self.fileManager.removeItemAtURL(fileURL)
+                    } catch {
+                        
+                    }
                         
                     URLsToDelete.append(fileURL)
                     
-                    if let fileSize = cachedFiles[fileURL]?.totalFileAllocatedSize {
-                        diskCacheSize -= UInt(fileSize)
+                    if let fileSize = cachedFiles[fileURL]?[NSURLTotalFileAllocatedSizeKey] as? NSNumber {
+                        diskCacheSize -= fileSize.unsignedLongValue
                     }
                     
                     if diskCacheSize < targetSize {
@@ -445,64 +417,69 @@ extension ImageCache {
                 }
             }
                 
-            DispatchQueue.main.async {
+            dispatch_async(dispatch_get_main_queue(), { () -> Void in
                 
                 if URLsToDelete.count != 0 {
-                    let cleanedHashes = URLsToDelete.map { $0.lastPathComponent }
-                    NotificationCenter.default.post(name: .KingfisherDidCleanDiskCache, object: self, userInfo: [KingfisherDiskCacheCleanedHashKey: cleanedHashes])
+                    let cleanedHashes = URLsToDelete.map({ (url) -> String in
+                        return url.lastPathComponent!
+                    })
+                    
+                    NSNotificationCenter.defaultCenter().postNotificationName(KingfisherDidCleanDiskCacheNotification, object: self, userInfo: [KingfisherDiskCacheCleanedHashKey: cleanedHashes])
                 }
                 
-                handler?()
-            }
-        }
+                completionHandler?()
+            })
+        })
     }
     
-    fileprivate func travelCachedFiles(onlyForCacheSize: Bool) -> (urlsToDelete: [URL], diskCacheSize: UInt, cachedFiles: [URL: URLResourceValues]) {
+    private func travelCachedFiles(onlyForCacheSize onlyForCacheSize: Bool) -> (URLsToDelete: [NSURL], diskCacheSize: UInt, cachedFiles: [NSURL: [NSObject: AnyObject]]) {
         
-        let diskCacheURL = URL(fileURLWithPath: diskCachePath)
-        let resourceKeys: Set<URLResourceKey> = [.isDirectoryKey, .contentAccessDateKey, .totalFileAllocatedSizeKey]
-        let expiredDate = Date(timeIntervalSinceNow: -maxCachePeriodInSecond)
+        let diskCacheURL = NSURL(fileURLWithPath: diskCachePath)
+        let resourceKeys = [NSURLIsDirectoryKey, NSURLContentAccessDateKey, NSURLTotalFileAllocatedSizeKey]
+        let expiredDate = NSDate(timeIntervalSinceNow: -self.maxCachePeriodInSecond)
         
-        var cachedFiles = [URL: URLResourceValues]()
-        var urlsToDelete = [URL]()
+        var cachedFiles = [NSURL: [NSObject: AnyObject]]()
+        var URLsToDelete = [NSURL]()
         var diskCacheSize: UInt = 0
         
-        if let fileEnumerator = self.fileManager.enumerator(at: diskCacheURL, includingPropertiesForKeys: Array(resourceKeys), options: FileManager.DirectoryEnumerationOptions.skipsHiddenFiles, errorHandler: nil),
-           let urls = fileEnumerator.allObjects as? [URL]
-        {
-            for fileUrl in urls {
-                
-                do {
-                    let resourceValues = try fileUrl.resourceValues(forKeys: resourceKeys)
-                    // If it is a Directory. Continue to next file URL.
-                    if resourceValues.isDirectory == true {
-                        continue
-                    }
+        if let fileEnumerator = self.fileManager.enumeratorAtURL(diskCacheURL, includingPropertiesForKeys: resourceKeys, options: NSDirectoryEnumerationOptions.SkipsHiddenFiles, errorHandler: nil),
+            urls = fileEnumerator.allObjects as? [NSURL] {
+                for fileURL in urls {
                     
-                    if !onlyForCacheSize {
-                        // If this file is expired, add it to URLsToDelete
-                        if let lastAccessData = resourceValues.contentAccessDate {
-                            if (lastAccessData as NSDate).laterDate(expiredDate) == expiredDate {
-                                urlsToDelete.append(fileUrl)
+                    do {
+                        let resourceValues = try fileURL.resourceValuesForKeys(resourceKeys)
+                        // If it is a Directory. Continue to next file URL.
+                        if let isDirectory = resourceValues[NSURLIsDirectoryKey] as? NSNumber {
+                            if isDirectory.boolValue {
                                 continue
                             }
                         }
-                    }
-
-                    if let fileSize = resourceValues.totalFileAllocatedSize {
-                        diskCacheSize += UInt(fileSize)
+                        
                         if !onlyForCacheSize {
-                            cachedFiles[fileUrl] = resourceValues
+                            // If this file is expired, add it to URLsToDelete
+                            if let lastAccessDate = resourceValues[NSURLContentAccessDateKey] as? NSDate {
+                                if lastAccessDate.laterDate(expiredDate) == expiredDate {
+                                    URLsToDelete.append(fileURL)
+                                    continue
+                                }
+                            }
                         }
+                        
+                        if let fileSize = resourceValues[NSURLTotalFileAllocatedSizeKey] as? NSNumber {
+                            diskCacheSize += fileSize.unsignedLongValue
+                            if !onlyForCacheSize {
+                                cachedFiles[fileURL] = resourceValues
+                            }
+                        }
+                    } catch _ {
                     }
-                } catch _ { }
-            }
+                }
         }
         
-        return (urlsToDelete, diskCacheSize, cachedFiles)
+        return (URLsToDelete, diskCacheSize, cachedFiles)
     }
     
-#if !os(macOS) && !os(watchOS)
+#if !os(OSX) && !os(watchOS)
     /**
     Clean expired disk cache when app in background. This is an async operation.
     In most cases, you should not call this method explicitly. 
@@ -510,19 +487,20 @@ extension ImageCache {
     */
     @objc public func backgroundCleanExpiredDiskCache() {
         // if 'sharedApplication()' is unavailable, then return
-        guard let sharedApplication = UIApplication.kf_shared else { return }
+        guard let sharedApplication = UIApplication.kf_sharedApplication() else { return }
 
-        func endBackgroundTask(_ task: inout UIBackgroundTaskIdentifier) {
+        func endBackgroundTask(inout task: UIBackgroundTaskIdentifier) {
             sharedApplication.endBackgroundTask(task)
             task = UIBackgroundTaskInvalid
         }
         
         var backgroundTask: UIBackgroundTaskIdentifier!
-        backgroundTask = sharedApplication.beginBackgroundTask {
+        
+        backgroundTask = sharedApplication.beginBackgroundTaskWithExpirationHandler { () -> Void in
             endBackgroundTask(&backgroundTask!)
         }
         
-        cleanExpiredDiskCache {
+        cleanExpiredDiskCacheWithCompletionHander { () -> () in
             endBackgroundTask(&backgroundTask!)
         }
     }
@@ -542,29 +520,42 @@ extension ImageCache {
     }
     
     /**
+     Determine if a cached image exists for the given image, as keyed by the URL. It will return true if the
+     image is found either in memory or on disk. Essentially as long as there is a cache of the image somewhere
+     true is returned. A convenience method that decodes `isImageCachedForKey`.
+     
+     - parameter url: The image URL.
+     
+     - returns: True if the image is cached, false otherwise.
+     */
+    public func cachedImageExistsforURL(url: NSURL) -> Bool {
+        let resource = Resource(downloadURL: url)
+        let result = isImageCachedForKey(resource.cacheKey)
+        return result.cached
+    }
+
+    /**
     Check whether an image is cached for a key.
     
     - parameter key: Key for the image.
     
     - returns: The check result.
     */
-    open func isImageCached(forKey key: String, processorIdentifier identifier: String = "") -> CacheCheckResult {
+    public func isImageCachedForKey(key: String) -> CacheCheckResult {
         
-        let computedKey = key.computedKey(with: identifier)
-        
-        if memoryCache.object(forKey: computedKey as NSString) != nil {
-            return CacheCheckResult(cached: true, cacheType: .memory)
+        if memoryCache.objectForKey(key) != nil {
+            return CacheCheckResult(cached: true, cacheType: .Memory)
         }
         
-        let filePath = cachePath(forComputedKey: computedKey)
+        let filePath = cachePathForKey(key)
         
         var diskCached = false
-        ioQueue.sync {
-            diskCached = fileManager.fileExists(atPath: filePath)
+        dispatch_sync(ioQueue) { () -> Void in
+            diskCached = self.fileManager.fileExistsAtPath(filePath)
         }
 
         if diskCached {
-            return CacheCheckResult(cached: true, cacheType: .disk)
+            return CacheCheckResult(cached: true, cacheType: .Disk)
         }
         
         return CacheCheckResult(cached: false, cacheType: nil)
@@ -573,14 +564,12 @@ extension ImageCache {
     /**
     Get the hash for the key. This could be used for matching files.
     
-    - parameter key:        The key which is used for caching.
-    - parameter identifier: The identifier of processor used. If you are using a processor for the image, pass the identifier of processor to it.
+    - parameter key: The key which is used for caching.
     
-     - returns: Corresponding hash.
+    - returns: Corresponding hash.
     */
-    open func hash(forKey key: String, processorIdentifier identifier: String = "") -> String {
-        let computedKey = key.computedKey(with: identifier)
-        return cacheFileName(forComputedKey: computedKey)
+    public func hashForKey(key: String) -> String {
+        return cacheFileNameForKey(key)
     }
     
     /**
@@ -589,53 +578,48 @@ extension ImageCache {
     
     - parameter completionHandler: Called with the calculated size when finishes.
     */
-    open func calculateDiskCacheSize(completion handler: @escaping ((_ size: UInt) -> ())) {
-        ioQueue.async {
+    public func calculateDiskCacheSizeWithCompletionHandler(completionHandler: ((size: UInt) -> ())) {
+        dispatch_async(ioQueue, { () -> Void in
             let (_, diskCacheSize, _) = self.travelCachedFiles(onlyForCacheSize: true)
-            DispatchQueue.main.async {
-                handler(diskCacheSize)
-            }
-        }
+            dispatch_async(dispatch_get_main_queue(), { () -> Void in
+                completionHandler(size: diskCacheSize)
+            })
+        })
     }
     
     /**
     Get the cache path for the key.
     It is useful for projects with UIWebView or anyone that needs access to the local file path.
     
-    i.e. Replace the `<img src='path_for_key'>` tag in your HTML.
+    i.e. `<img src='path_for_key'>`
      
-    - Note: This method does not guarantee there is an image already cached in the path. It just returns the path
-      that the image should be.
-      You could use `isImageCached(forKey:)` method to check whether the image is cached under that key.
+    - Note: This method does not guarantee there is an image already cached in the path. 
+      You could use `isImageCachedForKey` method to check whether the image is cached under that key.
     */
-    open func cachePath(forKey key: String, processorIdentifier identifier: String = "") -> String {
-        let computedKey = key.computedKey(with: identifier)
-        return cachePath(forComputedKey: computedKey)
+    public func cachePathForKey(key: String) -> String {
+        let fileName = cacheFileNameForKey(key)
+        return (diskCachePath as NSString).stringByAppendingPathComponent(fileName)
     }
 
-    func cachePath(forComputedKey key: String) -> String {
-        let fileName = cacheFileName(forComputedKey: key)
-        return (diskCachePath as NSString).appendingPathComponent(fileName)
-    }
 }
 
 // MARK: - Internal Helper
 extension ImageCache {
     
-    func diskImage(forComputedKey key: String, serializer: CacheSerializer, options: KingfisherOptionsInfo) -> Image? {
-        if let data = diskImageData(forComputedKey: key) {
-            return serializer.image(with: data, options: options)
+    func diskImageForKey(key: String, scale: CGFloat, preloadAllGIFData: Bool) -> Image? {
+        if let data = diskImageDataForKey(key) {
+            return Image.kf_imageWithData(data, scale: scale, preloadAllGIFData: preloadAllGIFData)
         } else {
             return nil
         }
     }
     
-    func diskImageData(forComputedKey key: String) -> Data? {
-        let filePath = cachePath(forComputedKey: key)
-        return (try? Data(contentsOf: URL(fileURLWithPath: filePath)))
+    func diskImageDataForKey(key: String) -> NSData? {
+        let filePath = cachePathForKey(key)
+        return NSData(contentsOfFile: filePath)
     }
     
-    func cacheFileName(forComputedKey key: String) -> String {
+    func cacheFileNameForKey(key: String) -> String {
         return key.kf_MD5
     }
 }
@@ -649,28 +633,18 @@ extension Image {
 }
 
 extension Dictionary {
-    func keysSortedByValue(_ isOrderedBefore: (Value, Value) -> Bool) -> [Key] {
-        return Array(self).sorted{ isOrderedBefore($0.1, $1.1) }.map{ $0.0 }
+    func keysSortedByValue(isOrderedBefore: (Value, Value) -> Bool) -> [Key] {
+        return Array(self).sort{ isOrderedBefore($0.1, $1.1) }.map{ $0.0 }
     }
 }
 
-#if !os(macOS) && !os(watchOS)
+#if !os(OSX) && !os(watchOS)
 // MARK: - For App Extensions
 extension UIApplication {
-    public static var kf_shared: UIApplication? {
+    public static func kf_sharedApplication() -> UIApplication? {
         let selector = NSSelectorFromString("sharedApplication")
-        guard responds(to: selector) else { return nil }
-        return perform(selector).takeUnretainedValue() as? UIApplication
+        guard respondsToSelector(selector) else { return nil }
+        return performSelector(selector).takeUnretainedValue() as? UIApplication
     }
 }
 #endif
-
-extension String {
-    func computedKey(with identifier: String) -> String {
-        if identifier.isEmpty {
-            return self
-        } else {
-            return appending("@\(identifier)")
-        }
-    }
-}
