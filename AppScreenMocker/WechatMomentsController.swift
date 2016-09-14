@@ -11,6 +11,7 @@ import Material
 import SnapKit
 import QuartzCore
 import Toast_Swift
+import Kingfisher
 
 class WechatMomentsController: UIViewController, MaterialSwitchDelegate {
     
@@ -192,8 +193,9 @@ class WechatMomentsController: UIViewController, MaterialSwitchDelegate {
         mockRootView.addSubview(navigationBarView)
         
         mockRootView.addSubview(coverImage)
-        
+        coverImage.kf_setImageWithURL(NSURL(string: "http://www.tcsports.com.cn/uploads/allimg/150419/001F0L20-0.jpg")!)
         mockRootView.addSubview(avatarImageBg)
+        avatarImage.kf_setImageWithURL(NSURL(string: "http://p3.img.cctvpic.com/20130502/images/1367465384571_1367465384571_r.jpg"))
         avatarImageBg.addSubview(avatarImage)
         mockRootView.addSubview(selfNameLabel)
 
