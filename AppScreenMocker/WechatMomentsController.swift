@@ -51,11 +51,7 @@ class WechatMomentsController: UIViewController, MaterialSwitchDelegate {
             self.flatMenu.views![0].hidden = false;
         } else {
             if self.flatMenu.opened {
-                self.flatMenu.close() { [unowned self] (view: UIView) in
-                    self.flatMenu.views![0].hidden = true;
-                }
-            } else {
-                self.flatMenu.views![0].hidden = true;
+                self.flatMenu.close()
             }
         }
     }
@@ -157,12 +153,12 @@ class WechatMomentsController: UIViewController, MaterialSwitchDelegate {
     
     func image(image: UIImage, didFinishSavingWithError error: NSError?, contextInfo:UnsafePointer<Void>) {
         if error == nil {
-            let ac = UIAlertController(title: "Saved!", message: "Your altered image has been saved to your photos.", preferredStyle: .Alert)
-            ac.addAction(UIAlertAction(title: "OK", style: .Default, handler: nil))
+            let ac = UIAlertController(title: "保存成功", message: "截图已保存至系统相册", preferredStyle: .Alert)
+            ac.addAction(UIAlertAction(title: "确定", style: .Default, handler: nil))
             presentViewController(ac, animated: true, completion: nil)
         } else {
-            let ac = UIAlertController(title: "Save error", message: error?.localizedDescription, preferredStyle: .Alert)
-            ac.addAction(UIAlertAction(title: "OK", style: .Default, handler: nil))
+            let ac = UIAlertController(title: "保存失败", message: error?.localizedDescription, preferredStyle: .Alert)
+            ac.addAction(UIAlertAction(title: "确定", style: .Default, handler: nil))
             presentViewController(ac, animated: true, completion: nil)
         }
     }
@@ -387,9 +383,9 @@ class WechatMomentsController: UIViewController, MaterialSwitchDelegate {
                 self.momentDataSource[indexPath.row].sourceText = MomentData.defaultSourceText
                 self.momentTableView.reloadRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
                 })
-            alert.addAction(UIAlertAction(title: "显示赞", style: .Default) { (action) -> Void in
+            alert.addAction(UIAlertAction(title: "添加赞", style: .Default) { (action) -> Void in
                 })
-            alert.addAction(UIAlertAction(title: "显示评论", style: .Default) { (action) -> Void in
+            alert.addAction(UIAlertAction(title: "添加评论", style: .Default) { (action) -> Void in
                 })
             alert.addAction(UIAlertAction(title: "移除该条朋友圈", style: .Destructive) { (action) -> Void in
                 self.momentDataSource.removeAtIndex(indexPath.row)

@@ -86,6 +86,17 @@ class MomentView: UITableViewCell {
         return imageView
     }()
     
+    let likeAndCommentsView: LikeAndCommentsView = {
+        let view = LikeAndCommentsView()
+        return view
+    }()
+    
+    let bottomMargin: UIView = {
+        let view = UIView()
+        view.backgroundColor = MaterialColor.white
+        return view
+    }()
+    
     let separator: UIView = {
         let view = UIView()
         view.backgroundColor = UIUtils.UIColorFromARGB(0xffe7e7e6)
@@ -103,6 +114,8 @@ class MomentView: UITableViewCell {
         self.addSubview(timeLabel)
         self.addSubview(sourceLabel)
         self.addSubview(actionButton)
+        self.addSubview(likeAndCommentsView)
+        self.addSubview(bottomMargin)
         self.addSubview(separator)
         self.updateConstraints()
     }
@@ -191,13 +204,11 @@ class MomentView: UITableViewCell {
                 timeLabel.snp_makeConstraints { make in
                     make.leading.equalTo(hostName)
                     make.top.equalTo(locationLabel.snp_bottom).offset(6)
-                    make.bottom.equalTo(self).inset(10)
                 }
             } else {
                 timeLabel.snp_makeConstraints { make in
                     make.leading.equalTo(hostName)
                     make.top.equalTo(singlePhoto.snp_bottom).offset(8)
-                    make.bottom.equalTo(self).inset(10)
                 }
             }
         } else if !multiplePhotos.hidden {
@@ -221,13 +232,11 @@ class MomentView: UITableViewCell {
                 timeLabel.snp_makeConstraints { make in
                     make.leading.equalTo(hostName)
                     make.top.equalTo(locationLabel.snp_bottom).offset(6)
-                    make.bottom.equalTo(self).inset(10)
                 }
             } else {
                 timeLabel.snp_makeConstraints { make in
                     make.leading.equalTo(hostName)
                     make.top.equalTo(multiplePhotos.snp_bottom).offset(8)
-                    make.bottom.equalTo(self).inset(10)
                 }
             }
         } else {
@@ -244,13 +253,11 @@ class MomentView: UITableViewCell {
                 timeLabel.snp_makeConstraints { make in
                     make.leading.equalTo(hostName)
                     make.top.equalTo(locationLabel.snp_bottom).offset(6)
-                    make.bottom.equalTo(self).inset(10)
                 }
             } else {
                 timeLabel.snp_makeConstraints { make in
                     make.leading.equalTo(hostName)
                     make.top.equalTo(bodyLabel.snp_bottom).offset(8)
-                    make.bottom.equalTo(self).inset(10)
                 }
             }
         }
@@ -263,6 +270,28 @@ class MomentView: UITableViewCell {
         actionButton.snp_makeConstraints { make in
             make.centerY.equalTo(timeLabel)
             make.trailing.equalTo(self.snp_trailing).inset(10).priorityHigh()
+        }
+        
+        if !likeAndCommentsView.hidden {
+            likeAndCommentsView.snp_makeConstraints { (make) in
+                make.leading.equalTo(timeLabel.snp_leading)
+                make.top.equalTo(timeLabel.snp_bottom).offset(8)
+                make.trailing.equalTo(self.snp_trailing).inset(10)
+            }
+            
+            bottomMargin.snp_makeConstraints { (make) in
+                make.width.equalTo(self)
+                make.height.equalTo(16)
+                make.top.equalTo(likeAndCommentsView.snp_bottom)
+                make.bottom.equalTo(self)
+            }
+        } else {
+            bottomMargin.snp_makeConstraints { (make) in
+                make.width.equalTo(self)
+                make.height.equalTo(16)
+                make.top.equalTo(timeLabel.snp_bottom)
+                make.bottom.equalTo(self)
+            }
         }
         
         separator.snp_makeConstraints { make in

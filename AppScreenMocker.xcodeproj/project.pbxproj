@@ -24,6 +24,7 @@
 		18AE42711D77BCFF0071C9C2 /* SudokuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18AE42701D77BCFF0071C9C2 /* SudokuView.swift */; };
 		18B532411D615EB70004BFE1 /* WechatScreenListController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18B532401D615EB70004BFE1 /* WechatScreenListController.swift */; };
 		18B532431D6167D80004BFE1 /* WechatMomentsController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18B532421D6167D80004BFE1 /* WechatMomentsController.swift */; };
+		18DE47CF1D89399000477C6B /* LikeAndCommentsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18DE47CE1D89399000477C6B /* LikeAndCommentsView.swift */; };
 		EC20D67A2C682F257C92D26E /* Pods_AppScreenMocker.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C9BFB3F7FE03F99592201D4A /* Pods_AppScreenMocker.framework */; };
 /* End PBXBuildFile section */
 
@@ -60,6 +61,7 @@
 		18AE42701D77BCFF0071C9C2 /* SudokuView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SudokuView.swift; sourceTree = "<group>"; };
 		18B532401D615EB70004BFE1 /* WechatScreenListController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WechatScreenListController.swift; sourceTree = "<group>"; };
 		18B532421D6167D80004BFE1 /* WechatMomentsController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WechatMomentsController.swift; sourceTree = "<group>"; };
+		18DE47CE1D89399000477C6B /* LikeAndCommentsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LikeAndCommentsView.swift; sourceTree = "<group>"; };
 		68A0C31FB7A9931C06C549D0 /* Pods-AppScreenMocker.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AppScreenMocker.debug.xcconfig"; path = "Pods/Target Support Files/Pods-AppScreenMocker/Pods-AppScreenMocker.debug.xcconfig"; sourceTree = "<group>"; };
 		B4C6B50DB8B1EF2342BBD08D /* Pods-AppScreenMocker.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AppScreenMocker.release.xcconfig"; path = "Pods/Target Support Files/Pods-AppScreenMocker/Pods-AppScreenMocker.release.xcconfig"; sourceTree = "<group>"; };
 		C9BFB3F7FE03F99592201D4A /* Pods_AppScreenMocker.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_AppScreenMocker.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -94,6 +96,7 @@
 				182439791D6BFC15002A5C99 /* ViewID.swift */,
 				182AB0AC1D757CC0001EA9A1 /* MomentData.swift */,
 				18AE42701D77BCFF0071C9C2 /* SudokuView.swift */,
+				18DE47CE1D89399000477C6B /* LikeAndCommentsView.swift */,
 			);
 			name = Moments;
 			sourceTree = "<group>";
@@ -313,6 +316,7 @@
 				1824397A1D6BFC15002A5C99 /* ViewID.swift in Sources */,
 				18576F811D619DF900837ED2 /* UIUtils.swift in Sources */,
 				18AE3CEB1D5DBA8700E651C6 /* AppNavigationController.swift in Sources */,
+				18DE47CF1D89399000477C6B /* LikeAndCommentsView.swift in Sources */,
 				187E30CA1D61C05000F27B9D /* WechatNavigationBarView.swift in Sources */,
 				18AE3CD91D5DB4D300E651C6 /* AppDelegate.swift in Sources */,
 			);
