@@ -36,6 +36,8 @@ class LikeAndCommentsView: UIView {
         textView.backgroundColor = UIUtils.UIColorFromARGB(0xFFF3F3F5)
         textView.textColor = UIUtils.UIColorFromARGB(0xff586C94)
         textView.contentInset = UIEdgeInsetsMake(-3, 2, 4, 0)
+        textView.editable = false
+        textView.selectable = false
         textView.text = "科比，詹姆斯，奥尼尔"
         textView.font = UIFont.boldSystemFontOfSize(14)
         return textView
@@ -47,7 +49,21 @@ class LikeAndCommentsView: UIView {
         return view
     }()
     
+    let commentBottomMargin: UIView = {
+        let view = UIView()
+        view.backgroundColor = UIUtils.UIColorFromARGB(0xFFF3F3F5)
+        return view
+    }()
+    
     var gestureClosure: (UIGestureRecognizer) -> () = {_ in }
+    
+    var preferredContentSize: CGSize {
+        get {
+            self.commentTableView.layoutIfNeeded()
+            return self.commentTableView.contentSize
+        }
+        set {}
+    }
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -60,6 +76,7 @@ class LikeAndCommentsView: UIView {
         prepareTableView()
         self.addSubview(commentTableView)
         self.clipsToBounds = true
+        self.addSubview(commentBottomMargin)
         self.updateConstraints()
     }
     
@@ -74,6 +91,8 @@ class LikeAndCommentsView: UIView {
     private func prepareTableView() {
         commentDataSource = [Comment]()
         commentDataSource.append(Comment())
+        commentDataSource.append(Comment("奥尼尔", "你真会扯淡"))
+        commentDataSource.append(Comment("韦德", "我不服"))
         commentTableView = UITableView()
         commentTableView.registerClass(CommentCell.self, forCellReuseIdentifier: "Comment")
         commentTableView.dataSource = self
@@ -115,10 +134,17 @@ class LikeAndCommentsView: UIView {
             make.top.equalTo(likes.snp_bottom)
         }
         
-        commentTableView.snp_makeConstraints { (make) in
+        commentTableView.snp_remakeConstraints { (make) in
             make.leading.equalTo(self)
             make.top.equalTo(separator.snp_bottom)
-            make.height.equalTo(48)
+            make.height.equalTo(preferredContentSize.height)
+            make.trailing.equalTo(self)
+        }
+        
+        commentBottomMargin.snp_makeConstraints { (make) in
+            make.leading.equalTo(self)
+            make.top.equalTo(commentTableView.snp_bottom)
+            make.height.equalTo(4)
             make.trailing.equalTo(self)
             make.bottom.equalTo(self)
         }
@@ -163,10 +189,19 @@ class Like {
 
 class Comment {
     static let defaultUserName = "詹姆斯"
-    static let defaultCommentText = "你说得对，每天晚上睡觉前我们都会FaceTime两小时呢，嘿嘿嘿"
+    static let defaultCommentText = "你说得对"
     
     internal var userName: String = defaultUserName
     internal var commentText: String = defaultCommentText
+    
+    convenience init() {
+        self.init(Comment.defaultUserName, Comment.defaultCommentText)
+    }
+    
+    init(_ userName: String, _ commentText: String) {
+        self.userName = userName
+        self.commentText = commentText
+    }
 }
 
 class CommentCell: UITableViewCell {
@@ -198,7 +233,7 @@ class CommentCell: UITableViewCell {
         commentLabel.snp_makeConstraints { (make) in
             make.leading.equalTo(self).inset(6)
             make.top.equalTo(self).inset(4)
-            make.bottom.equalTo(self).inset(4)
+            make.bottom.equalTo(self)
             make.trailing.equalTo(self)
         }
         
