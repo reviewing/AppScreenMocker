@@ -384,8 +384,12 @@ class WechatMomentsController: UIViewController, MaterialSwitchDelegate {
                 self.momentTableView.reloadRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
                 })
             alert.addAction(UIAlertAction(title: "添加赞", style: .Default) { (action) -> Void in
+                self.momentDataSource[indexPath.row].likes.append(Like("用户名"))
+                self.momentTableView.reloadRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
                 })
             alert.addAction(UIAlertAction(title: "添加评论", style: .Default) { (action) -> Void in
+                self.momentDataSource[indexPath.row].comments.append(Comment("用户名", "用户评论"))
+                self.momentTableView.reloadRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
                 })
             alert.addAction(UIAlertAction(title: "移除该条朋友圈", style: .Destructive) { (action) -> Void in
                 self.momentDataSource.removeAtIndex(indexPath.row)

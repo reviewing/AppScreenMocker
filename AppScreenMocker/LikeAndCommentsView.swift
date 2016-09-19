@@ -11,8 +11,6 @@ import Material
 
 class LikeAndCommentsView: UIView {
     
-    private var likeDataSource: Array<Like>!
-    private var commentDataSource: Array<Comment>!
     private var commentTableView: UITableView!
     internal var editMode: Bool = false
     
@@ -34,14 +32,56 @@ class LikeAndCommentsView: UIView {
     let likes: UITextView = {
         let textView = UITextView()
         textView.backgroundColor = UIUtils.UIColorFromARGB(0xFFF3F3F5)
-        textView.textColor = UIUtils.UIColorFromARGB(0xff586C94)
         textView.contentInset = UIEdgeInsetsMake(-3, 2, 4, 0)
         textView.editable = false
-        textView.selectable = false
-        textView.text = "科比，詹姆斯，奥尼尔"
-        textView.font = UIFont.boldSystemFontOfSize(14)
+        textView.scrollEnabled = false
+        let linkAttributes = [NSForegroundColorAttributeName: UIUtils.UIColorFromARGB(0xff586C94)]
+        textView.linkTextAttributes = linkAttributes
+        textView.font = UIFont.systemFontOfSize(12)
         return textView
     }()
+    
+    var likeDataSource: Array<Like> = [] {
+        didSet {
+            let attachment = LikeAndCommentsView.textAttachment(14, image: UIImage(named: "Like")!)
+            let attachmentString = NSAttributedString(attachment:attachment)
+            let attributedString = NSMutableAttributedString(attributedString: attachmentString)
+            attributedString.appendAttributedString(generateLikes(likeDataSource))
+            likes.attributedText = attributedString
+            self.updateConstraints()
+        }
+    }
+    
+    var commentDataSource: Array<Comment> = [] {
+        didSet {
+            commentTableView.reloadData()
+            self.updateConstraints()
+        }
+    }
+    
+    static func textAttachment(fontSize: CGFloat, image: UIImage) -> NSTextAttachment {
+        let font = UIFont.systemFontOfSize(fontSize)
+        let textAttachment = NSTextAttachment()
+        textAttachment.image = image
+        let mid = font.descender + font.capHeight
+        textAttachment.bounds = CGRectIntegral(CGRect(x: 0, y: font.descender - image.size.height / 2 + mid + 3, width: image.size.width - 1, height: image.size.height - 2))
+        return textAttachment
+    }
+    
+    func generateLikes(likes: Array<Like>) -> NSAttributedString {
+        let resultString = NSMutableAttributedString()
+        for i in 0..<likes.count {
+            let like = likes[i]
+            let attributes = [NSLinkAttributeName: "username://" + String(i), NSFontAttributeName: UIFont.boldSystemFontOfSize(14)]
+            let likeString = NSAttributedString(string: like.userName, attributes: attributes)
+            resultString.appendAttributedString(likeString)
+            resultString.appendAttributedString(NSAttributedString(string: "，", attributes: [NSFontAttributeName: UIFont.boldSystemFontOfSize(12)]))
+        }
+        if resultString.length >= 1 {
+            resultString.deleteCharactersInRange(NSMakeRange(resultString.length - 1, 1))
+        }
+        return resultString
+    }
     
     let separator: UIView = {
         let view = UIView()
@@ -68,6 +108,7 @@ class LikeAndCommentsView: UIView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         self.addSubview(triangleIndicator)
+        likes.delegate = self
         self.addSubview(likes)
         self.addSubview(separator)
         gestureClosure = {[unowned self] (recognizer: UIGestureRecognizer) in
@@ -89,10 +130,6 @@ class LikeAndCommentsView: UIView {
     }
     
     private func prepareTableView() {
-        commentDataSource = [Comment]()
-        commentDataSource.append(Comment())
-        commentDataSource.append(Comment("奥尼尔", "你真会扯淡"))
-        commentDataSource.append(Comment("韦德", "我不服"))
         commentTableView = UITableView()
         commentTableView.registerClass(CommentCell.self, forCellReuseIdentifier: "Comment")
         commentTableView.dataSource = self
@@ -108,48 +145,82 @@ class LikeAndCommentsView: UIView {
     }
     
     override func updateConstraints() {
-        triangleIndicator.snp_makeConstraints { (make) in
+        
+        triangleIndicator.snp_remakeConstraints { (make) in
             make.leading.equalTo(self).offset(10)
-            make.top.equalTo(self)
-            make.height.equalTo(5)
             make.width.equalTo(12)
+            
+            if likeDataSource.count <= 0 && commentDataSource.count <= 0 {
+                make.top.equalTo(self).offset(0)
+                make.height.equalTo(0)
+            } else {
+                make.top.equalTo(self).offset(8)
+                make.height.equalTo(5)
+            }
         }
         
         let fixedWidth = CGFloat(375 - 20 - 42 - 10)
         
-        likes.snp_makeConstraints { (make) in
+        likes.snp_remakeConstraints { (make) in
             make.leading.equalTo(self)
             make.top.equalTo(triangleIndicator.snp_bottom)
+            make.width.equalTo(fixedWidth)
             
-            var newSize = likes.sizeThatFits(CGSize(width: fixedWidth, height: CGFloat.max))
-            newSize.width = fixedWidth
-            newSize.height -= 8
-            make.size.equalTo(newSize)
+            if likeDataSource.count > 0 {
+                let newSize = likes.sizeThatFits(CGSize(width: fixedWidth, height: CGFloat.max))
+                make.height.equalTo(newSize.height - 8)
+            } else {
+                make.height.equalTo(0)
+            }
         }
         
-        separator.snp_makeConstraints { make in
+        separator.snp_remakeConstraints { make in
             make.leading.equalTo(self)
             make.trailing.equalTo(self)
-            make.height.equalTo(1)
             make.top.equalTo(likes.snp_bottom)
+            
+            if likeDataSource.count > 0 && commentDataSource.count > 0 {
+                make.height.equalTo(1)
+            } else {
+                make.height.equalTo(0)
+            }
         }
         
         commentTableView.snp_remakeConstraints { (make) in
             make.leading.equalTo(self)
             make.top.equalTo(separator.snp_bottom)
-            make.height.equalTo(preferredContentSize.height)
             make.trailing.equalTo(self)
+            
+            if commentDataSource.count > 0 {
+                make.height.equalTo(preferredContentSize.height)
+            } else {
+                make.height.equalTo(0)
+            }
         }
         
-        commentBottomMargin.snp_makeConstraints { (make) in
+        commentBottomMargin.snp_remakeConstraints { (make) in
             make.leading.equalTo(self)
             make.top.equalTo(commentTableView.snp_bottom)
-            make.height.equalTo(4)
             make.trailing.equalTo(self)
             make.bottom.equalTo(self)
+            
+            if commentDataSource.count > 0 {
+                make.height.equalTo(4)
+            } else {
+                make.height.equalTo(0)
+            }
         }
         
         super.updateConstraints()
+    }
+}
+
+extension LikeAndCommentsView: UITextViewDelegate {
+    func textView(textView: UITextView, shouldInteractWithURL URL: NSURL, inRange characterRange: NSRange) -> Bool {
+        if URL.scheme == "username" {
+            return false
+        }
+        return true
     }
 }
 
@@ -185,6 +256,10 @@ extension LikeAndCommentsView: UITableViewDelegate {
 class Like {
     static let defaultUserName = "科比"
     internal var userName: String = defaultUserName
+    
+    init(_ userName: String) {
+        self.userName = userName
+    }
 }
 
 class Comment {
@@ -225,7 +300,7 @@ class CommentCell: UITableViewCell {
     
     internal var data = Comment() {
         didSet {
-            self.commentLabel.text = data.userName + "：" + data.commentText
+            self.commentLabel.text = data.userName + ": " + data.commentText
         }
     }
     

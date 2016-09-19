@@ -24,4 +24,6 @@ class MomentData {
     internal var locationText: String? = defaultLocationText
     internal var timeText: String? = defaultTimeText
     internal var sourceText: String? = defaultSourceText
+    internal var likes: [Like] = []
+    internal var comments: [Comment] = []
 }

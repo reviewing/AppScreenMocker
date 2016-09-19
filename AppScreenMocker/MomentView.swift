@@ -159,6 +159,8 @@ class MomentView: UITableViewCell {
             timeLabel.text = data.timeText
             sourceLabel.text = data.sourceText
             sourceLabel.hidden = data.sourceText == nil
+            likeAndCommentsView.likeDataSource = data.likes
+            likeAndCommentsView.commentDataSource = data.comments
         }
     }
     
@@ -272,26 +274,17 @@ class MomentView: UITableViewCell {
             make.trailing.equalTo(self.snp_trailing).inset(10).priorityHigh()
         }
         
-        if !likeAndCommentsView.hidden {
-            likeAndCommentsView.snp_makeConstraints { (make) in
-                make.leading.equalTo(timeLabel.snp_leading)
-                make.top.equalTo(timeLabel.snp_bottom).offset(8)
-                make.trailing.equalTo(self.snp_trailing).inset(10)
-            }
-            
-            bottomMargin.snp_makeConstraints { (make) in
-                make.width.equalTo(self)
-                make.height.equalTo(16)
-                make.top.equalTo(likeAndCommentsView.snp_bottom)
-                make.bottom.equalTo(self)
-            }
-        } else {
-            bottomMargin.snp_makeConstraints { (make) in
-                make.width.equalTo(self)
-                make.height.equalTo(16)
-                make.top.equalTo(timeLabel.snp_bottom)
-                make.bottom.equalTo(self)
-            }
+        likeAndCommentsView.snp_makeConstraints { (make) in
+            make.leading.equalTo(timeLabel.snp_leading)
+            make.top.equalTo(timeLabel.snp_bottom)
+            make.trailing.equalTo(self.snp_trailing).inset(10)
+        }
+        
+        bottomMargin.snp_makeConstraints { (make) in
+            make.width.equalTo(self)
+            make.height.equalTo(16)
+            make.top.equalTo(likeAndCommentsView.snp_bottom)
+            make.bottom.equalTo(self)
         }
         
         separator.snp_makeConstraints { make in
