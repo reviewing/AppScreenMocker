@@ -384,11 +384,15 @@ class WechatMomentsController: UIViewController, MaterialSwitchDelegate {
                 self.momentTableView.reloadRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
                 })
             alert.addAction(UIAlertAction(title: "添加赞", style: .Default) { (action) -> Void in
-                self.momentDataSource[indexPath.row].likes.append(Like("用户名"))
+                self.momentDataSource[indexPath.row].likes.append(Like("詹姆斯"))
+                self.momentDataSource[indexPath.row].likes.append(Like("韦德"))
+                self.momentDataSource[indexPath.row].likes.append(Like("奥尼尔"))
                 self.momentTableView.reloadRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
                 })
             alert.addAction(UIAlertAction(title: "添加评论", style: .Default) { (action) -> Void in
-                self.momentDataSource[indexPath.row].comments.append(Comment("用户名", "用户评论"))
+                self.momentDataSource[indexPath.row].comments.append(Comment("詹姆斯", "你说得对"))
+                self.momentDataSource[indexPath.row].comments.append(Comment(fromUserName: "韦德", toUserName: "詹姆斯", commentText: "信不信我打死你？你看看你说的哪句话是真的？"))
+                self.momentDataSource[indexPath.row].comments.append(Comment("奥尼尔", "再给我发一条朋友圈我们还是朋友"))
                 self.momentTableView.reloadRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
                 })
             alert.addAction(UIAlertAction(title: "移除该条朋友圈", style: .Destructive) { (action) -> Void in

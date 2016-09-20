@@ -175,6 +175,7 @@ class MomentView: UITableViewCell {
             make.leading.equalTo(hostAvatar.snp_trailing).offset(10)
             make.top.equalTo(hostAvatar)
             make.trailing.equalTo(self.snp_trailing).inset(10).priorityHigh()
+            make.height.equalTo(20)
         }
         
         bodyLabel.snp_makeConstraints { make in
@@ -273,6 +274,8 @@ class MomentView: UITableViewCell {
             make.centerY.equalTo(timeLabel)
             make.trailing.equalTo(self.snp_trailing).inset(10).priorityHigh()
         }
+        
+        likeAndCommentsView.updateConstraints()
         
         likeAndCommentsView.snp_makeConstraints { (make) in
             make.leading.equalTo(timeLabel.snp_leading)

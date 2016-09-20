@@ -32,12 +32,12 @@ class LikeAndCommentsView: UIView {
     let likes: UITextView = {
         let textView = UITextView()
         textView.backgroundColor = UIUtils.UIColorFromARGB(0xFFF3F3F5)
-        textView.contentInset = UIEdgeInsetsMake(-3, 2, 4, 0)
+        textView.contentInset = UIEdgeInsetsMake(4, 2, 4, 0)
+        textView.textContainerInset = UIEdgeInsetsZero
         textView.editable = false
         textView.scrollEnabled = false
         let linkAttributes = [NSForegroundColorAttributeName: UIUtils.UIColorFromARGB(0xff586C94)]
         textView.linkTextAttributes = linkAttributes
-        textView.font = UIFont.systemFontOfSize(12)
         return textView
     }()
     
@@ -45,17 +45,17 @@ class LikeAndCommentsView: UIView {
         didSet {
             let attachment = LikeAndCommentsView.textAttachment(14, image: UIImage(named: "Like")!)
             let attachmentString = NSAttributedString(attachment:attachment)
-            let attributedString = NSMutableAttributedString(attributedString: attachmentString)
+            let attributedString = NSMutableAttributedString(string: " ")
+            attributedString.appendAttributedString(attachmentString)
+            attributedString.appendAttributedString(NSAttributedString(string: "  "))
             attributedString.appendAttributedString(generateLikes(likeDataSource))
             likes.attributedText = attributedString
-            self.updateConstraints()
         }
     }
     
     var commentDataSource: Array<Comment> = [] {
         didSet {
             commentTableView.reloadData()
-            self.updateConstraints()
         }
     }
     
@@ -72,7 +72,7 @@ class LikeAndCommentsView: UIView {
         let resultString = NSMutableAttributedString()
         for i in 0..<likes.count {
             let like = likes[i]
-            let attributes = [NSLinkAttributeName: "username://" + String(i), NSFontAttributeName: UIFont.boldSystemFontOfSize(14)]
+            let attributes = [NSLinkAttributeName: "internal://like?index=" + String(i), NSFontAttributeName: UIFont.boldSystemFontOfSize(14)]
             let likeString = NSAttributedString(string: like.userName, attributes: attributes)
             resultString.appendAttributedString(likeString)
             resultString.appendAttributedString(NSAttributedString(string: "，", attributes: [NSFontAttributeName: UIFont.boldSystemFontOfSize(12)]))
@@ -168,7 +168,7 @@ class LikeAndCommentsView: UIView {
             
             if likeDataSource.count > 0 {
                 let newSize = likes.sizeThatFits(CGSize(width: fixedWidth, height: CGFloat.max))
-                make.height.equalTo(newSize.height - 8)
+                make.height.equalTo(newSize.height + 8)
             } else {
                 make.height.equalTo(0)
             }
@@ -217,7 +217,7 @@ class LikeAndCommentsView: UIView {
 
 extension LikeAndCommentsView: UITextViewDelegate {
     func textView(textView: UITextView, shouldInteractWithURL URL: NSURL, inRange characterRange: NSRange) -> Bool {
-        if URL.scheme == "username" {
+        if URL.scheme == "internal" {
             return false
         }
         return true
@@ -266,30 +266,66 @@ class Comment {
     static let defaultUserName = "詹姆斯"
     static let defaultCommentText = "你说得对"
     
-    internal var userName: String = defaultUserName
+    internal var fromUserName: String = defaultUserName
+    internal var toUserName: String?
     internal var commentText: String = defaultCommentText
     
     convenience init() {
         self.init(Comment.defaultUserName, Comment.defaultCommentText)
     }
     
-    init(_ userName: String, _ commentText: String) {
-        self.userName = userName
+    init(_ fromUserName: String, _ commentText: String) {
+        self.fromUserName = fromUserName
         self.commentText = commentText
     }
+    
+    init(fromUserName: String, toUserName: String, commentText: String) {
+        self.fromUserName = fromUserName
+        self.toUserName = toUserName
+        self.commentText = commentText
+    }
+    
+    var attributedString: NSAttributedString {
+        get {
+            let resultString = NSMutableAttributedString()
+            let attributes = [NSLinkAttributeName: "internal://comment?user=from", NSFontAttributeName: UIFont.boldSystemFontOfSize(14)]
+            let fromString = NSAttributedString(string: fromUserName, attributes: attributes)
+            resultString.appendAttributedString(fromString)
+            
+            if let to = toUserName {
+                resultString.appendAttributedString(NSAttributedString(string: "回复", attributes: [NSFontAttributeName: UIFont.systemFontOfSize(14)]))
+                let attributes = [NSLinkAttributeName: "internal://comment?user=to", NSFontAttributeName: UIFont.boldSystemFontOfSize(14)]
+                let toString = NSAttributedString(string: to, attributes: attributes)
+                resultString.appendAttributedString(toString)
+            }
+            
+            resultString.appendAttributedString(NSAttributedString(string: ": ", attributes: [NSFontAttributeName: UIFont.boldSystemFontOfSize(12)]))
+            
+            resultString.appendAttributedString(NSAttributedString(string: commentText, attributes: [NSFontAttributeName: UIFont.systemFontOfSize(14)]))
+            return resultString
+        }
+        set {}
+    }
+    
 }
 
 class CommentCell: UITableViewCell {
-    let commentLabel: UILabel = {
-        let label = UILabel()
-        label.numberOfLines = 0
-        label.font = UIFont.systemFontOfSize(14)
-        return label
+    let commentText: UITextView = {
+        let textView = UITextView()
+        textView.backgroundColor = UIUtils.UIColorFromARGB(0xFFF3F3F5)
+        textView.contentInset = UIEdgeInsetsMake(0, 3, 0, 0)
+        textView.textContainerInset = UIEdgeInsetsZero
+        textView.editable = false
+        textView.scrollEnabled = false
+        let linkAttributes = [NSForegroundColorAttributeName: UIUtils.UIColorFromARGB(0xff586C94)]
+        textView.linkTextAttributes = linkAttributes
+        textView.font = UIFont.systemFontOfSize(14)
+        return textView
     }()
     
     override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
-        self.addSubview(commentLabel)
+        self.addSubview(commentText)
         self.backgroundColor = UIUtils.UIColorFromARGB(0xFFF3F3F5)
         self.updateConstraints()
     }
@@ -300,16 +336,21 @@ class CommentCell: UITableViewCell {
     
     internal var data = Comment() {
         didSet {
-            self.commentLabel.text = data.userName + ": " + data.commentText
+            self.commentText.attributedText = data.attributedString
+            self.updateConstraints()
         }
     }
     
     override func updateConstraints() {
-        commentLabel.snp_makeConstraints { (make) in
-            make.leading.equalTo(self).inset(6)
-            make.top.equalTo(self).inset(4)
+        
+        let fixedWidth = CGFloat(375 - 20 - 42 - 10)
+        commentText.snp_remakeConstraints { (make) in
+            make.leading.equalTo(self)
+            make.top.equalTo(self).offset(5)
+            make.width.equalTo(fixedWidth)
+            let newSize = commentText.sizeThatFits(CGSize(width: fixedWidth, height: CGFloat.max))
+            make.height.equalTo(newSize.height).priorityHigh()
             make.bottom.equalTo(self)
-            make.trailing.equalTo(self)
         }
         
         super.updateConstraints()
