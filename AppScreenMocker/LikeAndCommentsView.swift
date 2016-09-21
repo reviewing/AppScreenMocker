@@ -9,9 +9,15 @@
 import UIKit
 import Material
 
+protocol LikeAndCommentsViewDelegate {
+    func removeLikeAtIndex(index: Int)
+    func removeCommentAtIndex(index: Int)
+}
+
 class LikeAndCommentsView: UIView {
     
     private var commentTableView: UITableView!
+    var delegate: LikeAndCommentsViewDelegate?
     internal var editMode: Bool = false
     
     let triangleIndicator: UIView = {
@@ -111,13 +117,14 @@ class LikeAndCommentsView: UIView {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
+        gestureClosure = {[unowned self] (recognizer: UIGestureRecognizer) in
+            self.requestEdit(recognizer)
+        }
+        
         self.addSubview(triangleIndicator)
         likes.delegate = self
         self.addSubview(likes)
         self.addSubview(separator)
-        gestureClosure = {[unowned self] (recognizer: UIGestureRecognizer) in
-            self.requestEdit(recognizer)
-        }
         prepareTableView()
         self.addSubview(commentTableView)
         self.clipsToBounds = true
@@ -146,8 +153,8 @@ class LikeAndCommentsView: UIView {
     
     func requestEdit(recognizer: UIGestureRecognizer) {
         if let textView = (recognizer.view as? UITextView) {
-            if let index = findIndexPathOfView(textView)?.row {
-                self.requestCommentEdit(textView, index: index, elementTag: "body")
+            if let indexPath = findIndexPathOfView(textView) {
+                self.requestCommentEdit(textView, indexPath: indexPath, elementTag: "body")
             }
         }
     }
@@ -231,6 +238,16 @@ class LikeAndCommentsView: UIView {
     }
     
     func requestLikeEdit(textView: UITextView, index: Int) {
+        if editMode {
+            let alert = UIAlertController(title: likeDataSource[index].userName, message: nil, preferredStyle: .ActionSheet)
+            alert.addAction(UIAlertAction(title: "移除赞", style: .Default) { (action) -> Void in
+                self.delegate?.removeLikeAtIndex(index)
+                })
+            alert.addAction(UIAlertAction(title: "取消", style: .Cancel, handler: nil))
+            UIUtils.rootViewController()?.presentViewController(alert, animated: true, completion: nil)
+            return
+        }
+        
         let alert = UIAlertController(title: "编辑文字", message: likeDataSource[index].userName, preferredStyle: .Alert)
         
         alert.addTextFieldWithConfigurationHandler({ (textField) -> Void in
@@ -250,15 +267,25 @@ class LikeAndCommentsView: UIView {
         UIUtils.rootViewController()?.presentViewController(alert, animated: true, completion: nil)
     }
     
-    func requestCommentEdit(textView: UITextView, index: Int, elementTag: String) {
+    func requestCommentEdit(textView: UITextView, indexPath: NSIndexPath, elementTag: String) {
+        if editMode {
+            let alert = UIAlertController(title: textView.text, message: nil, preferredStyle: .ActionSheet)
+            alert.addAction(UIAlertAction(title: "移除评论", style: .Default) { (action) -> Void in
+                self.delegate?.removeCommentAtIndex(indexPath.row)
+                })
+            alert.addAction(UIAlertAction(title: "取消", style: .Cancel, handler: nil))
+            UIUtils.rootViewController()?.presentViewController(alert, animated: true, completion: nil)
+            return
+        }
+        
         var orignialText = ""
         switch elementTag {
         case "from":
-            orignialText = commentDataSource[index].fromUserName
+            orignialText = commentDataSource[indexPath.row].fromUserName
         case "to":
-            orignialText = commentDataSource[index].toUserName!
+            orignialText = commentDataSource[indexPath.row].toUserName!
         case "body":
-            orignialText = commentDataSource[index].commentText
+            orignialText = commentDataSource[indexPath.row].commentText
         default:
             break
         }
@@ -274,11 +301,11 @@ class LikeAndCommentsView: UIView {
             if !(textField.text?.isEmpty ?? true) {
                 switch elementTag {
                 case "from":
-                    self.commentDataSource[index].fromUserName = textField.text!
+                    self.commentDataSource[indexPath.row].fromUserName = textField.text!
                 case "to":
-                    self.commentDataSource[index].toUserName = textField.text!
+                    self.commentDataSource[indexPath.row].toUserName = textField.text!
                 case "body":
-                    self.commentDataSource[index].commentText = textField.text!
+                    self.commentDataSource[indexPath.row].commentText = textField.text!
                 default:
                     break
                 }
@@ -307,8 +334,8 @@ extension LikeAndCommentsView: UITextViewDelegate {
             } else if host == "comment" {
                 if let p = params {
                     if let user = p["user"] {
-                        if let index = findIndexPathOfView(textView)?.row {
-                            self.requestCommentEdit(textView, index: index, elementTag: user)
+                        if let indexPath = findIndexPathOfView(textView) {
+                            self.requestCommentEdit(textView, indexPath: indexPath, elementTag: user)
                         }
                     }
                 }

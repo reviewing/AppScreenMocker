@@ -9,8 +9,16 @@
 import UIKit
 import Material
 import SnapKit
+import Toast_Swift
+
+protocol MomentViewDelegate {
+    func removeSelf(cell: UITableViewCell)
+}
 
 class MomentView: UITableViewCell {
+    var currentImageView: UIImageView?
+    var delegate: MomentViewDelegate?
+
     let hostAvatar: UIImageView = {
         let imageView = UIImageView()
         imageView.tag = ViewID.HostAvatar.rawValue
@@ -103,8 +111,15 @@ class MomentView: UITableViewCell {
         return view
     }()
     
+    var gestureClosure: (UIGestureRecognizer) -> () = {_ in }
+
     override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
+        
+        gestureClosure = {[unowned self] (recognizer: UIGestureRecognizer) in
+            self.requestEdit(recognizer)
+        }
+        
         self.addSubview(hostAvatar)
         self.addSubview(hostName)
         self.addSubview(bodyLabel)
@@ -117,6 +132,17 @@ class MomentView: UITableViewCell {
         self.addSubview(likeAndCommentsView)
         self.addSubview(bottomMargin)
         self.addSubview(separator)
+        
+        hostAvatar.addSingleTapGesture(closure: gestureClosure)
+        hostName.addSingleTapGesture(closure: gestureClosure)
+        bodyLabel.addSingleTapGesture(closure: gestureClosure)
+        singlePhoto.addSingleTapGesture(closure: gestureClosure)
+        multiplePhotos.addSingleTapGesture(true, closure: gestureClosure)
+        locationLabel.addSingleTapGesture(closure: gestureClosure)
+        timeLabel.addSingleTapGesture(closure: gestureClosure)
+        sourceLabel.addSingleTapGesture(closure: gestureClosure)
+        actionButton.addSingleTapGesture(closure: gestureClosure)
+
         self.updateConstraints()
     }
         
@@ -124,6 +150,147 @@ class MomentView: UITableViewCell {
         fatalError("This class does not support NSCoding")
     }
     
+    func requestEdit(recognizer: UIGestureRecognizer) {
+        guard let id = ViewID(rawValue: recognizer.view!.tag) else {
+            return
+        }
+        
+        if editMode {
+            switch id {
+            case .LocationLabel, .SourceLabel, .BodyPhoto:
+                let alert = UIAlertController(title: id.description, message: nil, preferredStyle: .ActionSheet)
+                alert.addAction(UIAlertAction(title: "移除" + id.description, style: .Default) { (action) -> Void in
+                    let indexPath = self.findTableView()?.indexPathForCell(self)
+                    if indexPath == nil {
+                        return
+                    }
+                    
+                    switch id {
+                    case .LocationLabel:
+                        self.data.locationText = nil
+                    case .SourceLabel:
+                        self.data.sourceText = nil
+                    case .BodyPhoto:
+                        let index = self.findIndexOfImageView(recognizer.view as? UIImageView, indexPath: indexPath)
+                        if index >= 0 {
+                            self.data.photoUrls.removeAtIndex(index)
+                        }
+                    default:
+                        break
+                    }
+                    
+                    self.findTableView()?.reloadRowsAtIndexPaths([indexPath!], withRowAnimation: .Fade)
+                    })
+                alert.addAction(UIAlertAction(title: "取消", style: .Cancel, handler: nil))
+                UIUtils.rootViewController()?.presentViewController(alert, animated: true, completion: nil)
+                return
+            default:
+                break
+            }
+        }
+        
+        switch recognizer.view {
+        case let view where view is UIImageView && ViewID(rawValue: view!.tag)?.actionHint == 1:
+            currentImageView = recognizer.view as? UIImageView
+            
+            let imagePicker = UIImagePickerController()
+            imagePicker.delegate = self
+            imagePicker.sourceType = UIImagePickerControllerSourceType.SavedPhotosAlbum;
+            imagePicker.allowsEditing = false
+            
+            UIUtils.rootViewController()?.presentViewController(imagePicker, animated: true, completion: nil)
+        case let view where view is UILabel && view!.tag != 0:
+            let alert = UIAlertController(title: "编辑文字", message: ViewID(rawValue: view!.tag)?.description, preferredStyle: .Alert)
+            
+            alert.addTextFieldWithConfigurationHandler({ (textField) -> Void in
+                textField.placeholder = "请输入文字"
+                textField.text = (view as! UILabel).text
+            })
+            
+            alert.addAction(UIAlertAction(title: "确认", style: .Default) { (action) -> Void in
+                let textField = alert.textFields![0] as UITextField
+                if !(textField.text?.isEmpty ?? true) {
+                    (view as! UILabel).text = textField.text
+                    
+                    switch id {
+                    case .HostName:
+                        self.data.hostName = textField.text
+                    case .BodyLabel:
+                        self.data.bodyText = textField.text
+                    case .LocationLabel:
+                        self.data.locationText = textField.text
+                    case .TimeLabel:
+                        self.data.timeText = textField.text
+                    case .SourceLabel:
+                        self.data.sourceText = textField.text
+                    default:
+                        break
+                    }
+                }
+                })
+            
+            alert.addAction(UIAlertAction(title: "取消", style: .Cancel, handler: nil))
+            UIUtils.rootViewController()?.presentViewController(alert, animated: true, completion: nil)
+        case _ where id == .MomentAction:
+            guard let indexPath = findTableView()?.indexPathForCell(self) else {
+                return
+            }
+            let alert = UIAlertController(title: "编辑消息", message: nil, preferredStyle: .ActionSheet)
+            alert.addAction(UIAlertAction(title: "添加图片", style: .Default) { (action) -> Void in
+                self.data.singlePhotoSize = MomentData.defaultSinglePhotoSize
+                if self.data.photoUrls.count < 9 {
+                    self.data.photoUrls.append(NSURL())
+                    self.findTableView()?.reloadRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
+                } else {
+                    self.makeToast("最多只能添加9张图片", duration: 1.0, position: .Bottom)
+                }
+                })
+            alert.addAction(UIAlertAction(title: "显示地点", style: .Default) { (action) -> Void in
+                self.data.locationText = MomentData.defaultLocationText
+                self.findTableView()?.reloadRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
+                })
+            alert.addAction(UIAlertAction(title: "显示来源", style: .Default) { (action) -> Void in
+                self.data.sourceText = MomentData.defaultSourceText
+                self.findTableView()?.reloadRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
+                })
+            alert.addAction(UIAlertAction(title: "添加赞", style: .Default) { (action) -> Void in
+                self.data.likes.append(Like("詹姆斯"))
+                self.data.likes.append(Like("韦德"))
+                self.data.likes.append(Like("奥尼尔"))
+                self.findTableView()?.reloadRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
+                })
+            alert.addAction(UIAlertAction(title: "添加评论", style: .Default) { (action) -> Void in
+                self.data.comments.append(Comment("詹姆斯", "你说得对"))
+                self.data.comments.append(Comment(fromUserName: "韦德", toUserName: "詹姆斯", commentText: "信不信我打死你？你看看你说的哪句话是真的？"))
+                self.data.comments.append(Comment("奥尼尔", "再给我发一条朋友圈我们还是朋友"))
+                self.findTableView()?.reloadRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
+                })
+            alert.addAction(UIAlertAction(title: "移除该条朋友圈", style: .Destructive) { (action) -> Void in
+                self.delegate?.removeSelf(self)
+                })
+            alert.addAction(UIAlertAction(title: "取消", style: .Cancel, handler: nil))
+            UIUtils.rootViewController()?.presentViewController(alert, animated: true, completion: nil)
+        default:
+            break
+        }
+    }
+    
+    func findIndexOfImageView(imageView: UIImageView?, indexPath: NSIndexPath?) -> Int {
+        if imageView == nil || indexPath == nil {
+            return -1;
+        }
+        if imageView === self.singlePhoto {
+            return 0;
+        }
+        return self.multiplePhotos.imageViews.indexOf(imageView!) ?? -1
+    }
+    
+    internal var editMode = false {
+        didSet {
+            likeAndCommentsView.editMode = editMode
+        }
+    }
+
     internal var data = MomentData() {
         didSet {
             if data.hostAvatarUrl != nil {
@@ -161,6 +328,7 @@ class MomentView: UITableViewCell {
             sourceLabel.hidden = data.sourceText == nil
             likeAndCommentsView.likeDataSource = data.likes
             likeAndCommentsView.commentDataSource = data.comments
+            likeAndCommentsView.delegate = self
             
             self.updateConstraints()
         }
@@ -366,5 +534,58 @@ class MomentView: UITableViewCell {
             return max
         }
         return instinct
+    }
+}
+
+extension MomentView: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+    func imagePickerController(picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : AnyObject]){
+        UIUtils.rootViewController()?.dismissViewControllerAnimated(true, completion: nil)
+        if currentImageView == nil {
+            return
+        }
+        
+        let image = info[UIImagePickerControllerOriginalImage] as? UIImage
+        
+        guard let indexPath = findTableView()?.indexPathForCell(self) else {
+            return
+        }
+        
+        let id = ViewID(rawValue: currentImageView!.tag);
+        
+        if id == nil {
+            return
+        }
+        
+        guard let imageUrl = info[UIImagePickerControllerReferenceURL] as? NSURL else {
+            return
+        }
+        
+        switch id! {
+        case .HostAvatar:
+            self.data.hostAvatarUrl = imageUrl
+        case .BodyPhoto:
+            let index = self.findIndexOfImageView(currentImageView, indexPath: indexPath)
+            if index >= 0 {
+                self.data.photoUrls[index] = imageUrl
+                if self.data.photoUrls.count == 1 {
+                    self.data.singlePhotoSize = MomentView.computeImageSize(image?.size)
+                }
+            }
+        default:
+            break
+        }
+        findTableView()?.reloadRowsAtIndexPaths([indexPath], withRowAnimation: .Automatic)
+    }
+}
+
+extension MomentView: LikeAndCommentsViewDelegate {
+    func removeLikeAtIndex(index: Int) {
+        self.data.likes.removeAtIndex(index)
+        self.requestCellUpdate()
+    }
+    
+    func removeCommentAtIndex(index: Int) {
+        self.data.comments.removeAtIndex(index)
+        self.requestCellUpdate()
     }
 }
