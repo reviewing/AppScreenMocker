@@ -39,4 +39,12 @@ class UIUtils {
             onComplete(image: image)
         }
     }
+    
+    static func rootViewController() -> UIViewController? {
+        var rootViewController = UIApplication.sharedApplication().keyWindow?.rootViewController
+        while((rootViewController!.presentedViewController) != nil) {
+            rootViewController = rootViewController!.presentedViewController
+        }
+        return rootViewController
+    }
 }

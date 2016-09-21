@@ -43,14 +43,18 @@ class LikeAndCommentsView: UIView {
     
     var likeDataSource: Array<Like> = [] {
         didSet {
-            let attachment = LikeAndCommentsView.textAttachment(14, image: UIImage(named: "Like")!)
-            let attachmentString = NSAttributedString(attachment:attachment)
-            let attributedString = NSMutableAttributedString(string: " ")
-            attributedString.appendAttributedString(attachmentString)
-            attributedString.appendAttributedString(NSAttributedString(string: "  "))
-            attributedString.appendAttributedString(generateLikes(likeDataSource))
-            likes.attributedText = attributedString
+            refreshLikes()
         }
+    }
+    
+    func refreshLikes() {
+        let attachment = LikeAndCommentsView.textAttachment(14, image: UIImage(named: "Like")!)
+        let attachmentString = NSAttributedString(attachment:attachment)
+        let attributedString = NSMutableAttributedString(string: " ")
+        attributedString.appendAttributedString(attachmentString)
+        attributedString.appendAttributedString(NSAttributedString(string: "  "))
+        attributedString.appendAttributedString(generateLikes(likeDataSource))
+        likes.attributedText = attributedString
     }
     
     var commentDataSource: Array<Comment> = [] {
@@ -141,7 +145,11 @@ class LikeAndCommentsView: UIView {
     }
     
     func requestEdit(recognizer: UIGestureRecognizer) {
-        
+        if let textView = (recognizer.view as? UITextView) {
+            if let index = findIndexPathOfView(textView)?.row {
+                self.requestCommentEdit(textView, index: index, elementTag: "body")
+            }
+        }
     }
     
     override func updateConstraints() {
@@ -213,14 +221,120 @@ class LikeAndCommentsView: UIView {
         
         super.updateConstraints()
     }
+    
+    func requestViewLayout() {
+        guard let superview = (self.superview as? MomentView) else {
+            return
+        }
+        
+        superview.requestCellUpdate()
+    }
+    
+    func requestLikeEdit(textView: UITextView, index: Int) {
+        let alert = UIAlertController(title: "编辑文字", message: likeDataSource[index].userName, preferredStyle: .Alert)
+        
+        alert.addTextFieldWithConfigurationHandler({ (textField) -> Void in
+            textField.placeholder = "请输入文字"
+            textField.text = self.likeDataSource[index].userName
+        })
+        
+        alert.addAction(UIAlertAction(title: "确认", style: .Default) { (action) -> Void in
+            let textField = alert.textFields![0] as UITextField
+            if !(textField.text?.isEmpty ?? true) {
+                self.likeDataSource[index].userName = textField.text!
+                self.requestViewLayout();
+            }
+            })
+        
+        alert.addAction(UIAlertAction(title: "取消", style: .Cancel, handler: nil))
+        UIUtils.rootViewController()?.presentViewController(alert, animated: true, completion: nil)
+    }
+    
+    func requestCommentEdit(textView: UITextView, index: Int, elementTag: String) {
+        var orignialText = ""
+        switch elementTag {
+        case "from":
+            orignialText = commentDataSource[index].fromUserName
+        case "to":
+            orignialText = commentDataSource[index].toUserName!
+        case "body":
+            orignialText = commentDataSource[index].commentText
+        default:
+            break
+        }
+        let alert = UIAlertController(title: "编辑文字", message: orignialText, preferredStyle: .Alert)
+        
+        alert.addTextFieldWithConfigurationHandler({ (textField) -> Void in
+            textField.placeholder = "请输入文字"
+            textField.text = orignialText
+        })
+        
+        alert.addAction(UIAlertAction(title: "确认", style: .Default) { (action) -> Void in
+            let textField = alert.textFields![0] as UITextField
+            if !(textField.text?.isEmpty ?? true) {
+                switch elementTag {
+                case "from":
+                    self.commentDataSource[index].fromUserName = textField.text!
+                case "to":
+                    self.commentDataSource[index].toUserName = textField.text!
+                case "body":
+                    self.commentDataSource[index].commentText = textField.text!
+                default:
+                    break
+                }
+                self.requestViewLayout();
+            }
+            })
+        
+        alert.addAction(UIAlertAction(title: "取消", style: .Cancel, handler: nil))
+        UIUtils.rootViewController()?.presentViewController(alert, animated: true, completion: nil)
+    }
 }
 
 extension LikeAndCommentsView: UITextViewDelegate {
     func textView(textView: UITextView, shouldInteractWithURL URL: NSURL, inRange characterRange: NSRange) -> Bool {
         if URL.scheme == "internal" {
+            let host = URL.host
+            let params = URL.queryItems
+            if host == "like" {
+                if let p = params {
+                    if let i = p["index"] {
+                        if let index = Int(i) {
+                            self.requestLikeEdit(textView, index: index)
+                        }
+                    }
+                }
+            } else if host == "comment" {
+                if let p = params {
+                    if let user = p["user"] {
+                        if let index = findIndexPathOfView(textView)?.row {
+                            self.requestCommentEdit(textView, index: index, elementTag: user)
+                        }
+                    }
+                }
+            }
+            
             return false
         }
         return true
+    }
+    
+    func findIndexPathOfView(view: UIView?) -> NSIndexPath? {
+        var v: UIView? = view
+        while v != nil {
+            if v is CommentCell {
+                break
+            }
+            v = v!.superview
+        }
+        
+        if v == nil {
+            return nil
+        }
+        
+        let commentCell = v as! CommentCell
+        let indexPath = self.commentTableView.indexPathForCell(commentCell)
+        return indexPath
     }
 }
 
@@ -235,10 +349,9 @@ extension LikeAndCommentsView: UITableViewDataSource {
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell: CommentCell = CommentCell(style: .Default, reuseIdentifier: "Comment")
+        cell.commentText.delegate = self
         cell.data = commentDataSource[indexPath.row]
-        for view in cell.subviews where view.tag != 0 {
-            view.addSingleTapGesture(true, closure: gestureClosure)
-        }
+        cell.commentText.addSingleTapGesture(true, closure: gestureClosure)
         return cell
     }
 }

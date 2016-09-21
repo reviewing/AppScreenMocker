@@ -330,6 +330,7 @@ class WechatMomentsController: UIViewController, MaterialSwitchDelegate {
             
             alert.addTextFieldWithConfigurationHandler({ (textField) -> Void in
                 textField.placeholder = "请输入文字"
+                textField.text = (view as! UILabel).text
             })
             
             alert.addAction(UIAlertAction(title: "确认", style: .Default) { (action) -> Void in

@@ -161,7 +161,30 @@ class MomentView: UITableViewCell {
             sourceLabel.hidden = data.sourceText == nil
             likeAndCommentsView.likeDataSource = data.likes
             likeAndCommentsView.commentDataSource = data.comments
+            
+            self.updateConstraints()
         }
+    }
+    
+    func requestCellUpdate() {
+        guard let tableView = findTableView() else {
+            return
+        }
+        
+        guard let indexPath = tableView.indexPathForCell(self) else {
+            return
+        }
+        tableView.reloadRowsAtIndexPaths([indexPath], withRowAnimation: .None)
+    }
+    
+    func findTableView() -> UITableView? {
+        var view = self.superview;
+        
+        while (view != nil && !view!.isKindOfClass(UITableView.self)) {
+            view = view?.superview;
+        }
+        
+        return view as? UITableView;
     }
     
     override func updateConstraints() {
