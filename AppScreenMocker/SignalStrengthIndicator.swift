@@ -10,19 +10,19 @@ import UIKit
 
 class SignalStrengthIndicator: UIView {
     
-    override func drawRect(rect: CGRect) {
+    override func draw(_ rect: CGRect) {
         let radius = (rect.width - 6) / 5;
         
         for i in 0..<5 {
             if i < strength {
-                let iRect: CGRect = CGRectMake(rect.origin.x + (CGFloat(i) * radius + CGFloat(i) * 1.5), rect.origin.y, radius, radius)
-                let path = UIBezierPath(ovalInRect: iRect)
-                UIColor.whiteColor().setFill()
+                let iRect: CGRect = CGRect(x: rect.origin.x + (CGFloat(i) * radius + CGFloat(i) * 1.5), y: rect.origin.y, width: radius, height: radius)
+                let path = UIBezierPath(ovalIn: iRect)
+                UIColor.white.setFill()
                 path.fill()
             } else {
-                let iRect: CGRect = CGRectMake(rect.origin.x + (CGFloat(i) * radius + CGFloat(i) * 1.5) + 0.25, rect.origin.y + 0.25, radius - 0.5, radius - 0.5)
-                let path = UIBezierPath(ovalInRect: iRect)
-                UIColor.whiteColor().setStroke()
+                let iRect: CGRect = CGRect(x: rect.origin.x + (CGFloat(i) * radius + CGFloat(i) * 1.5) + 0.25, y: rect.origin.y + 0.25, width: radius - 0.5, height: radius - 0.5)
+                let path = UIBezierPath(ovalIn: iRect)
+                UIColor.white.setStroke()
                 path.lineWidth = 0.5
                 path.stroke()
             }

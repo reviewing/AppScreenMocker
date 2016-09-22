@@ -45,5 +45,7 @@
 	</dict>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>从相册选择图片</string>
 </dict>
 </plist>

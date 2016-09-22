@@ -13,23 +13,23 @@ class StatusBarView: UIView {
     
     let timeLabelInStatusBar: UILabel = {
         let label = UILabel()
-        label.textColor = .whiteColor()
-        label.font = UIFont.boldSystemFontOfSize(12)
+        label.textColor = UIColor.white
+        label.font = UIFont.boldSystemFont(ofSize: 12)
         label.text = NSLocalizedString("09:41", comment: "")
         return label
     }()
     
     let signalStrengthIndicator: SignalStrengthIndicator = {
         let view = SignalStrengthIndicator()
-        view.backgroundColor = .clearColor()
+        view.backgroundColor = UIColor.clear
         view.strength = 2;
         return view
     }()
     
     let carrierLabel: UILabel = {
         let label = UILabel()
-        label.textColor = .whiteColor()
-        label.font = UIFont.systemFontOfSize(12)
+        label.textColor = UIColor.white
+        label.font = UIFont.systemFont(ofSize: 12)
         label.text = NSLocalizedString("中国电信", comment: "")
         return label
         
@@ -67,8 +67,8 @@ class StatusBarView: UIView {
     
     let batteryLabel: UILabel = {
         let label = UILabel()
-        label.textColor = .whiteColor()
-        label.font = UIFont.systemFontOfSize(12)
+        label.textColor = UIColor.white
+        label.font = UIFont.systemFont(ofSize: 12)
         label.text = NSLocalizedString("49%", comment: "")
         return label
     }()
@@ -102,58 +102,58 @@ class StatusBarView: UIView {
     }
     
     override func updateConstraints() {
-        timeLabelInStatusBar.snp_makeConstraints { make in
+        timeLabelInStatusBar.snp.makeConstraints { make in
             make.center.equalTo(self)
         }
         
         // left
-        signalStrengthIndicator.snp_makeConstraints { make in
+        signalStrengthIndicator.snp.makeConstraints { make in
             make.centerY.equalTo(self)
             make.left.equalTo(self).offset(6)
             make.width.equalTo(33.5)
             make.height.equalTo(5.5)
         }
         
-        carrierLabel.snp_makeConstraints { make in
+        carrierLabel.snp.makeConstraints { make in
             make.centerY.equalTo(self)
-            make.left.equalTo(signalStrengthIndicator.snp_right).offset(4)
+            make.left.equalTo(signalStrengthIndicator.snp.right).offset(4)
         }
         
-        wifiImage.snp_makeConstraints { make in
+        wifiImage.snp.makeConstraints { make in
             make.centerY.equalTo(self)
-            make.left.equalTo(carrierLabel.snp_right).offset(6)
+            make.left.equalTo(carrierLabel.snp.right).offset(6)
         }
         
-        loadingImage.snp_makeConstraints { make in
+        loadingImage.snp.makeConstraints { make in
             make.centerY.equalTo(self)
-            make.left.equalTo(wifiImage.snp_right).offset(6)
+            make.left.equalTo(wifiImage.snp.right).offset(6)
         }
         
         // right
         
-        batteryImage.snp_makeConstraints { make in
+        batteryImage.snp.makeConstraints { make in
             make.centerY.equalTo(self)
             make.right.equalTo(self).offset(-5)
         }
         
-        batteryLabel.snp_makeConstraints { make in
+        batteryLabel.snp.makeConstraints { make in
             make.centerY.equalTo(self)
-            make.right.equalTo(batteryImage.snp_left).offset(-4)
+            make.right.equalTo(batteryImage.snp.left).offset(-4)
         }
         
-        bluetoothImage.snp_makeConstraints { make in
+        bluetoothImage.snp.makeConstraints { make in
             make.centerY.equalTo(self)
-            make.right.equalTo(batteryLabel.snp_left).offset(-6)
+            make.right.equalTo(batteryLabel.snp.left).offset(-6)
         }
         
-        alarmImage.snp_makeConstraints { make in
+        alarmImage.snp.makeConstraints { make in
             make.centerY.equalTo(self)
-            make.right.equalTo(bluetoothImage.snp_left).offset(-6)
+            make.right.equalTo(bluetoothImage.snp.left).offset(-6)
         }
         
-        portraitImage.snp_makeConstraints { make in
+        portraitImage.snp.makeConstraints { make in
             make.centerY.equalTo(self)
-            make.right.equalTo(alarmImage.snp_left).offset(-6)
+            make.right.equalTo(alarmImage.snp.left).offset(-6)
         }
         
         super.updateConstraints()

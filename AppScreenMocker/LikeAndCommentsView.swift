@@ -9,26 +9,26 @@
 import UIKit
 
 protocol LikeAndCommentsViewDelegate {
-    func removeLikeAtIndex(index: Int)
-    func removeCommentAtIndex(index: Int)
+    func removeLikeAtIndex(_ index: Int)
+    func removeCommentAtIndex(_ index: Int)
 }
 
 class LikeAndCommentsView: UIView {
     
-    private var commentTableView: UITableView!
+    fileprivate var commentTableView: UITableView!
     var delegate: LikeAndCommentsViewDelegate?
     internal var editMode: Bool = false
     
     let triangleIndicator: UIView = {
         let view = UIView()
         let triangle = UIBezierPath();
-        triangle.moveToPoint(CGPointMake(6, 0))
-        triangle.addLineToPoint(CGPointMake(0, 5))
-        triangle.addLineToPoint(CGPointMake(12, 5))
-        triangle.addLineToPoint(CGPointMake(6, 0))
-        triangle.closePath()
+        triangle.move(to: CGPoint(x: 6, y: 0))
+        triangle.addLine(to: CGPoint(x: 0, y: 5))
+        triangle.addLine(to: CGPoint(x: 12, y: 5))
+        triangle.addLine(to: CGPoint(x: 6, y: 0))
+        triangle.close()
         let mask = CAShapeLayer()
-        mask.path = triangle.CGPath
+        mask.path = triangle.cgPath
         view.layer.mask = mask
         view.backgroundColor = UIUtils.UIColorFromARGB(0xFFF3F3F5)
         return view
@@ -38,9 +38,9 @@ class LikeAndCommentsView: UIView {
         let textView = UITextView()
         textView.backgroundColor = UIUtils.UIColorFromARGB(0xFFF3F3F5)
         textView.contentInset = UIEdgeInsetsMake(4, 2, 4, 0)
-        textView.textContainerInset = UIEdgeInsetsZero
-        textView.editable = false
-        textView.scrollEnabled = false
+        textView.textContainerInset = UIEdgeInsets.zero
+        textView.isEditable = false
+        textView.isScrollEnabled = false
         let linkAttributes = [NSForegroundColorAttributeName: UIUtils.UIColorFromARGB(0xff586C94)]
         textView.linkTextAttributes = linkAttributes
         return textView
@@ -56,9 +56,9 @@ class LikeAndCommentsView: UIView {
         let attachment = LikeAndCommentsView.textAttachment(14, image: UIImage(named: "Like")!)
         let attachmentString = NSAttributedString(attachment:attachment)
         let attributedString = NSMutableAttributedString(string: " ")
-        attributedString.appendAttributedString(attachmentString)
-        attributedString.appendAttributedString(NSAttributedString(string: "  "))
-        attributedString.appendAttributedString(generateLikes(likeDataSource))
+        attributedString.append(attachmentString)
+        attributedString.append(NSAttributedString(string: "  "))
+        attributedString.append(generateLikes(likeDataSource))
         likes.attributedText = attributedString
     }
     
@@ -68,26 +68,26 @@ class LikeAndCommentsView: UIView {
         }
     }
     
-    static func textAttachment(fontSize: CGFloat, image: UIImage) -> NSTextAttachment {
-        let font = UIFont.systemFontOfSize(fontSize)
+    static func textAttachment(_ fontSize: CGFloat, image: UIImage) -> NSTextAttachment {
+        let font = UIFont.systemFont(ofSize: fontSize)
         let textAttachment = NSTextAttachment()
         textAttachment.image = image
         let mid = font.descender + font.capHeight
-        textAttachment.bounds = CGRectIntegral(CGRect(x: 0, y: font.descender - image.size.height / 2 + mid + 3, width: image.size.width - 1, height: image.size.height - 2))
+        textAttachment.bounds = CGRect(x: 0, y: font.descender - image.size.height / 2 + mid + 3, width: image.size.width - 1, height: image.size.height - 2).integral
         return textAttachment
     }
     
-    func generateLikes(likes: Array<Like>) -> NSAttributedString {
+    func generateLikes(_ likes: Array<Like>) -> NSAttributedString {
         let resultString = NSMutableAttributedString()
         for i in 0..<likes.count {
             let like = likes[i]
-            let attributes = [NSLinkAttributeName: "internal://like?index=" + String(i), NSFontAttributeName: UIFont.boldSystemFontOfSize(14)]
+            let attributes = [NSLinkAttributeName: "internal://like?index=" + String(i), NSFontAttributeName: UIFont.boldSystemFont(ofSize: 14)] as [String : Any]
             let likeString = NSAttributedString(string: like.userName, attributes: attributes)
-            resultString.appendAttributedString(likeString)
-            resultString.appendAttributedString(NSAttributedString(string: "，", attributes: [NSFontAttributeName: UIFont.boldSystemFontOfSize(12)]))
+            resultString.append(likeString)
+            resultString.append(NSAttributedString(string: "，", attributes: [NSFontAttributeName: UIFont.boldSystemFont(ofSize: 12)]))
         }
         if resultString.length >= 1 {
-            resultString.deleteCharactersInRange(NSMakeRange(resultString.length - 1, 1))
+            resultString.deleteCharacters(in: NSMakeRange(resultString.length - 1, 1))
         }
         return resultString
     }
@@ -139,18 +139,18 @@ class LikeAndCommentsView: UIView {
         fatalError("This class does not support NSCoding")
     }
     
-    private func prepareTableView() {
+    fileprivate func prepareTableView() {
         commentTableView = UITableView()
-        commentTableView.registerClass(CommentCell.self, forCellReuseIdentifier: "Comment")
+        commentTableView.register(CommentCell.self, forCellReuseIdentifier: "Comment")
         commentTableView.dataSource = self
         commentTableView.delegate = self
-        commentTableView.scrollEnabled = false
+        commentTableView.isScrollEnabled = false
         commentTableView.tableFooterView = UIView()
-        commentTableView.separatorStyle = .None
+        commentTableView.separatorStyle = .none
         commentTableView.allowsSelection = false
     }
     
-    func requestEdit(recognizer: UIGestureRecognizer) {
+    func requestEdit(_ recognizer: UIGestureRecognizer) {
         if let textView = (recognizer.view as? UITextView) {
             if let indexPath = findIndexPathOfView(textView) {
                 self.requestCommentEdit(textView, indexPath: indexPath, elementTag: "body")
@@ -160,7 +160,7 @@ class LikeAndCommentsView: UIView {
     
     override func updateConstraints() {
         
-        triangleIndicator.snp_remakeConstraints { (make) in
+        triangleIndicator.snp.remakeConstraints { (make) in
             make.leading.equalTo(self).offset(10)
             make.width.equalTo(12)
             
@@ -175,23 +175,23 @@ class LikeAndCommentsView: UIView {
         
         let fixedWidth = CGFloat(375 - 20 - 42 - 10)
         
-        likes.snp_remakeConstraints { (make) in
+        likes.snp.remakeConstraints { (make) in
             make.leading.equalTo(self)
-            make.top.equalTo(triangleIndicator.snp_bottom)
+            make.top.equalTo(triangleIndicator.snp.bottom)
             make.width.equalTo(fixedWidth)
             
             if likeDataSource.count > 0 {
-                let newSize = likes.sizeThatFits(CGSize(width: fixedWidth, height: CGFloat.max))
+                let newSize = likes.sizeThatFits(CGSize(width: fixedWidth, height: CGFloat.greatestFiniteMagnitude))
                 make.height.equalTo(newSize.height + 8)
             } else {
                 make.height.equalTo(0)
             }
         }
         
-        separator.snp_remakeConstraints { make in
+        separator.snp.remakeConstraints { make in
             make.leading.equalTo(self)
             make.trailing.equalTo(self)
-            make.top.equalTo(likes.snp_bottom)
+            make.top.equalTo(likes.snp.bottom)
             
             if likeDataSource.count > 0 && commentDataSource.count > 0 {
                 make.height.equalTo(1)
@@ -200,21 +200,24 @@ class LikeAndCommentsView: UIView {
             }
         }
         
-        commentTableView.snp_remakeConstraints { (make) in
+        commentTableView.snp.remakeConstraints { (make) in
             make.leading.equalTo(self)
-            make.top.equalTo(separator.snp_bottom)
+            make.top.equalTo(separator.snp.bottom)
             make.trailing.equalTo(self)
             
             if commentDataSource.count > 0 {
-                make.height.equalTo(preferredContentSize.height)
+                let tableHeight = preferredContentSize.height
+                commentTableView.snp.updateConstraints{ (make) in
+                    make.height.equalTo(tableHeight)
+                }
             } else {
                 make.height.equalTo(0)
             }
         }
         
-        commentBottomMargin.snp_remakeConstraints { (make) in
+        commentBottomMargin.snp.remakeConstraints { (make) in
             make.leading.equalTo(self)
-            make.top.equalTo(commentTableView.snp_bottom)
+            make.top.equalTo(commentTableView.snp.bottom)
             make.trailing.equalTo(self)
             make.bottom.equalTo(self)
             
@@ -236,25 +239,25 @@ class LikeAndCommentsView: UIView {
         superview.requestCellUpdate()
     }
     
-    func requestLikeEdit(textView: UITextView, index: Int) {
+    func requestLikeEdit(_ textView: UITextView, index: Int) {
         if editMode {
-            let alert = UIAlertController(title: likeDataSource[index].userName, message: nil, preferredStyle: .ActionSheet)
-            alert.addAction(UIAlertAction(title: "移除赞", style: .Default) { (action) -> Void in
+            let alert = UIAlertController(title: likeDataSource[index].userName, message: nil, preferredStyle: .actionSheet)
+            alert.addAction(UIAlertAction(title: "移除赞", style: .default) { (action) -> Void in
                 self.delegate?.removeLikeAtIndex(index)
                 })
-            alert.addAction(UIAlertAction(title: "取消", style: .Cancel, handler: nil))
-            UIUtils.rootViewController()?.presentViewController(alert, animated: true, completion: nil)
+            alert.addAction(UIAlertAction(title: "取消", style: .cancel, handler: nil))
+            UIUtils.rootViewController()?.present(alert, animated: true, completion: nil)
             return
         }
         
-        let alert = UIAlertController(title: "编辑文字", message: likeDataSource[index].userName, preferredStyle: .Alert)
+        let alert = UIAlertController(title: "编辑文字", message: likeDataSource[index].userName, preferredStyle: .alert)
         
-        alert.addTextFieldWithConfigurationHandler({ (textField) -> Void in
+        alert.addTextField(configurationHandler: { (textField) -> Void in
             textField.placeholder = "请输入文字"
             textField.text = self.likeDataSource[index].userName
         })
         
-        alert.addAction(UIAlertAction(title: "确认", style: .Default) { (action) -> Void in
+        alert.addAction(UIAlertAction(title: "确认", style: .default) { (action) -> Void in
             let textField = alert.textFields![0] as UITextField
             if !(textField.text?.isEmpty ?? true) {
                 self.likeDataSource[index].userName = textField.text!
@@ -262,49 +265,49 @@ class LikeAndCommentsView: UIView {
             }
             })
         
-        alert.addAction(UIAlertAction(title: "取消", style: .Cancel, handler: nil))
-        UIUtils.rootViewController()?.presentViewController(alert, animated: true, completion: nil)
+        alert.addAction(UIAlertAction(title: "取消", style: .cancel, handler: nil))
+        UIUtils.rootViewController()?.present(alert, animated: true, completion: nil)
     }
     
-    func requestCommentEdit(textView: UITextView, indexPath: NSIndexPath, elementTag: String) {
+    func requestCommentEdit(_ textView: UITextView, indexPath: IndexPath, elementTag: String) {
         if editMode {
-            let alert = UIAlertController(title: textView.text, message: nil, preferredStyle: .ActionSheet)
-            alert.addAction(UIAlertAction(title: "移除评论", style: .Default) { (action) -> Void in
-                self.delegate?.removeCommentAtIndex(indexPath.row)
+            let alert = UIAlertController(title: textView.text, message: nil, preferredStyle: .actionSheet)
+            alert.addAction(UIAlertAction(title: "移除评论", style: .default) { (action) -> Void in
+                self.delegate?.removeCommentAtIndex((indexPath as NSIndexPath).row)
                 })
-            alert.addAction(UIAlertAction(title: "取消", style: .Cancel, handler: nil))
-            UIUtils.rootViewController()?.presentViewController(alert, animated: true, completion: nil)
+            alert.addAction(UIAlertAction(title: "取消", style: .cancel, handler: nil))
+            UIUtils.rootViewController()?.present(alert, animated: true, completion: nil)
             return
         }
         
         var orignialText = ""
         switch elementTag {
         case "from":
-            orignialText = commentDataSource[indexPath.row].fromUserName
+            orignialText = commentDataSource[(indexPath as NSIndexPath).row].fromUserName
         case "to":
-            orignialText = commentDataSource[indexPath.row].toUserName!
+            orignialText = commentDataSource[(indexPath as NSIndexPath).row].toUserName!
         case "body":
-            orignialText = commentDataSource[indexPath.row].commentText
+            orignialText = commentDataSource[(indexPath as NSIndexPath).row].commentText
         default:
             break
         }
-        let alert = UIAlertController(title: "编辑文字", message: orignialText, preferredStyle: .Alert)
+        let alert = UIAlertController(title: "编辑文字", message: orignialText, preferredStyle: .alert)
         
-        alert.addTextFieldWithConfigurationHandler({ (textField) -> Void in
+        alert.addTextField(configurationHandler: { (textField) -> Void in
             textField.placeholder = "请输入文字"
             textField.text = orignialText
         })
         
-        alert.addAction(UIAlertAction(title: "确认", style: .Default) { (action) -> Void in
+        alert.addAction(UIAlertAction(title: "确认", style: .default) { (action) -> Void in
             let textField = alert.textFields![0] as UITextField
             if !(textField.text?.isEmpty ?? true) {
                 switch elementTag {
                 case "from":
-                    self.commentDataSource[indexPath.row].fromUserName = textField.text!
+                    self.commentDataSource[(indexPath as NSIndexPath).row].fromUserName = textField.text!
                 case "to":
-                    self.commentDataSource[indexPath.row].toUserName = textField.text!
+                    self.commentDataSource[(indexPath as NSIndexPath).row].toUserName = textField.text!
                 case "body":
-                    self.commentDataSource[indexPath.row].commentText = textField.text!
+                    self.commentDataSource[(indexPath as NSIndexPath).row].commentText = textField.text!
                 default:
                     break
                 }
@@ -312,13 +315,13 @@ class LikeAndCommentsView: UIView {
             }
             })
         
-        alert.addAction(UIAlertAction(title: "取消", style: .Cancel, handler: nil))
-        UIUtils.rootViewController()?.presentViewController(alert, animated: true, completion: nil)
+        alert.addAction(UIAlertAction(title: "取消", style: .cancel, handler: nil))
+        UIUtils.rootViewController()?.present(alert, animated: true, completion: nil)
     }
 }
 
 extension LikeAndCommentsView: UITextViewDelegate {
-    func textView(textView: UITextView, shouldInteractWithURL URL: NSURL, inRange characterRange: NSRange) -> Bool {
+    func textView(_ textView: UITextView, shouldInteractWith URL: URL, in characterRange: NSRange) -> Bool {
         if URL.scheme == "internal" {
             let host = URL.host
             let params = URL.queryItems
@@ -345,7 +348,7 @@ extension LikeAndCommentsView: UITextViewDelegate {
         return true
     }
     
-    func findIndexPathOfView(view: UIView?) -> NSIndexPath? {
+    func findIndexPathOfView(_ view: UIView?) -> IndexPath? {
         var v: UIView? = view
         while v != nil {
             if v is CommentCell {
@@ -359,35 +362,35 @@ extension LikeAndCommentsView: UITextViewDelegate {
         }
         
         let commentCell = v as! CommentCell
-        let indexPath = self.commentTableView.indexPathForCell(commentCell)
+        let indexPath = self.commentTableView.indexPath(for: commentCell)
         return indexPath
     }
 }
 
 extension LikeAndCommentsView: UITableViewDataSource {
-    func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return commentDataSource.count
     }
     
-    func numberOfSectionsInTableView(tableView: UITableView) -> Int {
+    func numberOfSections(in tableView: UITableView) -> Int {
         return 1
     }
     
-    func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell: CommentCell = CommentCell(style: .Default, reuseIdentifier: "Comment")
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell: CommentCell = CommentCell(style: .default, reuseIdentifier: "Comment")
         cell.commentText.delegate = self
-        cell.data = commentDataSource[indexPath.row]
+        cell.data = commentDataSource[(indexPath as NSIndexPath).row]
         cell.commentText.addSingleTapGesture(true, closure: gestureClosure)
         return cell
     }
 }
 
 extension LikeAndCommentsView: UITableViewDelegate {
-    func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return UITableViewAutomaticDimension
     }
     
-    func tableView(tableView: UITableView, estimatedHeightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
+    func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
         return UITableViewAutomaticDimension
     }
 }
@@ -427,20 +430,20 @@ class Comment {
     var attributedString: NSAttributedString {
         get {
             let resultString = NSMutableAttributedString()
-            let attributes = [NSLinkAttributeName: "internal://comment?user=from", NSFontAttributeName: UIFont.boldSystemFontOfSize(14)]
+            let attributes = [NSLinkAttributeName: "internal://comment?user=from", NSFontAttributeName: UIFont.boldSystemFont(ofSize: 14)] as [String : Any]
             let fromString = NSAttributedString(string: fromUserName, attributes: attributes)
-            resultString.appendAttributedString(fromString)
+            resultString.append(fromString)
             
             if let to = toUserName {
-                resultString.appendAttributedString(NSAttributedString(string: "回复", attributes: [NSFontAttributeName: UIFont.systemFontOfSize(14)]))
-                let attributes = [NSLinkAttributeName: "internal://comment?user=to", NSFontAttributeName: UIFont.boldSystemFontOfSize(14)]
+                resultString.append(NSAttributedString(string: "回复", attributes: [NSFontAttributeName: UIFont.systemFont(ofSize: 14)]))
+                let attributes = [NSLinkAttributeName: "internal://comment?user=to", NSFontAttributeName: UIFont.boldSystemFont(ofSize: 14)] as [String : Any]
                 let toString = NSAttributedString(string: to, attributes: attributes)
-                resultString.appendAttributedString(toString)
+                resultString.append(toString)
             }
             
-            resultString.appendAttributedString(NSAttributedString(string: ": ", attributes: [NSFontAttributeName: UIFont.boldSystemFontOfSize(12)]))
+            resultString.append(NSAttributedString(string: ": ", attributes: [NSFontAttributeName: UIFont.boldSystemFont(ofSize: 12)]))
             
-            resultString.appendAttributedString(NSAttributedString(string: commentText, attributes: [NSFontAttributeName: UIFont.systemFontOfSize(14)]))
+            resultString.append(NSAttributedString(string: commentText, attributes: [NSFontAttributeName: UIFont.systemFont(ofSize: 14)]))
             return resultString
         }
         set {}
@@ -453,12 +456,12 @@ class CommentCell: UITableViewCell {
         let textView = UITextView()
         textView.backgroundColor = UIUtils.UIColorFromARGB(0xFFF3F3F5)
         textView.contentInset = UIEdgeInsetsMake(0, 3, 0, 0)
-        textView.textContainerInset = UIEdgeInsetsZero
-        textView.editable = false
-        textView.scrollEnabled = false
+        textView.textContainerInset = UIEdgeInsets.zero
+        textView.isEditable = false
+        textView.isScrollEnabled = false
         let linkAttributes = [NSForegroundColorAttributeName: UIUtils.UIColorFromARGB(0xff586C94)]
         textView.linkTextAttributes = linkAttributes
-        textView.font = UIFont.systemFontOfSize(14)
+        textView.font = UIFont.systemFont(ofSize: 14)
         return textView
     }()
     
@@ -483,12 +486,12 @@ class CommentCell: UITableViewCell {
     override func updateConstraints() {
         
         let fixedWidth = CGFloat(375 - 20 - 42 - 10)
-        commentText.snp_remakeConstraints { (make) in
+        commentText.snp.remakeConstraints { (make) in
             make.leading.equalTo(self)
             make.top.equalTo(self).offset(5)
             make.width.equalTo(fixedWidth)
-            let newSize = commentText.sizeThatFits(CGSize(width: fixedWidth, height: CGFloat.max))
-            make.height.equalTo(newSize.height).priorityHigh()
+            let newSize = commentText.sizeThatFits(CGSize(width: fixedWidth, height: CGFloat.greatestFiniteMagnitude))
+            make.height.equalTo(newSize.height).priority(750)
             make.bottom.equalTo(self)
         }
         

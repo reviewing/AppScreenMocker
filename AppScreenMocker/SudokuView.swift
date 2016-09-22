@@ -13,15 +13,15 @@ class SudokuView: UIView {
     let imageMargin: CGFloat = 5
     var imageViews = [UIImageView]()
 
-    var imageUrls = [NSURL]() {
+    var imageUrls = [URL?]() {
         didSet {
             if oldValue.count != imageUrls.count {
                 let oldImageViewCount = imageViews.count
                 if imageViews.count < imageUrls.count {
                     for _ in 0..<imageUrls.count - oldImageViewCount {
                         let imageView = UIImageView()
-                        imageView.backgroundColor = UIColor.blackColor()
-                        imageView.tag = ViewID.BodyPhoto.rawValue
+                        imageView.backgroundColor = UIColor.black
+                        imageView.tag = ViewID.bodyPhoto.rawValue
                         imageViews.append(imageView)
                         self.addSubview(imageView)
                     }
@@ -36,12 +36,14 @@ class SudokuView: UIView {
             }
             
             for i in 0..<imageUrls.count {
-                if i < oldValue.count && oldValue[i] === imageUrls[i] {
+                if i < oldValue.count && oldValue[i] == imageUrls[i] {
                     continue
                 }
                 
-                let originalUrl = imageUrls[i]
-                UIUtils.imageFromAssetURL(originalUrl, targetSize: CGSizeMake(imageWidth, imageWidth), onComplete: { (image) in
+                guard let originalUrl = imageUrls[i] else {
+                    continue
+                }
+                UIUtils.imageFromAssetURL(originalUrl, targetSize: CGSize(width: imageWidth, height: imageWidth), onComplete: { (image) in
                     if self.imageUrls[i] == originalUrl {
                         self.imageViews[i].image = image
                     }
@@ -65,44 +67,44 @@ class SudokuView: UIView {
     
     override func updateConstraints() {
         for i in 0..<imageViews.count {
-            self.snp_makeConstraints { make in
+            self.snp.makeConstraints { make in
                 make.top.equalTo(imageViews[0])
                 make.left.equalTo(imageViews[0])
                 make.width.equalTo(3 * imageWidth + 2 * imageMargin)
             }
             
-            imageViews[i].snp_makeConstraints { make in
+            imageViews[i].snp.makeConstraints { make in
                 make.width.height.equalTo(imageWidth)
             }
             
             switch i {
             case 0..<3:
-                imageViews[i].snp_makeConstraints { make in
+                imageViews[i].snp.makeConstraints { make in
                     make.top.equalTo(self)
                     make.left.equalTo(CGFloat(i) * (imageWidth + imageMargin))
                 }
                 if imageViews.count <= 3 {
-                    self.snp_makeConstraints { make in
+                    self.snp.makeConstraints { make in
                         make.bottom.equalTo(imageViews[0])
                     }
                 }
             case 3..<6:
-                imageViews[i].snp_makeConstraints { make in
+                imageViews[i].snp.makeConstraints { make in
                     make.top.equalTo(imageWidth + imageMargin)
                     make.left.equalTo(CGFloat(i - 3) * (imageWidth + imageMargin))
                 }
                 if imageViews.count <= 6 {
-                    self.snp_makeConstraints { make in
+                    self.snp.makeConstraints { make in
                         make.bottom.equalTo(imageViews[3])
                     }
                 }
             case 6..<9:
-                imageViews[i].snp_makeConstraints { make in
+                imageViews[i].snp.makeConstraints { make in
                     make.top.equalTo(2 * (imageWidth + imageMargin))
                     make.left.equalTo(CGFloat(i - 6) * (imageWidth + imageMargin))
                 }
                 if imageViews.count <= 9 {
-                    self.snp_makeConstraints { make in
+                    self.snp.makeConstraints { make in
                         make.bottom.equalTo(imageViews[6])
                     }
                 }

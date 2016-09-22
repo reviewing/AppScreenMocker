@@ -19,16 +19,16 @@ class WechatNavigationBarView: UIView {
     
     let navigationBackItem: UILabel = {
         let label = UILabel()
-        label.textColor = .whiteColor()
-        label.font = UIFont.systemFontOfSize(16)
+        label.textColor = .white
+        label.font = UIFont.systemFont(ofSize: 16)
         label.text = NSLocalizedString("发现", comment: "")
         return label
     }()
     
     let navigationTitleLabel: UILabel = {
         let label = UILabel()
-        label.textColor = .whiteColor()
-        label.font = UIFont.boldSystemFontOfSize(18.5)
+        label.textColor = .white
+        label.font = UIFont.boldSystemFont(ofSize: 18.5)
         label.text = NSLocalizedString("朋友圈", comment: "")
         return label
     }()
@@ -57,21 +57,21 @@ class WechatNavigationBarView: UIView {
     }
     
     override func updateConstraints() {
-        navigationBackIcon.snp_makeConstraints { make in
+        navigationBackIcon.snp.makeConstraints { make in
             make.centerY.equalTo(self)
             make.left.equalTo(self).offset(10)
         }
         
-        navigationBackItem.snp_makeConstraints { make in
+        navigationBackItem.snp.makeConstraints { make in
             make.centerY.equalTo(self)
-            make.left.equalTo(navigationBackIcon.snp_right)
+            make.left.equalTo(navigationBackIcon.snp.right)
         }
         
-        navigationTitleLabel.snp_makeConstraints { make in
+        navigationTitleLabel.snp.makeConstraints { make in
             make.center.equalTo(self)
         }
         
-        navigationRightItem.snp_makeConstraints { make in
+        navigationRightItem.snp.makeConstraints { make in
             make.centerY.equalTo(self)
             make.right.equalTo(self).inset(10)
         }

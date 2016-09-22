@@ -3,6 +3,6 @@ platform :ios, '8.0'
 use_frameworks!
 
 target 'AppScreenMocker' do
-    pod 'SnapKit', '~> 0.22.0'
-    pod 'Kingfisher', '~> 2.4'
+    pod 'SnapKit', '~> 3.0.0'
+    pod 'Kingfisher', '~> 3.0'
 end

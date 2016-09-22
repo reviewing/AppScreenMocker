@@ -10,15 +10,15 @@ import UIKit
 
 class AppHomeController: UIViewController {
     
-    private var dataSourceItems: Array<Dictionary<String, AnyObject>>!
+    fileprivate var dataSourceItems: Array<Dictionary<String, AnyObject>>!
     
-    private var tableView: UITableView!
+    fileprivate var tableView: UITableView!
     
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
     }
     
-    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: NSBundle?) {
+    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
     }
     
@@ -35,28 +35,28 @@ class AppHomeController: UIViewController {
         updateViewConstraints()
     }
     
-    private func prepareView() {
-        view.backgroundColor = UIColor.whiteColor()
+    fileprivate func prepareView() {
+        view.backgroundColor = UIColor.white
     }
     
-    private func prepareNavigationItem() {
+    fileprivate func prepareNavigationItem() {
         navigationItem.title = "截屏构造"
     }
     
-    private func prepareItems() {
+    fileprivate func prepareItems() {
         dataSourceItems = [
             [
-                "title": "微信",
-                "detail": "支持朋友圈",
-                "icon": "Wechat",
-                "goto": "WechatScreenList"
+                "title": "微信" as AnyObject,
+                "detail": "支持朋友圈" as AnyObject,
+                "icon": "Wechat" as AnyObject,
+                "goto": "WechatScreenList" as AnyObject
             ]
         ]
     }
     
-    private func prepareTableView() {
+    fileprivate func prepareTableView() {
         tableView = UITableView()
-        tableView.registerClass(HomeTableViewCell.self, forCellReuseIdentifier: "HomeTableViewCell")
+        tableView.register(HomeTableViewCell.self, forCellReuseIdentifier: "HomeTableViewCell")
         tableView.dataSource = self
         tableView.delegate = self
         tableView.tableFooterView = UIView()
@@ -64,7 +64,7 @@ class AppHomeController: UIViewController {
     }
     
     override func updateViewConstraints() {
-        tableView.snp_makeConstraints { (make) in
+        tableView.snp.makeConstraints { (make) in
             make.edges.equalTo(view)
         }
         
@@ -73,22 +73,22 @@ class AppHomeController: UIViewController {
 }
 
 extension AppHomeController: UITableViewDataSource {
-    func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return dataSourceItems.count;
     }
     
-    func numberOfSectionsInTableView(tableView: UITableView) -> Int {
+    func numberOfSections(in tableView: UITableView) -> Int {
         return 1
     }
     
-    func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell: HomeTableViewCell = HomeTableViewCell(style: .Subtitle, reuseIdentifier: "HomeTableViewCell")
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell: HomeTableViewCell = HomeTableViewCell(style: .subtitle, reuseIdentifier: "HomeTableViewCell")
         
-        let item = dataSourceItems[indexPath.row]
-        cell.selectionStyle = .None
+        let item = dataSourceItems[(indexPath as NSIndexPath).row]
+        cell.selectionStyle = .none
         cell.textLabel?.text = item["title"] as? String
         cell.detailTextLabel?.text = item["detail"] as? String
-        cell.detailTextLabel?.textColor = UIColor.grayColor()
+        cell.detailTextLabel?.textColor = UIColor.gray
         cell.imageView?.layer.cornerRadius = 10
         cell.imageView?.clipsToBounds = true
         cell.imageView?.image = UIImage(named: item["icon"] as! String)
@@ -98,11 +98,11 @@ extension AppHomeController: UITableViewDataSource {
 }
 
 extension AppHomeController: UITableViewDelegate {
-    func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 80
     }
     
-    func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
 		navigationController?.pushViewController(WechatScreenListController(), animated: true)
     }
 }

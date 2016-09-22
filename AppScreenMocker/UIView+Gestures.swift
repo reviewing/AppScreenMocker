@@ -9,10 +9,10 @@
 import UIKit
 
 extension UIView {
-    func addSingleTapGesture(target: AnyObject?, action: Selector, recursively: Bool = false) {
+    func addSingleTapGesture(_ target: AnyObject?, action: Selector, recursively: Bool = false) {
         let singleTap = UITapGestureRecognizer(target: target, action:action)
         singleTap.numberOfTapsRequired = 1
-        self.userInteractionEnabled = true
+        self.isUserInteractionEnabled = true
         self.addGestureRecognizer(singleTap)
         
         if recursively {
@@ -22,10 +22,10 @@ extension UIView {
         }
     }
     
-    func addSingleTapGesture(recursively: Bool = false, closure: ((recognizer: UIGestureRecognizer) -> ())) {
+    func addSingleTapGesture(_ recursively: Bool = false, closure: @escaping ((_ recognizer: UIGestureRecognizer) -> ())) {
         let singleTap = UITapGestureRecognizer(closure)
         singleTap.numberOfTapsRequired = 1
-        self.userInteractionEnabled = true
+        self.isUserInteractionEnabled = true
         self.addGestureRecognizer(singleTap)
         
         if recursively {
@@ -41,7 +41,7 @@ private var target = [Target]()
 
 extension UIGestureRecognizer {
     
-    convenience init(_ closure: ((recognizer: UIGestureRecognizer) -> ())) {
+    convenience init(_ closure: @escaping ((_ recognizer: UIGestureRecognizer) -> ())) {
         // let UIGestureRecognizer do its thing
         self.init()
         
@@ -53,10 +53,10 @@ extension UIGestureRecognizer {
 private class Target {
     
     // store closure
-    private var trailingClosure: ((recognizer: UIGestureRecognizer) -> ())
-    private var recognizer: UIGestureRecognizer!
+    fileprivate var trailingClosure: ((_ recognizer: UIGestureRecognizer) -> ())
+    fileprivate var recognizer: UIGestureRecognizer!
     
-    init(_ recognizer: UIGestureRecognizer, _ closure:((recognizer: UIGestureRecognizer) -> ())) {
+    init(_ recognizer: UIGestureRecognizer, _ closure:@escaping ((_ recognizer: UIGestureRecognizer) -> ())) {
         trailingClosure = closure
         self.recognizer = recognizer
     }
@@ -65,6 +65,6 @@ private class Target {
     // calls closure
     /* Note: Note sure why @IBAction is needed here */
     @objc @IBAction func invoke() {
-        trailingClosure(recognizer: recognizer)
+        trailingClosure(recognizer)
     }
 }

@@ -10,11 +10,11 @@ import UIKit
 
 class WechatScreenListController: UIViewController {
     
-    private var dataSourceItems: Array<Dictionary<String, AnyObject>>!
+    fileprivate var dataSourceItems: Array<Dictionary<String, AnyObject>>!
     
-    private var tableView: UITableView!
+    fileprivate var tableView: UITableView!
     
-    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: NSBundle?) {
+    override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
     }
     
@@ -35,27 +35,27 @@ class WechatScreenListController: UIViewController {
         updateViewConstraints()
     }
     
-    private func prepareNavigationItem() {
+    fileprivate func prepareNavigationItem() {
         navigationItem.title = "微信"
     }
 
-    private func prepareView() {
-        view.backgroundColor = UIColor.whiteColor()
+    fileprivate func prepareView() {
+        view.backgroundColor = UIColor.white
     }
     
-    private func prepareItems() {
+    fileprivate func prepareItems() {
         dataSourceItems = [
             [
-                "title": "朋友圈",
-                "icon": "WechatMoments",
-                "goto": "WechatMoments"
+                "title": "朋友圈" as AnyObject,
+                "icon": "WechatMoments" as AnyObject,
+                "goto": "WechatMoments" as AnyObject
             ]
         ]
     }
     
-    private func prepareTableView() {
+    fileprivate func prepareTableView() {
         tableView = UITableView()
-        tableView.registerClass(WechatScreenTableViewCell.self, forCellReuseIdentifier: "WechatScreenTableViewCell")
+        tableView.register(WechatScreenTableViewCell.self, forCellReuseIdentifier: "WechatScreenTableViewCell")
         tableView.dataSource = self
         tableView.delegate = self
         tableView.tableFooterView = UIView()
@@ -63,7 +63,7 @@ class WechatScreenListController: UIViewController {
     }
     
     override func updateViewConstraints() {
-        tableView.snp_makeConstraints { (make) in
+        tableView.snp.makeConstraints { (make) in
             make.edges.equalTo(view)
         }
         
@@ -72,19 +72,19 @@ class WechatScreenListController: UIViewController {
 }
 
 extension WechatScreenListController: UITableViewDataSource {
-    func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return dataSourceItems.count;
     }
     
-    func numberOfSectionsInTableView(tableView: UITableView) -> Int {
+    func numberOfSections(in tableView: UITableView) -> Int {
         return 1
     }
     
-    func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell: WechatScreenTableViewCell = WechatScreenTableViewCell(style: .Default, reuseIdentifier: "WechatScreenTableViewCell")
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell: WechatScreenTableViewCell = WechatScreenTableViewCell(style: .default, reuseIdentifier: "WechatScreenTableViewCell")
         
-        let item = dataSourceItems[indexPath.row]
-        cell.selectionStyle = .None
+        let item = dataSourceItems[(indexPath as NSIndexPath).row]
+        cell.selectionStyle = .none
         cell.textLabel?.text = item["title"] as? String
         cell.detailTextLabel?.text = item["detail"] as? String
         cell.imageView?.layer.cornerRadius = 10
@@ -96,11 +96,11 @@ extension WechatScreenListController: UITableViewDataSource {
 }
 
 extension WechatScreenListController: UITableViewDelegate {
-    func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 80
     }
     
-    func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         navigationController?.pushViewController(WechatMomentsController(), animated: true)
     }
 }

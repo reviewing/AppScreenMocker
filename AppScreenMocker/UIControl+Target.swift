@@ -11,28 +11,23 @@ import UIKit
 public extension UIControl {
     
     /// The registry contains a weak reference to all UIControl objects that have been given targets, the events to observe, and the closures to execute when the events are triggered.
-    private static var actionRegistry = [Action]()
+    fileprivate static var actionRegistry = [ActionObject]()
     
     // MARK: Public methods
     
     /// Adds a target to the receiv er for the given event, which triggers the given action.
-    public func addTarget(forControlEvents: UIControlEvents, action: () -> Void) {
+    public func addTarget(_ forControlEvents: UIControlEvents, action: @escaping () -> Void) {
         self.addTarget(forEvent: forControlEvents, action: action)
     }
     
     // MARK: Private methods
     
     /// A wrapper used to maintain a weak reference to a UIControl, an event to observe, and a function to call.
-    private class Action: AnyObject {
+    fileprivate class ActionObject: AnyObject {
         weak var object: UIControl?
         var event: UIControlEvents
         var function: Any
-        init(object: UIControl, event: UIControlEvents, function: () -> Void) {
-            self.object = object
-            self.event = event
-            self.function = function
-        }
-        init(object: UIControl, event: UIControlEvents, function: (sender: UIControl) -> Void) {
+        init(object: UIControl, event: UIControlEvents, function: @escaping () -> Void) {
             self.object = object
             self.event = event
             self.function = function
@@ -40,63 +35,63 @@ public extension UIControl {
     }
     
     /// Adds the target to the actual object and adds the action to the registry.
-    private func addTarget(forEvent event: UIControlEvents, action: () -> Void) {
+    fileprivate func addTarget(forEvent event: UIControlEvents, action: @escaping () -> Void) {
         var actionString: Selector!
         switch event {
             
             // Touch events
             
-        case UIControlEvents.TouchDown:
+        case UIControlEvents.touchDown:
             actionString = #selector(UIControl.touchDown(_:))
-        case UIControlEvents.TouchDownRepeat:
+        case UIControlEvents.touchDownRepeat:
             actionString = #selector(UIControl.touchDownRepeat(_:))
-        case UIControlEvents.TouchDragInside:
+        case UIControlEvents.touchDragInside:
             actionString = #selector(UIControl.touchDragInside(_:))
-        case UIControlEvents.TouchDragOutside:
+        case UIControlEvents.touchDragOutside:
             actionString = #selector(UIControl.touchDragOutside(_:))
-        case UIControlEvents.TouchDragEnter:
+        case UIControlEvents.touchDragEnter:
             actionString = #selector(UIControl.touchDragEnter(_:))
-        case UIControlEvents.TouchDragExit:
+        case UIControlEvents.touchDragExit:
             actionString = #selector(UIControl.touchDragExit(_:))
-        case UIControlEvents.TouchUpInside:
+        case UIControlEvents.touchUpInside:
             actionString = #selector(UIControl.touchUpInside(_:))
-        case UIControlEvents.TouchUpOutside:
+        case UIControlEvents.touchUpOutside:
             actionString = #selector(UIControl.touchUpOutside(_:))
-        case UIControlEvents.TouchCancel:
+        case UIControlEvents.touchCancel:
             actionString = #selector(UIControl.touchCancel(_:))
             
             // UISlider events
             
-        case UIControlEvents.ValueChanged:
+        case UIControlEvents.valueChanged:
             actionString = #selector(UIControl.valueChanged(_:))
             
             // tvOS button events
             
-        case UIControlEvents.PrimaryActionTriggered:
+        case UIControlEvents.primaryActionTriggered:
             actionString = #selector(UIControl.primaryActionTriggered(_:))
             
             // UITextField events
             
-        case UIControlEvents.EditingDidBegin:
+        case UIControlEvents.editingDidBegin:
             actionString = #selector(UIControl.editingDidBegin(_:))
-        case UIControlEvents.EditingChanged:
+        case UIControlEvents.editingChanged:
             actionString = #selector(UIControl.editingChanged(_:))
-        case UIControlEvents.EditingDidEnd:
+        case UIControlEvents.editingDidEnd:
             actionString = #selector(UIControl.editingDidEnd(_:))
-        case UIControlEvents.EditingDidEndOnExit:
+        case UIControlEvents.editingDidEndOnExit:
             actionString = #selector(UIControl.editingDidEndOnExit(_:))
             
             // Other events
             
-        case UIControlEvents.AllTouchEvents:
+        case UIControlEvents.allTouchEvents:
             actionString = #selector(UIControl.allTouchEvents(_:))
-        case UIControlEvents.AllEditingEvents:
+        case UIControlEvents.allEditingEvents:
             actionString = #selector(UIControl.allEditingEvents(_:))
-        case UIControlEvents.ApplicationReserved:
+        case UIControlEvents.applicationReserved:
             actionString = #selector(UIControl.applicationReserved(_:))
-        case UIControlEvents.SystemReserved:
+        case UIControlEvents.systemReserved:
             actionString = #selector(UIControl.systemReserved(_:))
-        case UIControlEvents.AllEvents:
+        case UIControlEvents.allEvents:
             actionString = #selector(UIControl.allEvents(_:))
             
         default: // Unrecognized event
@@ -104,27 +99,27 @@ public extension UIControl {
         }
         
         // Add the Objective-C target
-        self.addTarget(self, action: actionString, forControlEvents: event)
+        self.addTarget(self, action: actionString, for: event)
         
         // Register action
-        UIControl.registerAction(Action(object: self, event: event, function: action))
+        UIControl.registerAction(ActionObject(object: self, event: event, function: action))
     }
     
     /// Adds an action to the registry.
-    private static func registerAction(action: Action) {
+    fileprivate static func registerAction(_ action: ActionObject) {
         self.cleanRegistry()
         // Add action to the registry
         self.actionRegistry.append(action)
     }
     
     /// Triggers the actions for the correct control events.
-    private func triggerAction(forObject: UIControl, event: UIControlEvents) {
+    fileprivate func triggerAction(_ forObject: UIControl, event: UIControlEvents) {
         for action in UIControl.actionRegistry {
             if action.object == forObject && action.event == event {
                 if let function = action.function as? () -> Void {
                     function()
-                } else if let function = action.function as? (sender: UIControl) -> Void {
-                    function(sender: forObject)
+                } else if let function = action.function as? (_ sender: UIControl) -> Void {
+                    function(forObject)
                 }
             }
         }
@@ -133,72 +128,72 @@ public extension UIControl {
     
     /// Cleans the registry, removing any actions whose object has already been released.
     /// This guarantees that no memory leaks will occur over time.
-    private static func cleanRegistry() {
+    fileprivate static func cleanRegistry() {
         UIControl.actionRegistry = UIControl.actionRegistry.filter({ $0.object != nil })
     }
     
     
     // MARK: Targets given to the Objective-C selectors
     
-    @objc private func touchDown(sender: UIControl) {
-        triggerAction(sender, event: .TouchDown)
+    @objc fileprivate func touchDown(_ sender: UIControl) {
+        triggerAction(sender, event: .touchDown)
     }
-    @objc private func touchDownRepeat(sender: UIControl) {
-        triggerAction(sender, event: .TouchDownRepeat)
+    @objc fileprivate func touchDownRepeat(_ sender: UIControl) {
+        triggerAction(sender, event: .touchDownRepeat)
     }
-    @objc private func touchDragInside(sender: UIControl) {
-        triggerAction(sender, event: .TouchDragInside)
+    @objc fileprivate func touchDragInside(_ sender: UIControl) {
+        triggerAction(sender, event: .touchDragInside)
     }
-    @objc private func touchDragOutside(sender: UIControl) {
-        triggerAction(sender, event: .TouchDragOutside)
+    @objc fileprivate func touchDragOutside(_ sender: UIControl) {
+        triggerAction(sender, event: .touchDragOutside)
     }
-    @objc private func touchDragEnter(sender: UIControl) {
-        triggerAction(sender, event: .TouchDragEnter)
+    @objc fileprivate func touchDragEnter(_ sender: UIControl) {
+        triggerAction(sender, event: .touchDragEnter)
     }
-    @objc private func touchDragExit(sender: UIControl) {
-        triggerAction(sender, event: .TouchDragExit)
+    @objc fileprivate func touchDragExit(_ sender: UIControl) {
+        triggerAction(sender, event: .touchDragExit)
     }
-    @objc private func touchUpInside(sender: UIControl) {
-        triggerAction(sender, event: .TouchUpInside)
+    @objc fileprivate func touchUpInside(_ sender: UIControl) {
+        triggerAction(sender, event: .touchUpInside)
     }
-    @objc private func touchUpOutside(sender: UIControl) {
-        triggerAction(sender, event: .TouchUpOutside)
+    @objc fileprivate func touchUpOutside(_ sender: UIControl) {
+        triggerAction(sender, event: .touchUpOutside)
     }
-    @objc private func touchCancel(sender: UIControl) {
-        triggerAction(sender, event: .TouchCancel)
+    @objc fileprivate func touchCancel(_ sender: UIControl) {
+        triggerAction(sender, event: .touchCancel)
     }
-    @objc private func valueChanged(sender: UIControl) {
-        triggerAction(sender, event: .ValueChanged)
+    @objc fileprivate func valueChanged(_ sender: UIControl) {
+        triggerAction(sender, event: .valueChanged)
     }
-    @objc private func primaryActionTriggered(sender: UIControl) {
-        triggerAction(sender, event: .PrimaryActionTriggered)
+    @objc fileprivate func primaryActionTriggered(_ sender: UIControl) {
+        triggerAction(sender, event: .primaryActionTriggered)
     }
-    @objc private func editingDidBegin(sender: UIControl) {
-        triggerAction(sender, event: .EditingDidBegin)
+    @objc fileprivate func editingDidBegin(_ sender: UIControl) {
+        triggerAction(sender, event: .editingDidBegin)
     }
-    @objc private func editingChanged(sender: UIControl) {
-        triggerAction(sender, event: .EditingChanged)
+    @objc fileprivate func editingChanged(_ sender: UIControl) {
+        triggerAction(sender, event: .editingChanged)
     }
-    @objc private func editingDidEnd(sender: UIControl) {
-        triggerAction(sender, event: .EditingDidEnd)
+    @objc fileprivate func editingDidEnd(_ sender: UIControl) {
+        triggerAction(sender, event: .editingDidEnd)
     }
-    @objc private func editingDidEndOnExit(sender: UIControl) {
-        triggerAction(sender, event: .EditingDidEndOnExit)
+    @objc fileprivate func editingDidEndOnExit(_ sender: UIControl) {
+        triggerAction(sender, event: .editingDidEndOnExit)
     }
-    @objc private func allTouchEvents(sender: UIControl) {
-        triggerAction(sender, event: .AllTouchEvents)
+    @objc fileprivate func allTouchEvents(_ sender: UIControl) {
+        triggerAction(sender, event: .allTouchEvents)
     }
-    @objc private func allEditingEvents(sender: UIControl) {
-        triggerAction(sender, event: .AllEditingEvents)
+    @objc fileprivate func allEditingEvents(_ sender: UIControl) {
+        triggerAction(sender, event: .allEditingEvents)
     }
-    @objc private func applicationReserved(sender: UIControl) {
-        triggerAction(sender, event: .ApplicationReserved)
+    @objc fileprivate func applicationReserved(_ sender: UIControl) {
+        triggerAction(sender, event: .applicationReserved)
     }
-    @objc private func systemReserved(sender: UIControl) {
-        triggerAction(sender, event: .SystemReserved)
+    @objc fileprivate func systemReserved(_ sender: UIControl) {
+        triggerAction(sender, event: .systemReserved)
     }
-    @objc private func allEvents(sender: UIControl) {
-        triggerAction(sender, event: .AllEvents)
+    @objc fileprivate func allEvents(_ sender: UIControl) {
+        triggerAction(sender, event: .allEvents)
     }
     
 }

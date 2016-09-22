@@ -9,40 +9,40 @@
 import Foundation
 
 enum ViewID: Int {
-    case RootView = 1, HostAvatar, HostName, BodyLabel, LocationLabel, TimeLabel, SourceLabel, SelfNameLabel, CoverImage, AvatarImage, MomentAction, BodyPhoto
+    case rootView = 1, hostAvatar, hostName, bodyLabel, locationLabel, timeLabel, sourceLabel, selfNameLabel, coverImage, avatarImage, momentAction, bodyPhoto
     
     var description: String {
         switch self {
-        case .RootView:
+        case .rootView:
             return "根视图"
-        case .HostAvatar:
+        case .hostAvatar:
             return "发布者头像"
-        case .HostName:
+        case .hostName:
             return "发布者用户名"
-        case .BodyLabel:
+        case .bodyLabel:
             return "文字内容"
-        case .LocationLabel:
+        case .locationLabel:
             return "地点"
-        case .TimeLabel:
+        case .timeLabel:
             return "发布时间"
-        case .SourceLabel:
+        case .sourceLabel:
             return "发布来源"
-        case .SelfNameLabel:
+        case .selfNameLabel:
             return "用户名"
-        case .CoverImage:
+        case .coverImage:
             return "封面图片"
-        case .AvatarImage:
+        case .avatarImage:
             return "用户头像"
-        case .MomentAction:
+        case .momentAction:
             return "赞和评论"
-        case .BodyPhoto:
+        case .bodyPhoto:
             return "图片内容"
         }
     }
     
     var actionHint: Int {
         switch self {
-        case .HostAvatar, .CoverImage, .AvatarImage, .BodyPhoto:
+        case .hostAvatar, .coverImage, .avatarImage, .bodyPhoto:
             return 1
         default:
             return 0

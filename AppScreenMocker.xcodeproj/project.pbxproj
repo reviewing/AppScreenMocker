@@ -11,7 +11,6 @@
 		182439751D63F72F002A5C99 /* StatusBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 182439741D63F72F002A5C99 /* StatusBarView.swift */; };
 		182439781D63FE12002A5C99 /* MomentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 182439771D63FE12002A5C99 /* MomentView.swift */; };
 		1824397A1D6BFC15002A5C99 /* ViewID.swift in Sources */ = {isa = PBXBuildFile; fileRef = 182439791D6BFC15002A5C99 /* ViewID.swift */; };
-		182AB0A71D75594D001EA9A1 /* UIControl+Target.swift in Sources */ = {isa = PBXBuildFile; fileRef = 182AB0A61D75594D001EA9A1 /* UIControl+Target.swift */; };
 		182AB0AD1D757CC0001EA9A1 /* MomentData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 182AB0AC1D757CC0001EA9A1 /* MomentData.swift */; };
 		18576F811D619DF900837ED2 /* UIUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18576F801D619DF900837ED2 /* UIUtils.swift */; };
 		186B46CA1D9385F600ADE14D /* HomeTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 186B46C91D9385F600ADE14D /* HomeTableViewCell.swift */; };
@@ -27,6 +26,7 @@
 		18B532431D6167D80004BFE1 /* WechatMomentsController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18B532421D6167D80004BFE1 /* WechatMomentsController.swift */; };
 		18DE47CF1D89399000477C6B /* LikeAndCommentsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18DE47CE1D89399000477C6B /* LikeAndCommentsView.swift */; };
 		18DE47D11D910A4F00477C6B /* NSURL+Params.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18DE47D01D910A4F00477C6B /* NSURL+Params.swift */; };
+		18FED1E11D93C2BC0008982F /* UIControl+Target.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18FED1E01D93C2BC0008982F /* UIControl+Target.swift */; };
 		EC20D67A2C682F257C92D26E /* Pods_AppScreenMocker.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C9BFB3F7FE03F99592201D4A /* Pods_AppScreenMocker.framework */; };
 /* End PBXBuildFile section */
 
@@ -48,7 +48,6 @@
 		182439741D63F72F002A5C99 /* StatusBarView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StatusBarView.swift; sourceTree = "<group>"; };
 		182439771D63FE12002A5C99 /* MomentView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MomentView.swift; sourceTree = "<group>"; };
 		182439791D6BFC15002A5C99 /* ViewID.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewID.swift; sourceTree = "<group>"; };
-		182AB0A61D75594D001EA9A1 /* UIControl+Target.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIControl+Target.swift"; sourceTree = "<group>"; };
 		182AB0AC1D757CC0001EA9A1 /* MomentData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MomentData.swift; sourceTree = "<group>"; };
 		18576F801D619DF900837ED2 /* UIUtils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIUtils.swift; sourceTree = "<group>"; };
 		186B46C91D9385F600ADE14D /* HomeTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HomeTableViewCell.swift; sourceTree = "<group>"; };
@@ -66,6 +65,7 @@
 		18B532421D6167D80004BFE1 /* WechatMomentsController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WechatMomentsController.swift; sourceTree = "<group>"; };
 		18DE47CE1D89399000477C6B /* LikeAndCommentsView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LikeAndCommentsView.swift; sourceTree = "<group>"; };
 		18DE47D01D910A4F00477C6B /* NSURL+Params.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NSURL+Params.swift"; sourceTree = "<group>"; };
+		18FED1E01D93C2BC0008982F /* UIControl+Target.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIControl+Target.swift"; sourceTree = "<group>"; };
 		68A0C31FB7A9931C06C549D0 /* Pods-AppScreenMocker.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AppScreenMocker.debug.xcconfig"; path = "Pods/Target Support Files/Pods-AppScreenMocker/Pods-AppScreenMocker.debug.xcconfig"; sourceTree = "<group>"; };
 		B4C6B50DB8B1EF2342BBD08D /* Pods-AppScreenMocker.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AppScreenMocker.release.xcconfig"; path = "Pods/Target Support Files/Pods-AppScreenMocker/Pods-AppScreenMocker.release.xcconfig"; sourceTree = "<group>"; };
 		C9BFB3F7FE03F99592201D4A /* Pods_AppScreenMocker.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_AppScreenMocker.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -86,8 +86,8 @@
 		182439711D62F986002A5C99 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
+				18FED1E01D93C2BC0008982F /* UIControl+Target.swift */,
 				182439721D62FA06002A5C99 /* UIView+Gestures.swift */,
-				182AB0A61D75594D001EA9A1 /* UIControl+Target.swift */,
 				18DE47D01D910A4F00477C6B /* NSURL+Params.swift */,
 			);
 			name = Extensions;
@@ -217,12 +217,13 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 0730;
-				LastUpgradeCheck = 0730;
+				LastUpgradeCheck = 0800;
 				ORGANIZATIONNAME = "Hong Duan";
 				TargetAttributes = {
 					18AE3CD41D5DB4D300E651C6 = {
 						CreatedOnToolsVersion = 7.3.1;
 						DevelopmentTeam = 446D3PL69W;
+						LastSwiftMigration = 0800;
 					};
 				};
 			};
@@ -311,6 +312,7 @@
 			files = (
 				18AE3CED1D5DBD5300E651C6 /* AppHomeController.swift in Sources */,
 				187E30C81D61A71300F27B9D /* SignalStrengthIndicator.swift in Sources */,
+				18FED1E11D93C2BC0008982F /* UIControl+Target.swift in Sources */,
 				182439731D62FA06002A5C99 /* UIView+Gestures.swift in Sources */,
 				182AB0AD1D757CC0001EA9A1 /* MomentData.swift in Sources */,
 				182439781D63FE12002A5C99 /* MomentView.swift in Sources */,
@@ -320,7 +322,6 @@
 				18DE47D11D910A4F00477C6B /* NSURL+Params.swift in Sources */,
 				18B532431D6167D80004BFE1 /* WechatMomentsController.swift in Sources */,
 				182439751D63F72F002A5C99 /* StatusBarView.swift in Sources */,
-				182AB0A71D75594D001EA9A1 /* UIControl+Target.swift in Sources */,
 				1824397A1D6BFC15002A5C99 /* ViewID.swift in Sources */,
 				18576F811D619DF900837ED2 /* UIUtils.swift in Sources */,
 				18DE47CF1D89399000477C6B /* LikeAndCommentsView.swift in Sources */,
@@ -358,8 +359,10 @@
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
@@ -403,8 +406,10 @@
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
@@ -423,6 +428,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
@@ -431,12 +437,14 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 68A0C31FB7A9931C06C549D0 /* Pods-AppScreenMocker.debug.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				INFOPLIST_FILE = AppScreenMocker/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = top.defaults.AppScreenMocker;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 3.0;
 			};
 			name = Debug;
 		};
@@ -444,12 +452,14 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = B4C6B50DB8B1EF2342BBD08D /* Pods-AppScreenMocker.release.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				INFOPLIST_FILE = AppScreenMocker/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = top.defaults.AppScreenMocker;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 3.0;
 			};
 			name = Release;
 		};
