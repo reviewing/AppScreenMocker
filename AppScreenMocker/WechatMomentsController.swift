@@ -298,8 +298,9 @@ class WechatMomentsController: UIViewController {
             
             mockRootView.snp.makeConstraints { make in
                 make.top.equalTo(scrollView)
-                make.centerX.equalTo(scrollView)
+                make.leading.equalTo(scrollView)
                 make.bottom.equalTo(scrollView)
+                make.trailing.equalTo(scrollView)
                 make.width.equalTo(375)
                 make.height.equalTo(667)
             }
