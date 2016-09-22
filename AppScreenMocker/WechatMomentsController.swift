@@ -7,100 +7,52 @@
 //
 
 import UIKit
-import Material
 import SnapKit
 import QuartzCore
-import Toast_Swift
 import Kingfisher
 
-class WechatMomentsController: UIViewController, MaterialSwitchDelegate {
+class WechatMomentsController: UIViewController {
     
     var didSetupConstraints = false
+    internal var editMode = false
     
     var currentImageView: UIImageView?
-    private var switchControl: MaterialSwitch!
-    private var editToggleButton: FlatButton!
-    private var flatMenu: Menu!
 
     private var momentDataSource: Array<MomentData>!
     private var momentTableView: UITableView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        prepareSwitchControl()
-        prepareEditToggleButton()
         prepareNavigationItem()
         prepareTableView()
+        prepareActions()
         prepareView()
-        prepareFlatMenu()
-    }
-    
-    private func prepareSwitchControl() {
-        switchControl = MaterialSwitch(state: .Off, style: .LightContent, size: .Small)
-        switchControl.buttonOnColor = MaterialColor.green.darken2
-        switchControl.trackOnColor = MaterialColor.green.lighten3
-        switchControl.buttonOffColor = MaterialColor.green.lighten4
-        switchControl.trackOffColor = MaterialColor.green.lighten3
-        switchControl.delegate = self
-    }
-    
-    func materialSwitchStateChanged(control: MaterialSwitch) {
-        self.view.makeToast(control.on ? "编辑模式" : "正常模式", duration: 1.0, position: .Bottom)
-        editToggleButton.setTitle(control.on ? "完成" : "编辑", forState: .Normal)
-        if control.on {
-            self.flatMenu.views![0].hidden = false;
-        } else {
-            if self.flatMenu.opened {
-                self.flatMenu.close()
-            }
-        }
-        self.momentTableView.reloadData()
-    }
-    
-    private func prepareEditToggleButton() {
-        let w: CGFloat = 100
-        editToggleButton = FlatButton(frame: CGRectMake((view.bounds.width - w) / 2, 0, w, 48))
-        editToggleButton.setTitle("编辑", forState: .Normal)
-        editToggleButton.setTitleColor(MaterialColor.white, forState: .Normal)
-        editToggleButton.pulseColor = MaterialColor.white
-        editToggleButton.addTarget(.TouchUpInside) { [unowned self] in
-            self.switchControl.toggle()
-        }
     }
     
     private func prepareNavigationItem() {
         navigationItem.title = "朋友圈"
-        navigationItem.titleLabel.textAlignment = .Left
-        navigationItem.titleLabel.textColor = MaterialColor.white
-        navigationItem.titleLabel.font = RobotoFont.mediumWithSize(20)
-        
         self.navigationItem.backBarButtonItem = nil
-        navigationItem.rightControls = [switchControl, editToggleButton]
     }
     
-    let action1: FlatButton = {
-        let button = FlatButton()
-        button.setTitleColor(MaterialColor.white, forState: .Normal)
-        button.backgroundColor = MaterialColor.green.darken1
-        button.pulseColor = MaterialColor.white
+    let action1: UIButton = {
+        let button = UIButton(type: .System)
         button.setTitle("隐藏封面", forState: .Normal)
         return button
     }()
     
-    let action2: FlatButton = {
-        let button = FlatButton()
-        button.setTitleColor(MaterialColor.white, forState: .Normal)
-        button.backgroundColor = MaterialColor.green.darken1
-        button.pulseColor = MaterialColor.white
+    let action2: UIButton = {
+        let button = UIButton(type: .System)
         button.setTitle("添加消息", forState: .Normal)
         return button
     }()
+    
+    let action3 = UIButton(type: .System)
     
     let spacing: CGFloat = 8
     let menuItemWidth: CGFloat = (UIScreen.mainScreen().bounds.width - 4 * 8) / 3
     let menuItemHeight: CGFloat = 36
     
-    private func prepareFlatMenu() {
+    private func prepareActions() {
         action1.addTarget(.TouchUpInside) { [unowned self] in
             self.toggleCoverVisiblity()
             self.action1.setTitle(self.coverImage.hidden ? "显示封面" :"隐藏封面", forState: .Normal)
@@ -114,42 +66,16 @@ class WechatMomentsController: UIViewController, MaterialSwitchDelegate {
             if self.momentDataSource.count > lastVisibleRow + 1 {
                 self.momentDataSource.removeLast()
                 self.momentTableView.deleteRowsAtIndexPaths([NSIndexPath(forRow: lastVisibleRow + 1, inSection: 0)], withRowAnimation: .None)
-                self.view.makeToast("一屏已经显示不下啦！", duration: 1.0, position: .Bottom)
+                print("一屏已经显示不下啦！")
             }
         }
         view.addSubview(action2)
         
-        let btn1: FlatButton = FlatButton()
-        btn1.addTarget(.TouchUpInside) { [unowned self] in
-            if self.flatMenu.enabled {
-                if self.flatMenu.opened {
-                    self.flatMenu.close()
-                } else {
-                    self.flatMenu.open()
-                }
-            }
-        }
-        btn1.setTitleColor(MaterialColor.white, forState: .Normal)
-        btn1.backgroundColor = MaterialColor.green.darken1
-        btn1.pulseColor = MaterialColor.white
-        btn1.setTitle("更多", forState: .Normal)
-        view.addSubview(btn1)
-        
-        let btn2: FlatButton = FlatButton()
-        btn2.addTarget(.TouchUpInside) { [unowned self] in
+        action3.addTarget(.TouchUpInside) { [unowned self] in
             UIImageWriteToSavedPhotosAlbum(UIUtils.imageWithView(self.mockRootView), self, #selector(WechatMomentsController.image(_:didFinishSavingWithError:contextInfo:)), nil)
         }
-        btn2.setTitleColor(MaterialColor.white, forState: .Normal)
-        btn2.backgroundColor = MaterialColor.green.darken1
-        btn2.pulseColor = MaterialColor.white
-        btn2.setTitle("保存截图", forState: .Normal)
-        view.addSubview(btn2)
-        
-        flatMenu = Menu(origin: CGPointMake(view.bounds.width - menuItemWidth - spacing, spacing))
-        flatMenu.direction = .Down
-        flatMenu.spacing = spacing
-        flatMenu.itemSize = CGSizeMake(menuItemWidth, menuItemHeight)
-        flatMenu.views = [btn1, btn2]
+        action3.setTitle("保存截图", forState: .Normal)
+        view.addSubview(action3)
     }
     
     func image(image: UIImage, didFinishSavingWithError error: NSError?, contextInfo:UnsafePointer<Void>) {
@@ -183,7 +109,7 @@ class WechatMomentsController: UIViewController, MaterialSwitchDelegate {
     var gestureClosure: (UIGestureRecognizer) -> () = {_ in }
 
     private func prepareView() {
-        view.backgroundColor = MaterialColor.white
+        view.backgroundColor = UIColor.whiteColor()
         view.addSubview(scrollView)
         scrollView.addSubview(mockRootView)
         mockRootView.addSubview(statusBarView)
@@ -217,7 +143,7 @@ class WechatMomentsController: UIViewController, MaterialSwitchDelegate {
     let mockRootView: UIView = {
         let view = UIView()
         view.clipsToBounds = true
-        view.backgroundColor = MaterialColor.white
+        view.backgroundColor = UIColor.whiteColor()
         return view;
     }()
     
@@ -236,7 +162,7 @@ class WechatMomentsController: UIViewController, MaterialSwitchDelegate {
     let coverImage: UIImageView = {
         let imageView = UIImageView()
         imageView.tag = ViewID.CoverImage.rawValue
-        imageView.backgroundColor = MaterialColor.black
+        imageView.backgroundColor = UIColor.blackColor()
         imageView.contentMode = .ScaleAspectFill
         imageView.clipsToBounds = true
         return imageView
@@ -244,8 +170,8 @@ class WechatMomentsController: UIViewController, MaterialSwitchDelegate {
     
     let avatarImageBg: UIView = {
         let view = UIView()
-        view.backgroundColor = MaterialColor.white
-        view.layer.borderColor = MaterialColor.grey.base.CGColor;
+        view.backgroundColor = UIColor.whiteColor()
+        view.layer.borderColor = UIColor.grayColor().CGColor;
         view.layer.borderWidth = 0.5;
         return view
     }()
@@ -253,7 +179,7 @@ class WechatMomentsController: UIViewController, MaterialSwitchDelegate {
     let avatarImage: UIImageView = {
         let imageView = UIImageView()
         imageView.tag = ViewID.AvatarImage.rawValue
-        imageView.backgroundColor = MaterialColor.black
+        imageView.backgroundColor = UIColor.blackColor()
         return imageView
     }()
     
@@ -263,7 +189,7 @@ class WechatMomentsController: UIViewController, MaterialSwitchDelegate {
         label.textColor = UIUtils.UIColorFromARGB(0xfffffdf1)
         label.font = UIFont.boldSystemFontOfSize(18)
         label.text = NSLocalizedString("詹姆斯", comment: "")
-        label.shadowColor = MaterialColor.black;
+        label.shadowColor = UIColor.blackColor();
         label.shadowOffset = CGSizeMake(0, 1);
         return label
     }()
@@ -273,7 +199,7 @@ class WechatMomentsController: UIViewController, MaterialSwitchDelegate {
             return
         }
         
-        if switchControl.on {
+        if editMode {
             switch id {
             case .SelfNameLabel, .CoverImage, .AvatarImage:
                 let alert = UIAlertController(title: "封面", message: nil, preferredStyle: .ActionSheet)
@@ -341,21 +267,29 @@ class WechatMomentsController: UIViewController, MaterialSwitchDelegate {
         if (!didSetupConstraints) {
             
             action1.snp_makeConstraints { make in
-                make.left.equalTo(view).offset(8)
-                make.top.equalTo(view).offset(8)
+                make.leading.equalTo(view).offset(8)
+                make.top.equalTo(snp_topLayoutGuideBottom).offset(8)
                 make.width.equalTo(menuItemWidth)
                 make.height.equalTo(menuItemHeight)
             }
             
             action2.snp_makeConstraints { make in
-                make.left.equalTo(action1.snp_right).offset(8)
-                make.top.equalTo(view).offset(8)
+                make.leading.equalTo(action1.snp_trailing).offset(8)
+                make.top.equalTo(action1)
+                make.width.equalTo(menuItemWidth)
+                make.height.equalTo(menuItemHeight)
+            }
+
+            action3.snp_makeConstraints { make in
+                make.leading.equalTo(action2.snp_trailing).offset(8)
+                make.top.equalTo(action1)
                 make.width.equalTo(menuItemWidth)
                 make.height.equalTo(menuItemHeight)
             }
             
             scrollView.snp_makeConstraints { make in
-                make.edges.equalTo(view).inset(UIEdgeInsetsMake(52, 0, 0, 0))
+                make.top.equalTo(action1.snp_bottom).offset(8)
+                make.leading.trailing.bottom.equalTo(view)
             }
             
             mockRootView.snp_makeConstraints { make in
@@ -463,7 +397,7 @@ extension WechatMomentsController: UITableViewDataSource {
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell: MomentView = MomentView(style: .Default, reuseIdentifier: "MomentViewCell")
-        cell.editMode = switchControl.on
+        cell.editMode = editMode
         cell.data = momentDataSource[indexPath.row]
         cell.delegate = self
         return cell

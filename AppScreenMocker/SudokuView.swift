@@ -7,7 +7,6 @@
 //
 
 import UIKit
-import Material
 
 class SudokuView: UIView {
     let imageWidth: CGFloat = 80
@@ -21,7 +20,7 @@ class SudokuView: UIView {
                 if imageViews.count < imageUrls.count {
                     for _ in 0..<imageUrls.count - oldImageViewCount {
                         let imageView = UIImageView()
-                        imageView.backgroundColor = MaterialColor.black
+                        imageView.backgroundColor = UIColor.blackColor()
                         imageView.tag = ViewID.BodyPhoto.rawValue
                         imageViews.append(imageView)
                         self.addSubview(imageView)

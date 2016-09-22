@@ -7,9 +7,7 @@
 //
 
 import UIKit
-import Material
 import SnapKit
-import Toast_Swift
 
 protocol MomentViewDelegate {
     func removeSelf(cell: UITableViewCell)
@@ -22,7 +20,7 @@ class MomentView: UITableViewCell {
     let hostAvatar: UIImageView = {
         let imageView = UIImageView()
         imageView.tag = ViewID.HostAvatar.rawValue
-        imageView.backgroundColor = MaterialColor.black
+        imageView.backgroundColor = UIColor.blackColor()
         imageView.contentMode = .ScaleAspectFill
         imageView.clipsToBounds = true
         return imageView
@@ -51,7 +49,7 @@ class MomentView: UITableViewCell {
         imageView.tag = ViewID.BodyPhoto.rawValue
         imageView.contentMode = .ScaleAspectFit
         imageView.clipsToBounds = true
-        imageView.backgroundColor = MaterialColor.black
+        imageView.backgroundColor = UIColor.blackColor()
         return imageView
     }()
     
@@ -101,7 +99,7 @@ class MomentView: UITableViewCell {
     
     let bottomMargin: UIView = {
         let view = UIView()
-        view.backgroundColor = MaterialColor.white
+        view.backgroundColor = UIColor.whiteColor()
         return view
     }()
     
@@ -242,7 +240,7 @@ class MomentView: UITableViewCell {
                     self.data.photoUrls.append(NSURL())
                     self.findTableView()?.reloadRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
                 } else {
-                    self.makeToast("最多只能添加9张图片", duration: 1.0, position: .Bottom)
+                    print("最多只能添加9张图片")
                 }
                 })
             alert.addAction(UIAlertAction(title: "显示地点", style: .Default) { (action) -> Void in

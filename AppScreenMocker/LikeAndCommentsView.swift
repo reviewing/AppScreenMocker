@@ -7,7 +7,6 @@
 //
 
 import UIKit
-import Material
 
 protocol LikeAndCommentsViewDelegate {
     func removeLikeAtIndex(index: Int)

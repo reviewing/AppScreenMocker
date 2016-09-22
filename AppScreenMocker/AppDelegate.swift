@@ -7,7 +7,6 @@
 //
 
 import UIKit
-import Material
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -16,11 +15,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
         let homeController: AppHomeController = AppHomeController()
-        let navigationController: AppNavigationController = AppNavigationController(rootViewController: homeController)
-        let statusBarController: StatusBarController = StatusBarController(rootViewController: navigationController)
+        let navigationController = UINavigationController(rootViewController: homeController)
         
         window = UIWindow(frame: UIScreen.mainScreen().bounds)
-        window!.rootViewController = statusBarController
+        window!.rootViewController = navigationController
         window!.makeKeyAndVisible()
         return true
     }
