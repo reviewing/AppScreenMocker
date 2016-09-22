@@ -17,7 +17,11 @@ class LikeAndCommentsView: UIView {
     
     fileprivate var commentTableView: UITableView!
     var delegate: LikeAndCommentsViewDelegate?
-    internal var editMode: Bool = false
+    internal var isEditing = false {
+        didSet {
+            commentTableView.setEditing(isEditing, animated: true)
+        }
+    }
     
     let triangleIndicator: UIView = {
         let view = UIView()
@@ -98,12 +102,6 @@ class LikeAndCommentsView: UIView {
         return view
     }()
     
-    let commentBottomMargin: UIView = {
-        let view = UIView()
-        view.backgroundColor = UIUtils.UIColorFromARGB(0xFFF3F3F5)
-        return view
-    }()
-    
     var gestureClosure: (UIGestureRecognizer) -> () = {_ in }
     
     var preferredContentSize: CGSize {
@@ -127,7 +125,6 @@ class LikeAndCommentsView: UIView {
         prepareTableView()
         self.addSubview(commentTableView)
         self.clipsToBounds = true
-        self.addSubview(commentBottomMargin)
         self.updateConstraints()
     }
     
@@ -213,19 +210,8 @@ class LikeAndCommentsView: UIView {
             } else {
                 make.height.equalTo(0)
             }
-        }
-        
-        commentBottomMargin.snp.remakeConstraints { (make) in
-            make.leading.equalTo(self)
-            make.top.equalTo(commentTableView.snp.bottom)
-            make.trailing.equalTo(self)
-            make.bottom.equalTo(self)
             
-            if commentDataSource.count > 0 {
-                make.height.equalTo(4)
-            } else {
-                make.height.equalTo(0)
-            }
+            make.bottom.equalTo(self)
         }
         
         super.updateConstraints()
@@ -240,7 +226,7 @@ class LikeAndCommentsView: UIView {
     }
     
     func requestLikeEdit(_ textView: UITextView, index: Int) {
-        if editMode {
+        if isEditing {
             let alert = UIAlertController(title: likeDataSource[index].userName, message: nil, preferredStyle: .actionSheet)
             alert.addAction(UIAlertAction(title: "移除赞", style: .default) { (action) -> Void in
                 self.delegate?.removeLikeAtIndex(index)
@@ -270,7 +256,7 @@ class LikeAndCommentsView: UIView {
     }
     
     func requestCommentEdit(_ textView: UITextView, indexPath: IndexPath, elementTag: String) {
-        if editMode {
+        if isEditing {
             let alert = UIAlertController(title: textView.text, message: nil, preferredStyle: .actionSheet)
             alert.addAction(UIAlertAction(title: "移除评论", style: .default) { (action) -> Void in
                 self.delegate?.removeCommentAtIndex((indexPath as NSIndexPath).row)
@@ -383,6 +369,16 @@ extension LikeAndCommentsView: UITableViewDataSource {
         cell.commentText.addSingleTapGesture(true, closure: gestureClosure)
         return cell
     }
+    
+    func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
+        return true
+    }
+    
+    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
+        if (editingStyle == UITableViewCellEditingStyle.delete) {
+            self.delegate?.removeCommentAtIndex((indexPath as NSIndexPath).row)
+        }
+    }
 }
 
 extension LikeAndCommentsView: UITableViewDelegate {
@@ -392,6 +388,16 @@ extension LikeAndCommentsView: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
         return UITableViewAutomaticDimension
+    }
+    
+    func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
+        let view = UIView()
+        view.backgroundColor = UIUtils.UIColorFromARGB(0xFFF3F3F5)
+        return view
+    }
+    
+    func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
+        return 4
     }
 }
 

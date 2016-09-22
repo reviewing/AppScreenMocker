@@ -135,7 +135,6 @@ class MomentView: UITableViewCell {
         hostName.addSingleTapGesture(closure: gestureClosure)
         bodyLabel.addSingleTapGesture(closure: gestureClosure)
         singlePhoto.addSingleTapGesture(closure: gestureClosure)
-        multiplePhotos.addSingleTapGesture(true, closure: gestureClosure)
         locationLabel.addSingleTapGesture(closure: gestureClosure)
         timeLabel.addSingleTapGesture(closure: gestureClosure)
         sourceLabel.addSingleTapGesture(closure: gestureClosure)
@@ -148,12 +147,17 @@ class MomentView: UITableViewCell {
         fatalError("This class does not support NSCoding")
     }
     
+    override func setEditing(_ editing:Bool, animated:Bool) {
+        super.setEditing(editing, animated:animated)
+        likeAndCommentsView.isEditing = editing
+    }
+    
     func requestEdit(_ recognizer: UIGestureRecognizer) {
         guard let id = ViewID(rawValue: recognizer.view!.tag) else {
             return
         }
         
-        if editMode {
+        if isEditing {
             switch id {
             case .locationLabel, .sourceLabel, .bodyPhoto:
                 let alert = UIAlertController(title: id.description, message: nil, preferredStyle: .actionSheet)
@@ -282,12 +286,6 @@ class MomentView: UITableViewCell {
         }
         return self.multiplePhotos.imageViews.index(of: imageView!) ?? -1
     }
-    
-    internal var editMode = false {
-        didSet {
-            likeAndCommentsView.editMode = editMode
-        }
-    }
 
     internal var data = MomentData() {
         didSet {
@@ -308,7 +306,6 @@ class MomentView: UITableViewCell {
                     UIUtils.imageFromAssetURL(originalUrl, targetSize: data.singlePhotoSize!, onComplete: { (image) in
                         if self.data.photoUrls.count == 1 && self.data.photoUrls[0] == originalUrl {
                             self.singlePhoto.image = image
-                            self.updateConstraints()
                         }
                     })
                 }
@@ -319,6 +316,7 @@ class MomentView: UITableViewCell {
             multiplePhotos.isHidden = data.photoUrls.count <= 1
             if !multiplePhotos.isHidden {
                 multiplePhotos.imageUrls = data.photoUrls
+                multiplePhotos.addSingleTapGesture(true, closure: gestureClosure)
             }
             locationLabel.text = data.locationText
             locationLabel.isHidden = data.locationText == nil

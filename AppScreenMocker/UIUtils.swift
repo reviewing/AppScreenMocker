@@ -34,10 +34,22 @@ class UIUtils {
             return
         }
         
+        let options = PHImageRequestOptions()
+        options.version = .original
+        options.deliveryMode = .highQualityFormat
+        options.resizeMode = .exact
+        
         let imageManager = PHImageManager.default()
-        imageManager.requestImage(for: result , targetSize: targetSize, contentMode: PHImageContentMode.aspectFill, options: nil) { (image, dict) -> Void in
+        imageManager.requestImage(for: result , targetSize: pointToPixel(targetSize), contentMode: PHImageContentMode.aspectFill, options: options) { (image, dict) -> Void in
             onComplete(image)
         }
+    }
+    
+    static func pointToPixel(_ sizeInPoint: CGSize) -> CGSize {
+        var sizeInPixel = sizeInPoint
+        sizeInPixel.height *= UIScreen.main.scale
+        sizeInPixel.width *= UIScreen.main.scale
+        return sizeInPixel
     }
     
     static func rootViewController() -> UIViewController? {

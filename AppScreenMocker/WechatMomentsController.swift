@@ -14,8 +14,6 @@ import Kingfisher
 class WechatMomentsController: UIViewController {
     
     var didSetupConstraints = false
-    internal var editMode = false
-    
     var currentImageView: UIImageView?
 
     fileprivate var momentDataSource: Array<MomentData>!
@@ -27,6 +25,11 @@ class WechatMomentsController: UIViewController {
         prepareTableView()
         prepareActions()
         prepareView()
+    }
+    
+    override func setEditing(_ editing:Bool, animated:Bool) {
+        super.setEditing(editing, animated:animated)
+        momentTableView.setEditing(editing, animated: animated)
     }
     
     fileprivate func prepareNavigationItem() {
@@ -200,7 +203,7 @@ class WechatMomentsController: UIViewController {
             return
         }
         
-        if editMode {
+        if isEditing {
             switch id {
             case .selfNameLabel, .coverImage, .avatarImage:
                 let alert = UIAlertController(title: "封面", message: nil, preferredStyle: .actionSheet)
@@ -388,6 +391,16 @@ extension WechatMomentsController: UIImagePickerControllerDelegate, UINavigation
     }
 }
 
+extension WechatMomentsController: MomentViewDelegate {
+    func removeSelf(_ cell: UITableViewCell) {
+        guard let indexPath = self.momentTableView.indexPath(for: cell) else {
+            return
+        }
+        self.momentDataSource.remove(at: indexPath.row)
+        self.momentTableView.deleteRows(at: [indexPath], with: .fade)
+    }
+}
+
 extension WechatMomentsController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return momentDataSource.count;
@@ -399,20 +412,20 @@ extension WechatMomentsController: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell: MomentView = MomentView(style: .default, reuseIdentifier: "MomentViewCell")
-        cell.editMode = editMode
         cell.data = momentDataSource[(indexPath as NSIndexPath).row]
         cell.delegate = self
         return cell
     }
-}
-
-extension WechatMomentsController: MomentViewDelegate {
-    func removeSelf(_ cell: UITableViewCell) {
-        guard let indexPath = self.momentTableView.indexPath(for: cell) else {
-            return
+    
+    func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
+        return true
+    }
+    
+    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
+        if (editingStyle == UITableViewCellEditingStyle.delete) {
+            self.momentDataSource.remove(at: indexPath.row)
+            self.momentTableView.deleteRows(at: [indexPath], with: .fade)
         }
-        self.momentDataSource.remove(at: (indexPath as NSIndexPath).row)
-        self.momentTableView.deleteRows(at: [indexPath], with: .fade)
     }
 }
 
