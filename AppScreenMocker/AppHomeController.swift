@@ -40,7 +40,7 @@ class AppHomeController: UIViewController {
     }
     
     fileprivate func prepareNavigationItem() {
-        navigationItem.title = "截屏构造"
+        navigationItem.title = "截屏制作"
     }
     
     fileprivate func prepareItems() {

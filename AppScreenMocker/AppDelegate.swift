@@ -16,6 +16,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         let homeController: AppHomeController = AppHomeController()
         let navigationController = UINavigationController(rootViewController: homeController)
+        navigationController.navigationBar.barTintColor = UIUtils.UIColorFromARGB(0xFFF44336)
+        navigationController.navigationBar.tintColor = UIColor.white
+        navigationController.navigationBar.titleTextAttributes = [NSForegroundColorAttributeName: UIColor.white]
         
         window = UIWindow(frame: UIScreen.main.bounds)
         window!.rootViewController = navigationController
