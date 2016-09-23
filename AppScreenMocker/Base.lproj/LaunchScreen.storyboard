@@ -17,7 +17,35 @@
                     <view key="view" contentMode="scaleToFill" id="Ze5-6b-2t3">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <subviews>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="LaunchIcon" translatesAutoresizingMaskIntoConstraints="NO" id="mth-cE-a17">
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="60" id="abb-WX-JWZ"/>
+                                    <constraint firstAttribute="height" constant="60" id="hOA-h0-wLa"/>
+                                </constraints>
+                            </imageView>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="bmi-hE-eHc">
+                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="1" id="NKs-wa-FIl"/>
+                                    <constraint firstAttribute="width" constant="240" id="nQE-Hh-N0B"/>
+                                </constraints>
+                            </view>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="红磨坊" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="JFY-b6-05K">
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="bmi-hE-eHc" firstAttribute="centerY" secondItem="Ze5-6b-2t3" secondAttribute="centerY" id="AtU-Qw-lbs"/>
+                            <constraint firstItem="JFY-b6-05K" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="aOJ-Ry-Nd1"/>
+                            <constraint firstItem="mth-cE-a17" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="fgW-gV-A8q"/>
+                            <constraint firstItem="bmi-hE-eHc" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="hbg-eb-IJN"/>
+                            <constraint firstItem="bmi-hE-eHc" firstAttribute="top" secondItem="JFY-b6-05K" secondAttribute="bottom" constant="8" id="luT-W6-WHw"/>
+                            <constraint firstItem="JFY-b6-05K" firstAttribute="top" secondItem="mth-cE-a17" secondAttribute="bottom" constant="16" id="neO-TC-neu"/>
+                        </constraints>
                     </view>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="iYj-Kq-Ea1" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -25,4 +53,7 @@
             <point key="canvasLocation" x="53" y="375"/>
         </scene>
     </scenes>
+    <resources>
+        <image name="LaunchIcon" width="60" height="60"/>
+    </resources>
 </document>

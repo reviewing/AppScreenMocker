@@ -35,6 +35,10 @@ class WechatScreenListController: UIViewController {
         updateViewConstraints()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        self.navigationController?.setToolbarHidden(true, animated: false)
+    }
+    
     fileprivate func prepareNavigationItem() {
         navigationItem.title = "微信"
     }

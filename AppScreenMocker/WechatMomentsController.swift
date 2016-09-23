@@ -24,8 +24,54 @@ class WechatMomentsController: UIViewController {
         super.viewDidLoad()
         prepareNavigationItem()
         prepareTableView()
-        prepareActions()
         prepareView()
+    }
+
+    enum ToolbarItemID : Int {
+        case toggleCover = 1, addMoment, moreAction
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        self.navigationController?.setToolbarHidden(false, animated: false)
+        var items = [UIBarButtonItem]()
+        var item = UIBarButtonItem(title: "隐藏封面", style: .plain, target: self, action: #selector(WechatMomentsController.onClickedToolBarItem(_:)))
+        item.tag = ToolbarItemID.toggleCover.rawValue
+        items.append(item)
+        
+        items.append(UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: self, action: nil))
+        
+        item = UIBarButtonItem(title: "添加消息", style: .plain, target: self, action: #selector(WechatMomentsController.onClickedToolBarItem(_:)))
+        item.tag = ToolbarItemID.addMoment.rawValue
+        items.append(item)
+        
+        items.append(UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: self, action: nil))
+        
+        item = UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(WechatMomentsController.onClickedToolBarItem(_:)))
+        item.tag = ToolbarItemID.moreAction.rawValue
+        items.append(item)
+        self.setToolbarItems(items, animated: false)
+    }
+    
+    func onClickedToolBarItem(_ item: UIBarButtonItem) {
+        switch item.tag {
+        case ToolbarItemID.toggleCover.rawValue:
+            self.toggleCoverVisiblity()
+            item.title = self.coverImage.isHidden ? "显示封面" :"隐藏封面"
+        case ToolbarItemID.addMoment.rawValue:
+            var lastVisibleRow = (self.momentTableView.indexPathsForVisibleRows?.last as NSIndexPath?)?.row ?? -1
+            self.momentDataSource.append(MomentData())
+            self.momentTableView.insertRows(at: [IndexPath(row: lastVisibleRow + 1, section: 0)], with: .fade)
+            lastVisibleRow = (self.momentTableView.indexPathsForVisibleRows?.last as NSIndexPath?)?.row ?? -1
+            if self.momentDataSource.count > lastVisibleRow + 1 {
+                self.momentDataSource.removeLast()
+                self.momentTableView.deleteRows(at: [IndexPath(row: lastVisibleRow + 1, section: 0)], with: .none)
+                print("一屏已经显示不下啦！")
+            }
+        case ToolbarItemID.moreAction.rawValue:
+            UIImageWriteToSavedPhotosAlbum(UIUtils.imageWithView(self.mockRootView), self, #selector(WechatMomentsController.image(_:didFinishSavingWithError:contextInfo:)), nil)
+        default:
+            break
+        }
     }
     
     override func setEditing(_ editing:Bool, animated:Bool) {
@@ -37,50 +83,6 @@ class WechatMomentsController: UIViewController {
         navigationItem.title = "朋友圈"
         navigationItem.rightBarButtonItem = self.editButtonItem
         self.navigationItem.backBarButtonItem = nil
-    }
-    
-    let action1: UIButton = {
-        let button = UIButton(type: .system)
-        button.setTitle("隐藏封面", for: UIControlState())
-        return button
-    }()
-    
-    let action2: UIButton = {
-        let button = UIButton(type: .system)
-        button.setTitle("添加消息", for: UIControlState())
-        return button
-    }()
-    
-    let action3 = UIButton(type: .system)
-    
-    let spacing: CGFloat = 8
-    let menuItemWidth: CGFloat = (UIScreen.main.bounds.width - 4 * 8) / 3
-    let menuItemHeight: CGFloat = 36
-    
-    fileprivate func prepareActions() {
-        action1.addTarget(.touchUpInside) { [unowned self] in
-            self.toggleCoverVisiblity()
-            self.action1.setTitle(self.coverImage.isHidden ? "显示封面" :"隐藏封面", for: UIControlState())
-        }
-        view.addSubview(action1)
-        action2.addTarget(.touchUpInside) { [unowned self] in
-            var lastVisibleRow = (self.momentTableView.indexPathsForVisibleRows?.last as NSIndexPath?)?.row ?? -1
-            self.momentDataSource.append(MomentData())
-            self.momentTableView.insertRows(at: [IndexPath(row: lastVisibleRow + 1, section: 0)], with: .fade)
-            lastVisibleRow = (self.momentTableView.indexPathsForVisibleRows?.last as NSIndexPath?)?.row ?? -1
-            if self.momentDataSource.count > lastVisibleRow + 1 {
-                self.momentDataSource.removeLast()
-                self.momentTableView.deleteRows(at: [IndexPath(row: lastVisibleRow + 1, section: 0)], with: .none)
-                print("一屏已经显示不下啦！")
-            }
-        }
-        view.addSubview(action2)
-        
-        action3.addTarget(.touchUpInside) { [unowned self] in
-            UIImageWriteToSavedPhotosAlbum(UIUtils.imageWithView(self.mockRootView), self, #selector(WechatMomentsController.image(_:didFinishSavingWithError:contextInfo:)), nil)
-        }
-        action3.setTitle("保存截图", for: UIControlState())
-        view.addSubview(action3)
     }
     
     func image(_ image: UIImage, didFinishSavingWithError error: NSError?, contextInfo:UnsafeRawPointer) {
@@ -270,31 +272,8 @@ class WechatMomentsController: UIViewController {
     override func updateViewConstraints() {
         
         if (!didSetupConstraints) {
-            
-            action1.snp.makeConstraints { make in
-                make.leading.equalTo(view).offset(8)
-                make.top.equalTo(topLayoutGuide.snp.bottom).offset(8)
-                make.width.equalTo(menuItemWidth)
-                make.height.equalTo(menuItemHeight)
-            }
-            
-            action2.snp.makeConstraints { make in
-                make.leading.equalTo(action1.snp.trailing).offset(8)
-                make.top.equalTo(action1)
-                make.width.equalTo(menuItemWidth)
-                make.height.equalTo(menuItemHeight)
-            }
-
-            action3.snp.makeConstraints { make in
-                make.leading.equalTo(action2.snp.trailing).offset(8)
-                make.top.equalTo(action1)
-                make.width.equalTo(menuItemWidth)
-                make.height.equalTo(menuItemHeight)
-            }
-            
             scrollView.snp.makeConstraints { make in
-                make.top.equalTo(action1.snp.bottom).offset(8)
-                make.leading.trailing.bottom.equalTo(view)
+                make.edges.equalTo(view)
             }
             
             mockRootView.snp.makeConstraints { make in
