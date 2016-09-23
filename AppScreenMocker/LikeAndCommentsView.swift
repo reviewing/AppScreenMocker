@@ -14,6 +14,7 @@ protocol LikeAndCommentsViewDelegate {
 }
 
 class LikeAndCommentsView: UIView {
+    var viewOptions = ViewOptions.defaultOptions
     
     fileprivate var commentTableView: UITableView!
     var delegate: LikeAndCommentsViewDelegate?
@@ -170,7 +171,7 @@ class LikeAndCommentsView: UIView {
             }
         }
         
-        let fixedWidth = CGFloat(375 - 20 - 42 - 10)
+        let fixedWidth = CGFloat(viewOptions.screenWidth - 2 * MomentConstants.momentPaddingLeftRight - MomentConstants.momentHostAvatarSize - MomentConstants.momentHostNameMarginLeft)
         
         likes.snp.remakeConstraints { (make) in
             make.leading.equalTo(self)
@@ -366,6 +367,7 @@ extension LikeAndCommentsView: UITableViewDataSource {
         let cell: CommentCell = CommentCell(style: .default, reuseIdentifier: "Comment")
         cell.commentText.delegate = self
         cell.data = commentDataSource[(indexPath as NSIndexPath).row]
+        cell.viewOptions = viewOptions
         cell.commentText.addSingleTapGesture(true, closure: gestureClosure)
         return cell
     }
@@ -458,6 +460,8 @@ class Comment {
 }
 
 class CommentCell: UITableViewCell {
+    var viewOptions = ViewOptions.defaultOptions
+
     let commentText: UITextView = {
         let textView = UITextView()
         textView.backgroundColor = UIUtils.UIColorFromARGB(0xFFF3F3F5)
@@ -491,7 +495,7 @@ class CommentCell: UITableViewCell {
     
     override func updateConstraints() {
         
-        let fixedWidth = CGFloat(375 - 20 - 42 - 10)
+        let fixedWidth = CGFloat(viewOptions.screenWidth - 2 * MomentConstants.momentPaddingLeftRight - MomentConstants.momentHostAvatarSize - MomentConstants.momentHostNameMarginLeft)
         commentText.snp.remakeConstraints { (make) in
             make.leading.equalTo(self)
             make.top.equalTo(self).offset(5)

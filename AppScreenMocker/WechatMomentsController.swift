@@ -12,6 +12,7 @@ import QuartzCore
 import Kingfisher
 
 class WechatMomentsController: UIViewController {
+    var viewOptions = ViewOptions.defaultOptions
     
     var didSetupConstraints = false
     var currentImageView: UIImageView?
@@ -301,22 +302,22 @@ class WechatMomentsController: UIViewController {
                 make.leading.equalTo(scrollView)
                 make.bottom.equalTo(scrollView)
                 make.trailing.equalTo(scrollView)
-                make.width.equalTo(375)
-                make.height.equalTo(667)
+                make.width.equalTo(viewOptions.screenWidth)
+                make.height.equalTo(viewOptions.screenHeight)
             }
             
             statusBarView.snp.makeConstraints { make in
                 make.top.equalTo(mockRootView)
                 make.leading.equalTo(mockRootView)
                 make.trailing.equalTo(mockRootView)
-                make.height.equalTo(20)
+                make.height.equalTo(ViewOptions.statusBarHeight)
             }
             
             navigationBarView.snp.makeConstraints { make in
                 make.top.equalTo(statusBarView.snp.bottom)
                 make.leading.equalTo(mockRootView)
                 make.trailing.equalTo(mockRootView)
-                make.height.equalTo(43)
+                make.height.equalTo(ViewOptions.navigationBarHeight)
             }
             
             if !coverImage.isHidden {
@@ -414,7 +415,9 @@ extension WechatMomentsController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell: MomentView = MomentView(style: .default, reuseIdentifier: "MomentViewCell")
         cell.data = momentDataSource[(indexPath as NSIndexPath).row]
+        cell.viewOptions = viewOptions
         cell.delegate = self
+        cell.updateConstraints()
         return cell
     }
     

@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1814CF831D94BD0900F24842 /* ViewOptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1814CF821D94BD0900F24842 /* ViewOptions.swift */; };
+		1814CF871D94C57400F24842 /* MomentConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1814CF861D94C57400F24842 /* MomentConstants.swift */; };
 		182439731D62FA06002A5C99 /* UIView+Gestures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 182439721D62FA06002A5C99 /* UIView+Gestures.swift */; };
 		182439751D63F72F002A5C99 /* StatusBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 182439741D63F72F002A5C99 /* StatusBarView.swift */; };
 		182439781D63FE12002A5C99 /* MomentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 182439771D63FE12002A5C99 /* MomentView.swift */; };
@@ -44,6 +46,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		1814CF821D94BD0900F24842 /* ViewOptions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewOptions.swift; sourceTree = "<group>"; };
+		1814CF861D94C57400F24842 /* MomentConstants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MomentConstants.swift; sourceTree = "<group>"; };
 		182439721D62FA06002A5C99 /* UIView+Gestures.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIView+Gestures.swift"; sourceTree = "<group>"; };
 		182439741D63F72F002A5C99 /* StatusBarView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StatusBarView.swift; sourceTree = "<group>"; };
 		182439771D63FE12002A5C99 /* MomentView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MomentView.swift; sourceTree = "<group>"; };
@@ -103,6 +107,7 @@
 				182AB0AC1D757CC0001EA9A1 /* MomentData.swift */,
 				18AE42701D77BCFF0071C9C2 /* SudokuView.swift */,
 				18DE47CE1D89399000477C6B /* LikeAndCommentsView.swift */,
+				1814CF861D94C57400F24842 /* MomentConstants.swift */,
 			);
 			name = Moments;
 			sourceTree = "<group>";
@@ -111,6 +116,7 @@
 			isa = PBXGroup;
 			children = (
 				18576F801D619DF900837ED2 /* UIUtils.swift */,
+				1814CF821D94BD0900F24842 /* ViewOptions.swift */,
 			);
 			name = Utils;
 			sourceTree = "<group>";
@@ -312,6 +318,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				18AE3CED1D5DBD5300E651C6 /* AppHomeController.swift in Sources */,
+				1814CF871D94C57400F24842 /* MomentConstants.swift in Sources */,
 				187E30C81D61A71300F27B9D /* SignalStrengthIndicator.swift in Sources */,
 				18FED1E11D93C2BC0008982F /* UIControl+Target.swift in Sources */,
 				182439731D62FA06002A5C99 /* UIView+Gestures.swift in Sources */,
@@ -320,6 +327,7 @@
 				18B532411D615EB70004BFE1 /* WechatScreenListController.swift in Sources */,
 				186B46CA1D9385F600ADE14D /* HomeTableViewCell.swift in Sources */,
 				18AE42711D77BCFF0071C9C2 /* SudokuView.swift in Sources */,
+				1814CF831D94BD0900F24842 /* ViewOptions.swift in Sources */,
 				18DE47D11D910A4F00477C6B /* NSURL+Params.swift in Sources */,
 				18B532431D6167D80004BFE1 /* WechatMomentsController.swift in Sources */,
 				182439751D63F72F002A5C99 /* StatusBarView.swift in Sources */,

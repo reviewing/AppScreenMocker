@@ -14,6 +14,12 @@ protocol MomentViewDelegate {
 }
 
 class MomentView: UITableViewCell {
+    var viewOptions = ViewOptions.defaultOptions {
+        didSet {
+            likeAndCommentsView.viewOptions = viewOptions
+        }
+    }
+
     var currentImageView: UIImageView?
     var delegate: MomentViewDelegate?
 
@@ -326,8 +332,6 @@ class MomentView: UITableViewCell {
             likeAndCommentsView.likeDataSource = data.likes
             likeAndCommentsView.commentDataSource = data.comments
             likeAndCommentsView.delegate = self
-            
-            self.updateConstraints()
         }
     }
     
@@ -354,13 +358,13 @@ class MomentView: UITableViewCell {
     
     override func updateConstraints() {
         hostAvatar.snp.makeConstraints { make in
-            make.leading.equalTo(self).offset(10)
+            make.leading.equalTo(self).offset(MomentConstants.momentPaddingLeftRight)
             make.top.equalTo(self).offset(14)
-            make.width.height.equalTo(42)
+            make.width.height.equalTo(MomentConstants.momentHostAvatarSize)
         }
         
         hostName.snp.makeConstraints { make in
-            make.leading.equalTo(hostAvatar.snp.trailing).offset(10)
+            make.leading.equalTo(hostAvatar.snp.trailing).offset(MomentConstants.momentHostNameMarginLeft)
             make.top.equalTo(hostAvatar)
             make.trailing.equalTo(self.snp.trailing).inset(10).priority(750)
             make.height.equalTo(20)
@@ -369,7 +373,7 @@ class MomentView: UITableViewCell {
         bodyLabel.snp.makeConstraints { make in
             make.leading.equalTo(hostName)
             make.top.equalTo(hostName.snp.bottom).offset(6).priority(750)
-            make.trailing.equalTo(self.snp.trailing).inset(10).priority(750)
+            make.trailing.equalTo(self.snp.trailing).inset(MomentConstants.momentPaddingLeftRight).priority(750)
         }
         
         if !singlePhoto.isHidden {
@@ -390,7 +394,7 @@ class MomentView: UITableViewCell {
                 locationLabel.snp.makeConstraints { make in
                     make.leading.equalTo(hostName)
                     make.top.equalTo(singlePhoto.snp.bottom).offset(8)
-                    make.trailing.equalTo(self.snp.trailing).inset(10).priority(750)
+                    make.trailing.equalTo(self.snp.trailing).inset(MomentConstants.momentPaddingLeftRight).priority(750)
                 }
                 timeLabel.snp.makeConstraints { make in
                     make.leading.equalTo(hostName)
@@ -418,7 +422,7 @@ class MomentView: UITableViewCell {
                 locationLabel.snp.makeConstraints { make in
                     make.leading.equalTo(hostName)
                     make.top.equalTo(multiplePhotos.snp.bottom).offset(8)
-                    make.trailing.equalTo(self.snp.trailing).inset(10).priority(750)
+                    make.trailing.equalTo(self.snp.trailing).inset(MomentConstants.momentPaddingLeftRight).priority(750)
                 }
                 timeLabel.snp.makeConstraints { make in
                     make.leading.equalTo(hostName)
@@ -439,7 +443,7 @@ class MomentView: UITableViewCell {
                 locationLabel.snp.makeConstraints { make in
                     make.leading.equalTo(hostName)
                     make.top.equalTo(bodyLabel.snp.bottom).offset(8)
-                    make.trailing.equalTo(self.snp.trailing).inset(10).priority(750)
+                    make.trailing.equalTo(self.snp.trailing).inset(MomentConstants.momentPaddingLeftRight).priority(750)
                 }
                 timeLabel.snp.makeConstraints { make in
                     make.leading.equalTo(hostName)
@@ -460,7 +464,7 @@ class MomentView: UITableViewCell {
         
         actionButton.snp.makeConstraints { make in
             make.centerY.equalTo(timeLabel)
-            make.trailing.equalTo(self.snp.trailing).inset(10).priority(750)
+            make.trailing.equalTo(self.snp.trailing).inset(MomentConstants.momentPaddingLeftRight).priority(750)
         }
         
         likeAndCommentsView.updateConstraints()
@@ -468,7 +472,7 @@ class MomentView: UITableViewCell {
         likeAndCommentsView.snp.makeConstraints { (make) in
             make.leading.equalTo(timeLabel.snp.leading)
             make.top.equalTo(timeLabel.snp.bottom)
-            make.trailing.equalTo(self.snp.trailing).inset(10)
+            make.trailing.equalTo(self.snp.trailing).inset(MomentConstants.momentPaddingLeftRight)
         }
         
         bottomMargin.snp.makeConstraints { (make) in
@@ -487,11 +491,14 @@ class MomentView: UITableViewCell {
         super.updateConstraints()
     }
     
+    static let minSizeOfSinglePhoto = 120
+    static let maxSizeOfSinglePhoto = 180
+
     static func computeImageSize(_ instinct: CGSize?) -> CGSize {
         if instinct == nil {
             return CGSize.zero
         }
-        return computeImageSize(CGSize(width: 120, height: 120), max: CGSize(width: 180, height: 180), instinct: instinct!)
+        return computeImageSize(CGSize(width: minSizeOfSinglePhoto, height: minSizeOfSinglePhoto), max: CGSize(width: maxSizeOfSinglePhoto, height: maxSizeOfSinglePhoto), instinct: instinct!)
     }
     
     static func computeImageSize(_ min: CGSize, max: CGSize, instinct: CGSize) -> CGSize {

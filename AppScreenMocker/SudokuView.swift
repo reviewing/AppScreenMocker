@@ -30,9 +30,7 @@ class SudokuView: UIView {
                         let imageView = imageViews.removeLast()
                         imageView.removeFromSuperview()
                     }
-                }
-                
-                self.updateConstraints()
+                }                
             }
             
             for i in 0..<imageUrls.count {
