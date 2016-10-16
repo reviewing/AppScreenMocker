@@ -404,7 +404,7 @@ extension LikeAndCommentsView: UITableViewDelegate {
 }
 
 class Like {
-    static let defaultUserName = "科比"
+    static let defaultUserName = "小红"
     internal var userName: String = defaultUserName
     
     init(_ userName: String) {
@@ -413,7 +413,7 @@ class Like {
 }
 
 class Comment {
-    static let defaultUserName = "詹姆斯"
+    static let defaultUserName = "小明"
     static let defaultCommentText = "你说得对"
     
     internal var fromUserName: String = defaultUserName

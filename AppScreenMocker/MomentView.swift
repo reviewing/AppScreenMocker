@@ -26,7 +26,7 @@ class MomentView: UITableViewCell {
     let hostAvatar: UIImageView = {
         let imageView = UIImageView()
         imageView.tag = ViewID.hostAvatar.rawValue
-        imageView.backgroundColor = UIColor.black
+        imageView.backgroundColor = UIUtils.UIColorFromARGB(0xfff44336)
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
         return imageView
@@ -55,7 +55,7 @@ class MomentView: UITableViewCell {
         imageView.tag = ViewID.bodyPhoto.rawValue
         imageView.contentMode = .scaleAspectFit
         imageView.clipsToBounds = true
-        imageView.backgroundColor = UIColor.black
+        imageView.backgroundColor = UIUtils.UIColorFromARGB(0xfff44336)
         return imageView
     }()
     
@@ -262,15 +262,16 @@ class MomentView: UITableViewCell {
                 self.findTableView()?.reloadRows(at: [indexPath], with: .fade)
                 })
             alert.addAction(UIAlertAction(title: "添加赞", style: .default) { (action) -> Void in
-                self.data.likes.append(Like("詹姆斯"))
-                self.data.likes.append(Like("韦德"))
-                self.data.likes.append(Like("奥尼尔"))
+                self.data.likes.append(Like("小红"))
+                self.data.likes.append(Like("小明"))
+                self.data.likes.append(Like("小明的女朋友"))
+                self.data.likes.append(Like("小明的基友"))
                 self.findTableView()?.reloadRows(at: [indexPath], with: .fade)
                 })
             alert.addAction(UIAlertAction(title: "添加评论", style: .default) { (action) -> Void in
-                self.data.comments.append(Comment("詹姆斯", "你说得对"))
-                self.data.comments.append(Comment(fromUserName: "韦德", toUserName: "詹姆斯", commentText: "信不信我打死你？你看看你说的哪句话是真的？"))
-                self.data.comments.append(Comment("奥尼尔", "再给我发一条朋友圈我们还是朋友"))
+                self.data.comments.append(Comment("小明", "你说得对"))
+                self.data.comments.append(Comment(fromUserName: "小明的女朋友", toUserName: "小明", commentText: "信不信我打死你？"))
+                self.data.comments.append(Comment("小红的基友", "再给我发一条朋友圈我们还是朋友"))
                 self.findTableView()?.reloadRows(at: [indexPath], with: .fade)
                 })
             alert.addAction(UIAlertAction(title: "移除该条朋友圈", style: .destructive) { (action) -> Void in

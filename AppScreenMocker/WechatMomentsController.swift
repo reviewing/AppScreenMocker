@@ -123,9 +123,7 @@ class WechatMomentsController: UIViewController {
         mockRootView.addSubview(navigationBarView)
         
         mockRootView.addSubview(coverImage)
-        coverImage.kf.setImage(with: URL(string: "http://www.tcsports.com.cn/uploads/allimg/150419/001F0L20-0.jpg")!)
         mockRootView.addSubview(avatarImageBg)
-        avatarImage.kf.setImage(with: URL(string: "http://p3.img.cctvpic.com/20130502/images/1367465384571_1367465384571_r.jpg"))
         avatarImageBg.addSubview(avatarImage)
         mockRootView.addSubview(selfNameLabel)
 
@@ -169,7 +167,7 @@ class WechatMomentsController: UIViewController {
     let coverImage: UIImageView = {
         let imageView = UIImageView()
         imageView.tag = ViewID.coverImage.rawValue
-        imageView.backgroundColor = UIColor.black
+        imageView.backgroundColor = UIUtils.UIColorFromARGB(0xfff44336)
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
         return imageView
@@ -186,7 +184,7 @@ class WechatMomentsController: UIViewController {
     let avatarImage: UIImageView = {
         let imageView = UIImageView()
         imageView.tag = ViewID.avatarImage.rawValue
-        imageView.backgroundColor = UIColor.black
+        imageView.backgroundColor = UIUtils.UIColorFromARGB(0xfff44336)
         return imageView
     }()
     
@@ -195,7 +193,7 @@ class WechatMomentsController: UIViewController {
         label.tag = ViewID.selfNameLabel.rawValue
         label.textColor = UIUtils.UIColorFromARGB(0xfffffdf1)
         label.font = UIFont.boldSystemFont(ofSize: 18)
-        label.text = NSLocalizedString("詹姆斯", comment: "")
+        label.text = NSLocalizedString("小红", comment: "")
         label.shadowColor = UIColor.black;
         label.shadowOffset = CGSize(width: 0, height: 1);
         return label

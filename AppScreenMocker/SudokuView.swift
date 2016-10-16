@@ -20,7 +20,7 @@ class SudokuView: UIView {
                 if imageViews.count < imageUrls.count {
                     for _ in 0..<imageUrls.count - oldImageViewCount {
                         let imageView = UIImageView()
-                        imageView.backgroundColor = UIColor.black
+                        imageView.backgroundColor = UIUtils.UIColorFromARGB(0xfff44336)
                         imageView.tag = ViewID.bodyPhoto.rawValue
                         imageViews.append(imageView)
                         self.addSubview(imageView)
