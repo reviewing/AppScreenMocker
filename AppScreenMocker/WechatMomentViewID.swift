@@ -1,5 +1,5 @@
 //
-//  ViewID.swift
+//  WechatMomentViewId.swift
 //  AppScreenMocker
 //
 //  Created by Hong Duan on 8/23/16.
@@ -8,7 +8,7 @@
 
 import Foundation
 
-enum ViewID: Int {
+enum WechatMomentViewId: Int {
     case rootView = 1, hostAvatar, hostName, bodyLabel, locationLabel, timeLabel, sourceLabel, selfNameLabel, coverImage, avatarImage, momentAction, bodyPhoto
     
     var description: String {

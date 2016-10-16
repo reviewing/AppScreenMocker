@@ -25,7 +25,7 @@ class MomentView: UITableViewCell {
 
     let hostAvatar: UIImageView = {
         let imageView = UIImageView()
-        imageView.tag = ViewID.hostAvatar.rawValue
+        imageView.tag = WechatMomentViewId.hostAvatar.rawValue
         imageView.backgroundColor = UIUtils.UIColorFromARGB(0xfff44336)
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
@@ -34,7 +34,7 @@ class MomentView: UITableViewCell {
     
     let hostName: UILabel = {
         let label = UILabel()
-        label.tag = ViewID.hostName.rawValue
+        label.tag = WechatMomentViewId.hostName.rawValue
         label.textColor = UIUtils.UIColorFromARGB(0xff465783)
         label.font = UIFont.boldSystemFont(ofSize: 15)
         return label
@@ -42,7 +42,7 @@ class MomentView: UITableViewCell {
     
     let bodyLabel: UILabel = {
         let label = UILabel()
-        label.tag = ViewID.bodyLabel.rawValue
+        label.tag = WechatMomentViewId.bodyLabel.rawValue
         label.textColor = UIUtils.UIColorFromARGB(0xff222222)
         label.font = UIFont.systemFont(ofSize: 15)
         label.lineBreakMode = .byWordWrapping
@@ -52,7 +52,7 @@ class MomentView: UITableViewCell {
     
     let singlePhoto: UIImageView = {
         let imageView = UIImageView()
-        imageView.tag = ViewID.bodyPhoto.rawValue
+        imageView.tag = WechatMomentViewId.bodyPhoto.rawValue
         imageView.contentMode = .scaleAspectFit
         imageView.clipsToBounds = true
         imageView.backgroundColor = UIUtils.UIColorFromARGB(0xfff44336)
@@ -61,13 +61,13 @@ class MomentView: UITableViewCell {
     
     let multiplePhotos: SudokuView = {
         let sudokuView = SudokuView()
-        sudokuView.tag = ViewID.bodyPhoto.rawValue
+        sudokuView.tag = WechatMomentViewId.bodyPhoto.rawValue
         return sudokuView
     }()
     
     let locationLabel: UILabel = {
         let label = UILabel()
-        label.tag = ViewID.locationLabel.rawValue
+        label.tag = WechatMomentViewId.locationLabel.rawValue
         label.textColor = UIUtils.UIColorFromARGB(0xff5b6a92)
         label.font = UIFont.systemFont(ofSize: 12)
         label.lineBreakMode = .byWordWrapping
@@ -77,7 +77,7 @@ class MomentView: UITableViewCell {
     
     let timeLabel: UILabel = {
         let label = UILabel()
-        label.tag = ViewID.timeLabel.rawValue
+        label.tag = WechatMomentViewId.timeLabel.rawValue
         label.textColor = .gray
         label.font = UIFont.systemFont(ofSize: 12)
         return label
@@ -85,7 +85,7 @@ class MomentView: UITableViewCell {
     
     let sourceLabel: UILabel = {
         let label = UILabel()
-        label.tag = ViewID.sourceLabel.rawValue
+        label.tag = WechatMomentViewId.sourceLabel.rawValue
         label.textColor = .gray
         label.font = UIFont.systemFont(ofSize: 12)
         return label
@@ -93,7 +93,7 @@ class MomentView: UITableViewCell {
     
     let actionButton: UIImageView = {
         let imageView = UIImageView()
-        imageView.tag = ViewID.momentAction.rawValue
+        imageView.tag = WechatMomentViewId.momentAction.rawValue
         imageView.image = UIImage.init(named: "WechatMomentsAction")
         return imageView
     }()
@@ -159,7 +159,7 @@ class MomentView: UITableViewCell {
     }
     
     func requestEdit(_ recognizer: UIGestureRecognizer) {
-        guard let id = ViewID(rawValue: recognizer.view!.tag) else {
+        guard let id = WechatMomentViewId(rawValue: recognizer.view!.tag) else {
             return
         }
         
@@ -198,7 +198,7 @@ class MomentView: UITableViewCell {
         }
         
         switch recognizer.view {
-        case let view where view is UIImageView && ViewID(rawValue: view!.tag)?.actionHint == 1:
+        case let view where view is UIImageView && WechatMomentViewId(rawValue: view!.tag)?.actionHint == 1:
             currentImageView = recognizer.view as? UIImageView
             
             let imagePicker = UIImagePickerController()
@@ -208,7 +208,7 @@ class MomentView: UITableViewCell {
             
             UIUtils.rootViewController()?.present(imagePicker, animated: true, completion: nil)
         case let view where view is UILabel && view!.tag != 0:
-            let alert = UIAlertController(title: "编辑文字", message: ViewID(rawValue: view!.tag)?.description, preferredStyle: .alert)
+            let alert = UIAlertController(title: "编辑文字", message: WechatMomentViewId(rawValue: view!.tag)?.description, preferredStyle: .alert)
             
             alert.addTextField(configurationHandler: { (textField) -> Void in
                 textField.placeholder = "请输入文字"
@@ -554,7 +554,7 @@ extension MomentView: UIImagePickerControllerDelegate, UINavigationControllerDel
             return
         }
         
-        let id = ViewID(rawValue: currentImageView!.tag);
+        let id = WechatMomentViewId(rawValue: currentImageView!.tag);
         
         if id == nil {
             return

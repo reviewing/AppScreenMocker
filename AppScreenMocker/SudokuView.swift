@@ -21,7 +21,7 @@ class SudokuView: UIView {
                     for _ in 0..<imageUrls.count - oldImageViewCount {
                         let imageView = UIImageView()
                         imageView.backgroundColor = UIUtils.UIColorFromARGB(0xfff44336)
-                        imageView.tag = ViewID.bodyPhoto.rawValue
+                        imageView.tag = WechatMomentViewId.bodyPhoto.rawValue
                         imageViews.append(imageView)
                         self.addSubview(imageView)
                     }

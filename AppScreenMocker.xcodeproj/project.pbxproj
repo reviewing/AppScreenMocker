@@ -12,8 +12,9 @@
 		182439731D62FA06002A5C99 /* UIView+Gestures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 182439721D62FA06002A5C99 /* UIView+Gestures.swift */; };
 		182439751D63F72F002A5C99 /* StatusBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 182439741D63F72F002A5C99 /* StatusBarView.swift */; };
 		182439781D63FE12002A5C99 /* MomentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 182439771D63FE12002A5C99 /* MomentView.swift */; };
-		1824397A1D6BFC15002A5C99 /* ViewID.swift in Sources */ = {isa = PBXBuildFile; fileRef = 182439791D6BFC15002A5C99 /* ViewID.swift */; };
+		1824397A1D6BFC15002A5C99 /* WechatMomentViewID.swift in Sources */ = {isa = PBXBuildFile; fileRef = 182439791D6BFC15002A5C99 /* WechatMomentViewID.swift */; };
 		182AB0AD1D757CC0001EA9A1 /* MomentData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 182AB0AC1D757CC0001EA9A1 /* MomentData.swift */; };
+		183E42F11DB33E810077A850 /* ViewId.swift in Sources */ = {isa = PBXBuildFile; fileRef = 183E42F01DB33E810077A850 /* ViewId.swift */; };
 		18576F811D619DF900837ED2 /* UIUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18576F801D619DF900837ED2 /* UIUtils.swift */; };
 		186B46CA1D9385F600ADE14D /* HomeTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 186B46C91D9385F600ADE14D /* HomeTableViewCell.swift */; };
 		187E30C81D61A71300F27B9D /* SignalStrengthIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 187E30C71D61A71300F27B9D /* SignalStrengthIndicator.swift */; };
@@ -51,8 +52,9 @@
 		182439721D62FA06002A5C99 /* UIView+Gestures.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIView+Gestures.swift"; sourceTree = "<group>"; };
 		182439741D63F72F002A5C99 /* StatusBarView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StatusBarView.swift; sourceTree = "<group>"; };
 		182439771D63FE12002A5C99 /* MomentView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MomentView.swift; sourceTree = "<group>"; };
-		182439791D6BFC15002A5C99 /* ViewID.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewID.swift; sourceTree = "<group>"; };
+		182439791D6BFC15002A5C99 /* WechatMomentViewID.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WechatMomentViewID.swift; sourceTree = "<group>"; };
 		182AB0AC1D757CC0001EA9A1 /* MomentData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MomentData.swift; sourceTree = "<group>"; };
+		183E42F01DB33E810077A850 /* ViewId.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewId.swift; sourceTree = "<group>"; };
 		18576F801D619DF900837ED2 /* UIUtils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIUtils.swift; sourceTree = "<group>"; };
 		186B46C91D9385F600ADE14D /* HomeTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HomeTableViewCell.swift; sourceTree = "<group>"; };
 		187E30C71D61A71300F27B9D /* SignalStrengthIndicator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SignalStrengthIndicator.swift; sourceTree = "<group>"; };
@@ -103,7 +105,7 @@
 			children = (
 				18B532421D6167D80004BFE1 /* WechatMomentsController.swift */,
 				182439771D63FE12002A5C99 /* MomentView.swift */,
-				182439791D6BFC15002A5C99 /* ViewID.swift */,
+				182439791D6BFC15002A5C99 /* WechatMomentViewID.swift */,
 				182AB0AC1D757CC0001EA9A1 /* MomentData.swift */,
 				18AE42701D77BCFF0071C9C2 /* SudokuView.swift */,
 				18DE47CE1D89399000477C6B /* LikeAndCommentsView.swift */,
@@ -126,6 +128,7 @@
 			children = (
 				187E30C71D61A71300F27B9D /* SignalStrengthIndicator.swift */,
 				182439741D63F72F002A5C99 /* StatusBarView.swift */,
+				183E42F01DB33E810077A850 /* ViewId.swift */,
 			);
 			name = Views;
 			sourceTree = "<group>";
@@ -327,11 +330,12 @@
 				18B532411D615EB70004BFE1 /* WechatScreenListController.swift in Sources */,
 				186B46CA1D9385F600ADE14D /* HomeTableViewCell.swift in Sources */,
 				18AE42711D77BCFF0071C9C2 /* SudokuView.swift in Sources */,
+				183E42F11DB33E810077A850 /* ViewId.swift in Sources */,
 				1814CF831D94BD0900F24842 /* ViewOptions.swift in Sources */,
 				18DE47D11D910A4F00477C6B /* NSURL+Params.swift in Sources */,
 				18B532431D6167D80004BFE1 /* WechatMomentsController.swift in Sources */,
 				182439751D63F72F002A5C99 /* StatusBarView.swift in Sources */,
-				1824397A1D6BFC15002A5C99 /* ViewID.swift in Sources */,
+				1824397A1D6BFC15002A5C99 /* WechatMomentViewID.swift in Sources */,
 				18576F811D619DF900837ED2 /* UIUtils.swift in Sources */,
 				18DE47CF1D89399000477C6B /* LikeAndCommentsView.swift in Sources */,
 				187E30CA1D61C05000F27B9D /* WechatNavigationBarView.swift in Sources */,

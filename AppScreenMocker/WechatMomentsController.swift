@@ -166,7 +166,7 @@ class WechatMomentsController: UIViewController {
     
     let coverImage: UIImageView = {
         let imageView = UIImageView()
-        imageView.tag = ViewID.coverImage.rawValue
+        imageView.tag = WechatMomentViewId.coverImage.rawValue
         imageView.backgroundColor = UIUtils.UIColorFromARGB(0xfff44336)
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
@@ -183,14 +183,14 @@ class WechatMomentsController: UIViewController {
     
     let avatarImage: UIImageView = {
         let imageView = UIImageView()
-        imageView.tag = ViewID.avatarImage.rawValue
+        imageView.tag = WechatMomentViewId.avatarImage.rawValue
         imageView.backgroundColor = UIUtils.UIColorFromARGB(0xfff44336)
         return imageView
     }()
     
     let selfNameLabel: UILabel = {
         let label = UILabel()
-        label.tag = ViewID.selfNameLabel.rawValue
+        label.tag = WechatMomentViewId.selfNameLabel.rawValue
         label.textColor = UIUtils.UIColorFromARGB(0xfffffdf1)
         label.font = UIFont.boldSystemFont(ofSize: 18)
         label.text = NSLocalizedString("小红", comment: "")
@@ -200,7 +200,7 @@ class WechatMomentsController: UIViewController {
     }()
 
     func requestEdit(_ recognizer: UIGestureRecognizer) {
-        guard let id = ViewID(rawValue: recognizer.view!.tag) else {
+        guard let id = WechatMomentViewId(rawValue: recognizer.view!.tag) else {
             return
         }
         
@@ -220,7 +220,7 @@ class WechatMomentsController: UIViewController {
         }
         
         switch recognizer.view {
-        case let view where view is UIImageView && ViewID(rawValue: view!.tag)?.actionHint == 1:
+        case let view where view is UIImageView && WechatMomentViewId(rawValue: view!.tag)?.actionHint == 1:
             currentImageView = recognizer.view as? UIImageView
             
             let imagePicker = UIImagePickerController()
@@ -230,7 +230,7 @@ class WechatMomentsController: UIViewController {
             
             self.present(imagePicker, animated: true, completion: nil)
         case let view where view is UILabel && view!.tag != 0:
-            let alert = UIAlertController(title: "编辑文字", message: ViewID(rawValue: view!.tag)?.description, preferredStyle: .alert)
+            let alert = UIAlertController(title: "编辑文字", message: WechatMomentViewId(rawValue: view!.tag)?.description, preferredStyle: .alert)
             
             alert.addTextField(configurationHandler: { (textField) -> Void in
                 textField.placeholder = "请输入文字"

@@ -13,6 +13,7 @@ class StatusBarView: UIView {
     
     let timeLabelInStatusBar: UILabel = {
         let label = UILabel()
+        label.tag = ViewId.timeLabelInStatusBar.rawValue
         label.textColor = UIColor.white
         label.font = UIFont.boldSystemFont(ofSize: 12)
         label.text = NSLocalizedString("09:41", comment: "")
@@ -67,6 +68,7 @@ class StatusBarView: UIView {
     
     let batteryLabel: UILabel = {
         let label = UILabel()
+        label.tag = ViewId.batteryLabel.rawValue
         label.textColor = UIColor.white
         label.font = UIFont.systemFont(ofSize: 12)
         label.text = NSLocalizedString("49%", comment: "")
@@ -79,8 +81,15 @@ class StatusBarView: UIView {
         return view
     }()
     
+    var gestureClosure: (UIGestureRecognizer) -> () = {_ in }
+
     override init(frame: CGRect) {
         super.init(frame: frame)
+        
+        gestureClosure = {[unowned self] (recognizer: UIGestureRecognizer) in
+            self.requestEdit(recognizer)
+        }
+        
         self.addSubview(timeLabelInStatusBar)
         self.addSubview(signalStrengthIndicator)
         self.addSubview(carrierLabel)
@@ -91,6 +100,9 @@ class StatusBarView: UIView {
         self.addSubview(bluetoothImage)
         self.addSubview(batteryLabel)
         self.addSubview(batteryImage)
+        
+        timeLabelInStatusBar.addSingleTapGesture(closure: gestureClosure)
+        batteryLabel.addSingleTapGesture(closure: gestureClosure)
     }
     
     convenience init() {
@@ -99,6 +111,34 @@ class StatusBarView: UIView {
     
     required init(coder aDecoder: NSCoder) {
         fatalError("This class does not support NSCoding")
+    }
+    
+    func requestEdit(_ recognizer: UIGestureRecognizer) {
+        guard ViewId(rawValue: recognizer.view!.tag) != nil else {
+            return
+        }
+        
+        switch recognizer.view {
+        case let view where view is UILabel:
+            let alert = UIAlertController(title: "编辑文字", message: ViewId(rawValue: view!.tag)?.description, preferredStyle: .alert)
+            
+            alert.addTextField(configurationHandler: { (textField) -> Void in
+                textField.placeholder = "请输入文字"
+                textField.text = (view as! UILabel).text
+            })
+            
+            alert.addAction(UIAlertAction(title: "确认", style: .default) { (action) -> Void in
+                let textField = alert.textFields![0] as UITextField
+                if !(textField.text?.isEmpty ?? true) {
+                    (view as! UILabel).text = textField.text
+                }
+            })
+            
+            alert.addAction(UIAlertAction(title: "取消", style: .cancel, handler: nil))
+            UIUtils.rootViewController()?.present(alert, animated: true, completion: nil)
+        default:
+            break
+        }
     }
     
     override func updateConstraints() {
